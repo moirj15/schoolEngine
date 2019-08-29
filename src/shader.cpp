@@ -1,0 +1,165 @@
+#include "shader.h"
+
+static char *readFile(const char *name) {
+    FILE *fp = nullptr;
+    fp = fopen(name, "r");
+    char *src = nullptr;
+    uint64_t len = 0;
+
+    fseek(fp, 0, SEEK_END);
+    len = ftell(fp);
+    rewind(fp);
+
+    if (len == 0) {
+        fprintf(stderr, "failed to get file size");
+        //exit(EXIT_FAILURE);
+    }
+
+    src = (char *)calloc(len + 1, sizeof(char));
+    len = fread(src, sizeof(char), len, fp);
+
+    fclose(fp);
+
+    return src;
+}
+
+static void printShaderInfo(u32 shader) {
+    s32 length = 0;
+    GLsizei nchars = 0;
+    char *log = nullptr;
+
+    glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &length);
+
+    if (length > 0) {
+        log = new char[length];
+
+        if (log != nullptr) {
+            glGetShaderInfoLog(shader, length, &nchars, log);
+
+            if (log[0] != '\0') {
+                printf("shader log: '%s'\n", log);
+            }
+
+            delete[](log);
+        }
+    }
+}
+
+static void printProgramProgramInfo(const u32 shader) {
+    GLint length = 0;
+    GLsizei nchars = 0;
+    char *log = nullptr;
+
+    glGetProgramiv(shader, GL_INFO_LOG_LENGTH, &length);
+
+    if (length > 0) {
+        log = new char[length];
+
+        if (log) {
+            glGetProgramInfoLog(shader, length, &nchars, log);
+
+            if (log[0] != '\0') {
+                printf("program log: '%s'\n", log);
+            }
+
+            delete[](log);
+        }
+    }
+}
+
+Shader::Shader(const std::vector<std::string> &filePaths) :
+        m_programHandle(0),
+        m_filePaths(filePaths) {
+    CompileShader();
+}
+
+void Shader::SetUniform1F(const std::string &name, const f32 value) {
+    const u32 location = LocationFromCache(name);
+    glUniform1f(location, value);
+}
+
+void Shader::SetUniform2F(const std::string &name, const glm::vec2 &value) {
+    const u32 location = LocationFromCache(name);
+    glUniform2fv(location, 1, glm::value_ptr(value));
+}
+
+void Shader::SetUniform3F(const std::string &name, const glm::vec3 &value) {
+    const u32 location = LocationFromCache(name);
+    glUniform3fv(location, 1, glm::value_ptr(value));
+}
+
+void Shader::SetUniform4F(const std::string &name, const glm::vec4 &value) {
+    const u32 location = LocationFromCache(name);
+    glUniform4fv(location, 1, glm::value_ptr(value));
+}
+
+void Shader::SetUniformMat4(const std::string &name, const glm::mat4 &value) {
+    const u32 location = LocationFromCache(name);
+    glUniformMatrix4fv(location, 1, false, glm::value_ptr(value));
+}
+
+// Private
+s32 Shader::LocationFromCache(const std::string &name) {
+    if (m_uniformCache.find(name) != m_uniformCache.end()) {
+        return m_uniformCache[name];
+    } else {
+        m_uniformCache[name] = glGetUniformLocation(m_programHandle, name.c_str());
+        return m_uniformCache[name];
+    }
+}
+
+void Shader::CompileShader() {
+    m_programHandle = glCreateProgram();
+    s32 flag;
+    std::vector<GLenum> shaderTypes = DetermineShaderTypes();
+
+    for (s32 i = 0; i < m_filePaths.size(); i++) {
+        const auto filename = m_filePaths[i].c_str();
+        const auto shaderType = shaderTypes[i];
+        char *shaderSrc = nullptr;
+
+        const u32 shaderRef = glCreateShader(shaderType);
+
+        shaderSrc = readFile(filename);
+
+        glShaderSource(shaderRef, 1, static_cast<GLchar **>(&shaderSrc), nullptr);
+
+        delete[](shaderSrc);
+
+        glCompileShader(shaderRef);
+        glGetShaderiv(shaderRef, GL_COMPILE_STATUS, &flag);
+        printShaderInfo(shaderRef);
+
+        if (!flag) {
+            fprintf(stderr, "failed to compile frag shader\n");
+            //exit(EXIT_FAILURE);
+        }
+
+        glAttachShader(m_programHandle, shaderRef);
+    }
+    glLinkProgram(m_programHandle);
+    glGetProgramiv(m_programHandle, GL_LINK_STATUS, &flag);
+
+    printProgramProgramInfo(m_programHandle);
+
+    if (!flag) {
+        fprintf(stderr, "failed to link shaders");
+        //exit(EXIT_FAILURE);
+    }
+
+}
+
+std::vector<GLenum> Shader::DetermineShaderTypes() {
+    std::vector<GLenum> ret;
+    for (const auto &src : m_filePaths) {
+        std::string type = src.substr(src.size() - 4);
+        if (type == "vert") {
+            ret.push_back(GL_VERTEX_SHADER);
+        } else if (type == "frag") {
+            ret.push_back(GL_FRAGMENT_SHADER);
+        }
+    }
+    return ret;
+}
+
+
