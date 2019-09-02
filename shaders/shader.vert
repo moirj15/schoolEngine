@@ -1,10 +1,10 @@
 #version 450
 
-in vec4 vPosition;
+layout (location = 0) in vec4 vPosition;
 
-in vec4 vNormal;
+// layout (location = 1) in vec4 vNormal;
 
-in vec2 uv;
+//layout (location = 2) in vec2 uv;
 
 uniform mat4 projection = mat4(1.0);
 uniform mat4 transform = mat4(1.0);
