@@ -3,7 +3,7 @@
 #set(CMAKE_C_COMPILER "C:/Program Files/LLVM/bin/clang.exe")
 #set(CMAKE_CXX_COMPILER "C:/Program Files/LLVM/bin/clang.exe")
 cmake_minimum_required(VERSION 3.10)
-project(yeo)
+project(schoolEngine)
 
 file(GLOB IMGUI_FILES "imgui/*")
 file(GLOB SRC_FILES "src/*")
@@ -27,7 +27,7 @@ set(SOURCE_LIST
 source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${SOURCE_LIST})
 
 add_executable(
-    yoe
+    schoolEngine
 	${SOURCE_LIST}
 #	${SRC_FILES}
 #	${STB_FILES}
@@ -50,7 +50,7 @@ if (WIN32)
 	#set(CMAKE_CXX_FLAGS "-std=c++17 -g -Wall -Wextra -pedantic -D_DEBUG")
 #    #add_definitions(-DGLEW_STATIC=1)
     target_link_libraries(
-        yoe
+        schoolEngine
         ${OPENGL_LIBRARY}#OpenGL
         #D:/libraries/glew-2.1.0/lib/Release/x64/libglew32.a
         #D:/libraries/glew-2.1.0/lib/Release/x64/libglew32.dll.a
@@ -64,7 +64,7 @@ else()
 message("not windows hit me")
 	set(CMAKE_CXX_FLAGS "-std=c++17 -g -Wall -Wextra -pedantic -D_DEBUG")
     target_link_libraries(
-        yoe
+        schoolEngine
         opengl32
         glew32
         glfw3
