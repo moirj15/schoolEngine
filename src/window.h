@@ -1,7 +1,9 @@
 #ifndef WINDOW_H
 #define WINDOW_H
 
+#ifndef __APPLE__
 #include <GL/glew.h>
+#endif
 #include <GLFW/glfw3.h>
 
 #include "common.h"

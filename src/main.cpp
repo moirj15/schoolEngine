@@ -3,7 +3,7 @@
 #include "../imgui/imgui.h"
 #include "../imgui/imgui_impl_glfw.h"
 #include "../imgui/imgui_impl_opengl3.h"
-#include <GL/glew.h>
+//#include <GL/glew.h>
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
 #include <glm/gtx/normal.hpp>
@@ -12,16 +12,26 @@
 #include "window.h"
 #include "shader.h"
 #define STB_IMAGE_IMPLEMENTATION
-#include "../stb/stb_image.h"
+//#include "../stb/stb_image.h"
 
+#ifdef __APPLE__
+constexpr s32 width = 480;
+constexpr s32 height = 360;
+#elif _WIN32
 constexpr s32 width = 1920;
 constexpr s32 height = 1080;
+#endif
 
 void InitGL() {
     if (!glfwInit()) {
         fprintf(stderr, "Failed to init GLFW\n");
         exit(EXIT_FAILURE);
     }
+    printf("%s\n", glGetString(GL_VERSION));
+
+    //glClearColor(0.0, 0.0, 0.0, 1.0);
+    //glDepthFunc(GL_LESS);
+    //glfwSwapInterval(1);
 }
 
 int main(int argc, char **argv) {
@@ -30,11 +40,11 @@ int main(int argc, char **argv) {
 
     InitGL();
     Window window{width, height};
-    Shader shader{{"../shaders/shader.vert", "../shaders/shader.frag"}};
-    shader.Bind();
-    shader.SetUniformMat4("projection", glm::perspective(90.0f, 16.0f / 9.0f, 0.01f, 100.0f));
-    shader.SetUniformMat4("transform", glm::mat4(1.0f));
-    shader.SetUniformMat4("camera", glm::mat4());
+//    Shader shader{{"../shaders/shader.vert", "../shaders/shader.frag"}};
+//    shader.Bind();
+//    shader.SetUniformMat4("projection", glm::perspective(90.0f, 16.0f / 9.0f, 0.01f, 100.0f));
+//    shader.SetUniformMat4("transform", glm::mat4(1.0f));
+//    shader.SetUniformMat4("camera", glm::mat4());
 
     //glfwSetInputMode(window.m_glWindow, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
     f64 lastTime = glfwGetTime();

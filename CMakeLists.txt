@@ -3,7 +3,7 @@
 #set(CMAKE_C_COMPILER "C:/Program Files/LLVM/bin/clang.exe")
 #set(CMAKE_CXX_COMPILER "C:/Program Files/LLVM/bin/clang.exe")
 cmake_minimum_required(VERSION 3.10)
-project(yeo)
+project(yoe)
 
 file(GLOB IMGUI_FILES "imgui/*")
 file(GLOB SRC_FILES "src/*")
@@ -29,15 +29,8 @@ source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${SOURCE_LIST})
 add_executable(
     yoe
 	${SOURCE_LIST}
-#	${SRC_FILES}
-#	${STB_FILES}
-#	${IMGUI_FILES}
-#	${GUI_FILES}
 )
-#λ cmake .. -G"NMake Makefiles JOM" -DCMAKE_C_COMPILER="C:/Program Files/LLVM/bin/clang.exe" -DCMAKE_CXX_COMPILER="C:/Program Files/LLVM/bin/clang.exe" -DCMAKE_LINKER="C:/Program Files/LLVM/bin/lld-link.exe" -DCMAKE_C_COMPILER_ID="Clang" -DCMAKE_CXX_COMPILER_ID="CLANG" -DCMAKE_SYSTEM_NAME="Generic"
 find_package(OpenGL REQUIRED)
-#set(CMAKE_CXX_FLAGS "-std=c++17 -g -Wall -Wextra -pedantic -D_DEBUG")#-MT -D_DLL")
-#set(CMAKE_EXE_LINKER_FLAGS "-lGL -lGLEW -lglfw")
 
 if (WIN32)
 	message("WINDOWS")
@@ -60,6 +53,20 @@ if (WIN32)
         D:/libraries/glfw-3.2.1.bin.WIN64/lib-vc2015/glfw3.lib
         #D:/libraries/glfw-3.2.1.bin.WIN64/lib-mingw-w64/libglfw3.a
     )
+elseif(APPLE)
+	set(CMAKE_CXX_FLAGS "-std=c++17 -g -Wall -Wextra -pedantic -D_DEBUG")
+    INCLUDE_DIRECTORIES ( /System/Library/Frameworks )
+    FIND_LIBRARY(COCOA_LIBRARY Cocoa)
+    FIND_LIBRARY(GLEW_LIBRARY GLEW)
+    FIND_LIBRARY(GLFW_LIBRARY glfw)
+    FIND_LIBRARY(OpenGL_LIBRARY OpenGL )
+    MARK_AS_ADVANCED (COCOA_LIBRARY
+                     GLEW_LIBRARY
+                     GLFW_LIBRARY
+                     OpenGL_LIBRARY)
+    SET(EXTRA_LIBS ${COCOA_LIBRARY} ${GLEW_LIBRARY} ${GLFW_LIBRARY} ${OpenGL_LIBRARY})
+    target_link_libraries(yoe ${EXTRA_LIBS})
+    #endif(APPLE)
 else()
 message("not windows hit me")
 	set(CMAKE_CXX_FLAGS "-std=c++17 -g -Wall -Wextra -pedantic -D_DEBUG")
