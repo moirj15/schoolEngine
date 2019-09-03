@@ -5,9 +5,7 @@
 #include <vector>
 #include <unordered_map>
 
-#ifndef __APPLE__
 #include <GL/glew.h>
-#endif
 #include <GLFW/glfw3.h>
 
 #include <glm/glm.hpp>

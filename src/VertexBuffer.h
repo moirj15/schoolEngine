@@ -5,7 +5,14 @@
 #include <memory>
 #include <string>
 
+
 #include <GL/glew.h>
+//#include <OpenGL/gl.h>
+//#include <OpenGL/glu.h>
+#include <GLFW/glfw3.h>
+//#include <OpenGL/gl.h>
+//#include <OpenGL/glu.h>
+//#include <GLUT/glut.h>
 
 #include "common.h"
 
@@ -25,7 +32,7 @@ class VertexBuffer {
     GLHandle m_vertexBufferHandle;
     std::vector<BufferLayout> m_layout;
 public:
-    VertexBuffer(const f32 const *vertecies, const size_t size, std::vector<BufferLayout> layout);
+    VertexBuffer(const f32 *vertecies, const size_t size, std::vector<BufferLayout> layout);
     ~VertexBuffer();
 
     void Bind();
@@ -38,7 +45,7 @@ class IndexBuffer {
     u64 m_count;
 
 public:
-    IndexBuffer(const u32 const *indecies, const size_t size);
+    IndexBuffer(const u32 *indecies, const size_t size);
     ~IndexBuffer();
 
     void Bind();

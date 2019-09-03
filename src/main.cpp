@@ -1,10 +1,15 @@
 #define GLM_ENABLE_EXPERIMENTAL
 #define IMGUI_IMPL_OPENGL_LOADER_GLEW
+#if 0
 #include "../imgui/imgui.h"
 #include "../imgui/imgui_impl_glfw.h"
 #include "../imgui/imgui_impl_opengl3.h"
-//#include <GL/glew.h>
+#endif
+#include <GL/glew.h>
 #include <GLFW/glfw3.h>
+//#include <OpenGL/gl.h>
+//#include <OpenGL/glu.h>
+//#include <GLUT/glut.h>
 #include <glm/glm.hpp>
 #include <glm/gtx/normal.hpp>
 #include <glm/gtx/transform.hpp>
@@ -30,9 +35,13 @@ void InitGL() {
         fprintf(stderr, "Failed to init GLFW\n");
         exit(EXIT_FAILURE);
     }
-    printf("%s\n", glGetString(GL_VERSION));
-    glEnable(GL_DEPTH_TEST);
-    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+
+	glfwWindowHint(GLFW_SAMPLES, 4);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE); // To make MacOS happy; should not be needed
+	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+
 }
 
 int main(int argc, char **argv) {
@@ -49,6 +58,7 @@ int main(int argc, char **argv) {
         exit(EXIT_FAILURE);
     }
 
+    printf("%s\n", glGetString(GL_VERSION));
 
     Shader shader{{"../shaders/shader.vert", "../shaders/shader.frag"}};
 

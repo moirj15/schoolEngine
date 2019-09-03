@@ -65,7 +65,7 @@ elseif(APPLE)
                      GLFW_LIBRARY
                      OpenGL_LIBRARY)
     SET(EXTRA_LIBS ${COCOA_LIBRARY} ${GLEW_LIBRARY} ${GLFW_LIBRARY} ${OpenGL_LIBRARY})
-    target_link_libraries(yoe ${EXTRA_LIBS})
+    target_link_libraries(schoolEngine ${EXTRA_LIBS})
     #endif(APPLE)
 else()
 message("not windows hit me")
