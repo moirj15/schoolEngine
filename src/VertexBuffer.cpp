@@ -46,7 +46,9 @@ void IndexBuffer::Unbind() {
 
 
 VertexArray::VertexArray() :
-        m_vertexArrayHandle(0) {
+        m_vertexArrayHandle(0),
+        m_vertexBuffers{},
+        m_indexBuffer{} {
     glGenVertexArrays(1, &m_vertexArrayHandle);
 }
 
