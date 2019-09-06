@@ -60,7 +60,12 @@ int main(int argc, char **argv) {
 
     printf("%s\n", glGetString(GL_VERSION));
 
+#ifndef __APPLE__
     Shader shader{{"../shaders/shader.vert", "../shaders/shader.frag"}};
+#else
+    Shader shader{{"../shaders/macshader.vert", "../shaders/macshader.frag"}};
+#endif
+
 
     f32 verts[] = {
         -1.0, 0.0, -1.0, 1.0,
@@ -72,10 +77,32 @@ int main(int argc, char **argv) {
         0, 1, 2
     };
 
-    VertexArray vertexArray{};
-    vertexArray.AddVertexBuffer(new VertexBuffer(verts, sizeof(verts) / sizeof(f32),
-        {{"verts", 4, 0, 0, GL_FLOAT}}));
-    vertexArray.AddIndexBuffer(new IndexBuffer(conn, sizeof(conn) / sizeof(u32)));
+    f32 boxVerts[] = {
+        1.0, 1.0, -1.0, 1.0,
+        -1.0, 1.0, -1.0, 1.0,
+        -1.0, -1.0, -1.0, 1.0,
+        1.0, 1.0, -1.0, 1.0,
+
+        1.0, 1.0, -2.0, 1.0,
+        -1.0, 1.0, -2.0, 1.0,
+        -1.0, -1.0, -2.0, 1.0,
+        1.0, 1.0, -2.0, 1.0,
+    };
+
+    u32 boxConn[] = {
+        0, 1, 2,
+        0, 2, 3,
+
+    };
+
+//    VertexArray vertexArray{};
+//    vertexArray.AddVertexBuffer(new VertexBuffer(verts, sizeof(verts) / sizeof(f32),
+//        {{"verts", 4, 0, 0, GL_FLOAT}}));
+//    vertexArray.AddIndexBuffer(new IndexBuffer(conn, sizeof(conn) / sizeof(u32)));
+    VertexArray squareVertexArray{};
+    squareVertexArray.AddVertexBuffer(new VertexBuffer(boxVerts, sizeof(boxVerts) / sizeof(f32),
+        {{"boxVerts", 4, 0, 0, GL_FLOAT}}));
+    squareVertexArray.AddIndexBuffer(new IndexBuffer(boxConn, sizeof(boxConn) / sizeof(u32)));
 
     shader.Bind();
     shader.SetUniformMat4("projection", glm::perspective(90.0f, 16.0f / 9.0f, 0.01f, 100.0f));

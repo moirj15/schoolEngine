@@ -28,12 +28,12 @@ source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${SOURCE_LIST})
 
 add_executable(
     schoolEngine
-	${SOURCE_LIST}
+    ${SOURCE_LIST}
 )
 find_package(OpenGL REQUIRED)
 
 if (WIN32)
-	message("WINDOWS")
+    message("WINDOWS")
     include_directories(
         D:/libraries/glm;
         D:/libraries/glfw-3.2.1.bin.WIN64/include;
