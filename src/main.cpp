@@ -36,12 +36,13 @@ void InitGL() {
         exit(EXIT_FAILURE);
     }
 
+#ifdef __APPLE__
 	glfwWindowHint(GLFW_SAMPLES, 4);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE); // To make MacOS happy; should not be needed
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-
+#endif
 }
 
 int main(int argc, char **argv) {
@@ -57,6 +58,7 @@ int main(int argc, char **argv) {
         glfwTerminate();
         exit(EXIT_FAILURE);
     }
+    glfwSwapInterval(1);
 
     printf("%s\n", glGetString(GL_VERSION));
 
@@ -78,21 +80,48 @@ int main(int argc, char **argv) {
     };
 
     f32 boxVerts[] = {
-        1.0, 1.0, -1.0, 1.0,
-        -1.0, 1.0, -1.0, 1.0,
+        // front
+        -1.0, -1.0,  1.0, 1.0,
+         1.0, -1.0,  1.0, 1.0,
+         1.0,  1.0,  1.0, 1.0,
+        -1.0,  1.0,  1.0, 1.0,
+        // back
         -1.0, -1.0, -1.0, 1.0,
-        1.0, 1.0, -1.0, 1.0,
+         1.0, -1.0, -1.0, 1.0,
+         1.0,  1.0, -1.0, 1.0,
+        -1.0,  1.0, -1.0, 1.0,
+    };
 
-        1.0, 1.0, -2.0, 1.0,
-        -1.0, 1.0, -2.0, 1.0,
-        -1.0, -1.0, -2.0, 1.0,
-        1.0, 1.0, -2.0, 1.0,
+    f32 boxColors[] = {
+        0.0, 0.0, 1.0,
+        0.0, 0.0, 0.0,
+        0.0, 1.0, 0.0,
+        0.0, 1.0, 1.0,
+        1.0, 0.0, 0.0,
+        1.0, 0.0, 1.0,
+        1.0, 1.0, 0.0,
+        1.0, 1.0, 1.0,
     };
 
     u32 boxConn[] = {
+        // front
         0, 1, 2,
-        0, 2, 3,
-
+        2, 3, 0,
+        // right
+        1, 5, 6,
+        6, 2, 1,
+        // back
+        7, 6, 5,
+        5, 4, 7,
+        // left
+        4, 0, 3,
+        3, 7, 4,
+        // bottom
+        4, 5, 1,
+        1, 0, 4,
+        // top
+        3, 2, 6,
+        6, 7, 3
     };
 
 //    VertexArray vertexArray{};
@@ -102,6 +131,8 @@ int main(int argc, char **argv) {
     VertexArray squareVertexArray{};
     squareVertexArray.AddVertexBuffer(new VertexBuffer(boxVerts, sizeof(boxVerts) / sizeof(f32),
         {{"boxVerts", 4, 0, 0, GL_FLOAT}}));
+    squareVertexArray.AddVertexBuffer(new VertexBuffer(boxColors, sizeof(boxColors) / sizeof(f32),
+        {{"boxColors", 3, 0, 1, GL_FLOAT}}));
     squareVertexArray.AddIndexBuffer(new IndexBuffer(boxConn, sizeof(boxConn) / sizeof(u32)));
 
     shader.Bind();
@@ -110,18 +141,34 @@ int main(int argc, char **argv) {
     shader.SetUniformMat4("camera", glm::lookAt(glm::vec3{0.0f, 0.0f, 0.0f}, glm::vec3{0.0f, 0.0f, -1.0f}, glm::vec3{0.0f, 1.0f, 0.0f}));
 
     f64 lastTime = glfwGetTime();
+    glEnable(GL_DEPTH_TEST);
+    glCullFace(GL_BACK);
+    glClearColor(0.0, 0.0, 0.0, 1.0);
+    glPolygonMode(GL_FRONT, GL_FILL);
+    glClearDepth(4.0);
+    glDepthFunc(GL_LESS);
     while (!glfwWindowShouldClose(window.m_glWindow)) {
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        f32 t = lastTime / 10.0f;
+        printf("t: %f\n", t);
         glfwPollEvents();
+        glm::mat4 translate = glm::translate(glm::mat4(1.0f), glm::vec3(5.0f * t, 5.0f * t, -5.0f));
+        glm::mat4 rotate = glm::rotate(glm::mat4(1.0f), 18.0f * t, glm::vec3(0.0f, 1.0f, 0.0f));
+//        glm::mat4 scale = glm::scale(glm::mat4(1.0f), glm::vec3(0.20f, 0.20f, 1.00f));
+        glm::mat4 transform = translate * rotate;
+        shader.SetUniformMat4("transform", transform);
 
-        f64 currentTime = glfwGetTime();
-        f64 delta = (currentTime - lastTime) * 1000.0;
+//        f64 currentTime = glfwGetTime();
+//        f64 delta = (currentTime - lastTime) * 1000.0;
 
         lastTime = glfwGetTime();
 
         shader.Bind();
 
-        vertexArray.Bind();
-        glDrawElements(GL_TRIANGLES, vertexArray.IndexCount(), GL_UNSIGNED_INT, (void*)0);
+//        vertexArray.Bind();
+        squareVertexArray.Bind();
+        glDrawElements(GL_TRIANGLES, squareVertexArray.IndexCount(), GL_UNSIGNED_INT, (void*)0);
+//        glDrawElements(GL_TRIANGLES, vertexArray.IndexCount(), GL_UNSIGNED_INT, (void*)0);
 
         glfwSwapBuffers(window.m_glWindow);
         //printf("%f\n", 1000.0 / delta);

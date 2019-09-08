@@ -1,6 +1,7 @@
 #version 450
 
 layout (location = 0) in vec4 vPosition;
+layout (location = 1) in vec3 vColor;
 
 // layout (location = 1) in vec4 vNormal;
 
@@ -15,10 +16,12 @@ out vec4 normal;
 out vec4 lightPos;
 out vec4 pos;
 out vec2 tex_coord;
+out vec4 color;
 
 void main() {
     gl_PointSize = 10.0;
 	gl_Position = projection * camera * transform * vPosition;
+    color = vec4(vColor, 1.0);
     //normal = normalize((camera * transform) * vNormal);
     //lightPos = camera * light;
     //pos = (camera * transform) * vPosition;
