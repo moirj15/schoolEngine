@@ -18,7 +18,7 @@ typedef int64_t s64;
 typedef float f32;
 typedef double f64;
 
-inline FILE *open_file(const char *file, const char *perm) {
+inline FILE *OpenFile(const char *file, const char *perm) {
     FILE *ret = NULL;
     ret = fopen(file, perm);
     if (!ret) {

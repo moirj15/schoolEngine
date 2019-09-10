@@ -12,7 +12,13 @@
 struct Mesh {
     std::vector<f32> vertecies;
     std::vector<u32> connections;
-    VertexArray vertexArray;
+    u32 vertexSize;
+
+    Mesh() = default;
+    Mesh(Mesh &&m) :
+        vertecies(std::move(m.vertecies)),
+        connections(std::move(m.connections)),
+        vertexSize(m.vertexSize) {}
 };
 
 class ObjReader
@@ -21,6 +27,8 @@ class ObjReader
     std::vector<char> m_data;
 
     size_t m_pos;
+
+    Mesh m_mesh;
 
     enum class DataType {
         Vertex,
@@ -31,6 +39,7 @@ class ObjReader
         LineElement,
         Object,
         Group,
+        Comment,
         Unknown
     };
 
@@ -44,6 +53,16 @@ private:
     DataType ParseType();
 
     inline char Token() { return m_data[m_pos]; }
+
+    void ParseVertex();
+
+    void ParseFace();
+
+    std::string ReadLine();
+
+    void SkipLine();
+
+    void ReplaceChars(std::string *str, char toReplace, char replacement);
 
 };
 

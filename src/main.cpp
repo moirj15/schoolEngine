@@ -14,10 +14,15 @@
 #include <glm/gtx/normal.hpp>
 #include <glm/gtx/transform.hpp>
 
+#include <thread>
+#include <chrono>
+
 #include "window.h"
 #include "shader.h"
 
 #include "VertexBuffer.h"
+
+#include "obj.h"
 
 #define STB_IMAGE_IMPLEMENTATION
 //#include "../stb/stb_image.h"
@@ -48,6 +53,11 @@ void InitGL() {
 int main(int argc, char **argv) {
     (void)argc;
     (void)argv;
+
+    std::string filename = "../objData/block.obj";
+    ObjReader objReader{filename};
+    std::unique_ptr<Mesh> mesh{objReader.Parse()};
+
 
     InitGL();
     Window window{width, height};
@@ -124,10 +134,6 @@ int main(int argc, char **argv) {
         6, 7, 3
     };
 
-//    VertexArray vertexArray{};
-//    vertexArray.AddVertexBuffer(new VertexBuffer(verts, sizeof(verts) / sizeof(f32),
-//        {{"verts", 4, 0, 0, GL_FLOAT}}));
-//    vertexArray.AddIndexBuffer(new IndexBuffer(conn, sizeof(conn) / sizeof(u32)));
     VertexArray squareVertexArray{};
     squareVertexArray.AddVertexBuffer(new VertexBuffer(boxVerts, sizeof(boxVerts) / sizeof(f32),
         {{"boxVerts", 4, 0, 0, GL_FLOAT}}));
@@ -140,13 +146,16 @@ int main(int argc, char **argv) {
     shader.SetUniformMat4("transform", glm::mat4(1.0f));
     shader.SetUniformMat4("camera", glm::lookAt(glm::vec3{0.0f, 0.0f, 0.0f}, glm::vec3{0.0f, 0.0f, -1.0f}, glm::vec3{0.0f, 1.0f, 0.0f}));
 
-    f64 lastTime = glfwGetTime();
+    std::this_thread::sleep_for(std::chrono::seconds(10));
     glEnable(GL_DEPTH_TEST);
     glCullFace(GL_BACK);
     glClearColor(0.0, 0.0, 0.0, 1.0);
     glPolygonMode(GL_FRONT, GL_FILL);
     glClearDepth(4.0);
     glDepthFunc(GL_LESS);
+
+    glfwSetTime(0.0);
+    f64 lastTime = glfwGetTime();
     while (!glfwWindowShouldClose(window.m_glWindow)) {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         f32 t = lastTime / 10.0f;
@@ -154,7 +163,6 @@ int main(int argc, char **argv) {
         glfwPollEvents();
         glm::mat4 translate = glm::translate(glm::mat4(1.0f), glm::vec3(5.0f * t, 5.0f * t, -5.0f));
         glm::mat4 rotate = glm::rotate(glm::mat4(1.0f), 18.0f * t, glm::vec3(0.0f, 1.0f, 0.0f));
-//        glm::mat4 scale = glm::scale(glm::mat4(1.0f), glm::vec3(0.20f, 0.20f, 1.00f));
         glm::mat4 transform = translate * rotate;
         shader.SetUniformMat4("transform", transform);
 
@@ -165,10 +173,8 @@ int main(int argc, char **argv) {
 
         shader.Bind();
 
-//        vertexArray.Bind();
         squareVertexArray.Bind();
         glDrawElements(GL_TRIANGLES, squareVertexArray.IndexCount(), GL_UNSIGNED_INT, (void*)0);
-//        glDrawElements(GL_TRIANGLES, vertexArray.IndexCount(), GL_UNSIGNED_INT, (void*)0);
 
         glfwSwapBuffers(window.m_glWindow);
         //printf("%f\n", 1000.0 / delta);
