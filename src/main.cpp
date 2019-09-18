@@ -54,9 +54,9 @@ int main(int argc, char **argv) {
     (void)argc;
     (void)argv;
 
-    std::string filename = "../objData/block.obj";
-    ObjReader objReader{filename};
-    std::unique_ptr<Mesh> mesh{objReader.Parse()};
+//    std::string filename = "../objData/block.obj";
+//    ObjReader objReader{filename};
+//    std::unique_ptr<Mesh> mesh{objReader.Parse()};
 
 
     InitGL();
@@ -146,7 +146,7 @@ int main(int argc, char **argv) {
     shader.SetUniformMat4("transform", glm::mat4(1.0f));
     shader.SetUniformMat4("camera", glm::lookAt(glm::vec3{0.0f, 0.0f, 0.0f}, glm::vec3{0.0f, 0.0f, -1.0f}, glm::vec3{0.0f, 1.0f, 0.0f}));
 
-    std::this_thread::sleep_for(std::chrono::seconds(10));
+//    std::this_thread::sleep_for(std::chrono::seconds(10));
     glEnable(GL_DEPTH_TEST);
     glCullFace(GL_BACK);
     glClearColor(0.0, 0.0, 0.0, 1.0);
@@ -154,20 +154,27 @@ int main(int argc, char **argv) {
     glClearDepth(4.0);
     glDepthFunc(GL_LESS);
 
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glfwSwapBuffers(window.m_glWindow);
+    do {
+        glfwPollEvents();
+    } while (glfwGetKey(window.m_glWindow, GLFW_KEY_G) != GLFW_PRESS);
+
     glfwSetTime(0.0);
     f64 lastTime = glfwGetTime();
+    f32 t = 0.0;
     while (!glfwWindowShouldClose(window.m_glWindow)) {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        f32 t = lastTime / 10.0f;
+        f64 currentTime = glfwGetTime();
+        f64 delta = (currentTime - lastTime);// * 1000.0;
+        t += delta;//lastTime / 60.0f;
         printf("t: %f\n", t);
         glfwPollEvents();
-        glm::mat4 translate = glm::translate(glm::mat4(1.0f), glm::vec3(5.0f * t, 5.0f * t, -5.0f));
-        glm::mat4 rotate = glm::rotate(glm::mat4(1.0f), 18.0f * t, glm::vec3(0.0f, 1.0f, 0.0f));
+        glm::mat4 translate = glm::translate(glm::mat4(1.0f), glm::vec3(0.5f * t, 0.5f * t, -10.0f));
+        glm::mat4 rotate = glm::rotate(glm::mat4(1.0f), glm::radians(18.0f * t), glm::vec3(0.0f, 1.0f, 0.0f));
         glm::mat4 transform = translate * rotate;
         shader.SetUniformMat4("transform", transform);
 
-//        f64 currentTime = glfwGetTime();
-//        f64 delta = (currentTime - lastTime) * 1000.0;
 
         lastTime = glfwGetTime();
 
