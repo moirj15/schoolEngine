@@ -23,6 +23,7 @@
 #include "VertexBuffer.h"
 
 #include "obj.h"
+#include "keyframe.h"
 
 #define STB_IMAGE_IMPLEMENTATION
 //#include "../stb/stb_image.h"
@@ -34,6 +35,62 @@ constexpr s32 height = 360;
 constexpr s32 width = 1920;
 constexpr s32 height = 1080;
 #endif
+
+
+static f32 verts[] = {
+    -1.0, 0.0, -1.0, 1.0,
+    1.0, 0.0, -1.0, 1.0,
+    0.0, 1.0, -1.0, 1.0,
+};
+
+static u32 conn[] = {
+    0, 1, 2
+};
+
+static f32 boxVerts[] = {
+    // front
+    -1.0, -1.0,  1.0, 1.0,
+     1.0, -1.0,  1.0, 1.0,
+     1.0,  1.0,  1.0, 1.0,
+    -1.0,  1.0,  1.0, 1.0,
+    // back
+    -1.0, -1.0, -1.0, 1.0,
+     1.0, -1.0, -1.0, 1.0,
+     1.0,  1.0, -1.0, 1.0,
+    -1.0,  1.0, -1.0, 1.0,
+};
+
+static f32 boxColors[] = {
+    0.0, 0.0, 1.0,
+    0.0, 0.0, 0.0,
+    0.0, 1.0, 0.0,
+    0.0, 1.0, 1.0,
+    1.0, 0.0, 0.0,
+    1.0, 0.0, 1.0,
+    1.0, 1.0, 0.0,
+    1.0, 1.0, 1.0,
+};
+
+static u32 boxConn[] = {
+    // front
+    0, 1, 2,
+    2, 3, 0,
+    // right
+    1, 5, 6,
+    6, 2, 1,
+    // back
+    7, 6, 5,
+    5, 4, 7,
+    // left
+    4, 0, 3,
+    3, 7, 4,
+    // bottom
+    4, 5, 1,
+    1, 0, 4,
+    // top
+    3, 2, 6,
+    6, 7, 3
+};
 
 void InitGL() {
     if (!glfwInit()) {
@@ -54,11 +111,6 @@ int main(int argc, char **argv) {
     (void)argc;
     (void)argv;
 
-//    std::string filename = "../objData/block.obj";
-//    ObjReader objReader{filename};
-//    std::unique_ptr<Mesh> mesh{objReader.Parse()};
-
-
     InitGL();
     Window window{width, height};
 
@@ -78,62 +130,6 @@ int main(int argc, char **argv) {
     Shader shader{{"../shaders/macshader.vert", "../shaders/macshader.frag"}};
 #endif
 
-
-    f32 verts[] = {
-        -1.0, 0.0, -1.0, 1.0,
-        1.0, 0.0, -1.0, 1.0,
-        0.0, 1.0, -1.0, 1.0,
-    };
-
-    u32 conn[] = {
-        0, 1, 2
-    };
-
-    f32 boxVerts[] = {
-        // front
-        -1.0, -1.0,  1.0, 1.0,
-         1.0, -1.0,  1.0, 1.0,
-         1.0,  1.0,  1.0, 1.0,
-        -1.0,  1.0,  1.0, 1.0,
-        // back
-        -1.0, -1.0, -1.0, 1.0,
-         1.0, -1.0, -1.0, 1.0,
-         1.0,  1.0, -1.0, 1.0,
-        -1.0,  1.0, -1.0, 1.0,
-    };
-
-    f32 boxColors[] = {
-        0.0, 0.0, 1.0,
-        0.0, 0.0, 0.0,
-        0.0, 1.0, 0.0,
-        0.0, 1.0, 1.0,
-        1.0, 0.0, 0.0,
-        1.0, 0.0, 1.0,
-        1.0, 1.0, 0.0,
-        1.0, 1.0, 1.0,
-    };
-
-    u32 boxConn[] = {
-        // front
-        0, 1, 2,
-        2, 3, 0,
-        // right
-        1, 5, 6,
-        6, 2, 1,
-        // back
-        7, 6, 5,
-        5, 4, 7,
-        // left
-        4, 0, 3,
-        3, 7, 4,
-        // bottom
-        4, 5, 1,
-        1, 0, 4,
-        // top
-        3, 2, 6,
-        6, 7, 3
-    };
-
     VertexArray squareVertexArray{};
     squareVertexArray.AddVertexBuffer(new VertexBuffer(boxVerts, sizeof(boxVerts) / sizeof(f32),
         {{"boxVerts", 4, 0, 0, GL_FLOAT}}));
@@ -144,9 +140,14 @@ int main(int argc, char **argv) {
     shader.Bind();
     shader.SetUniformMat4("projection", glm::perspective(90.0f, 16.0f / 9.0f, 0.01f, 100.0f));
     shader.SetUniformMat4("transform", glm::mat4(1.0f));
-    shader.SetUniformMat4("camera", glm::lookAt(glm::vec3{0.0f, 0.0f, 0.0f}, glm::vec3{0.0f, 0.0f, -1.0f}, glm::vec3{0.0f, 1.0f, 0.0f}));
+    shader.SetUniformMat4("camera", glm::lookAt(glm::vec3{0.0f, 0.0f, 0.0f},
+                                                glm::vec3{0.0f, 0.0f, -1.0f},
+                                                glm::vec3{0.0f, 1.0f, 0.0f}));
 
-//    std::this_thread::sleep_for(std::chrono::seconds(10));
+    KeyFrameGroup keyFrameGroup{};
+    keyFrameGroup.LoadFromFile("../keyframe-input.txt");
+
+
     glEnable(GL_DEPTH_TEST);
     glCullFace(GL_BACK);
     glClearColor(0.0, 0.0, 0.0, 1.0);
@@ -170,10 +171,6 @@ int main(int argc, char **argv) {
         t += delta;//lastTime / 60.0f;
         printf("t: %f\n", t);
         glfwPollEvents();
-        glm::mat4 translate = glm::translate(glm::mat4(1.0f), glm::vec3(0.5f * t, 0.5f * t, -10.0f));
-        glm::mat4 rotate = glm::rotate(glm::mat4(1.0f), glm::radians(18.0f * t), glm::vec3(0.0f, 1.0f, 0.0f));
-        glm::mat4 transform = translate * rotate;
-        shader.SetUniformMat4("transform", transform);
 
 
         lastTime = glfwGetTime();
@@ -184,7 +181,6 @@ int main(int argc, char **argv) {
         glDrawElements(GL_TRIANGLES, squareVertexArray.IndexCount(), GL_UNSIGNED_INT, (void*)0);
 
         glfwSwapBuffers(window.m_glWindow);
-        //printf("%f\n", 1000.0 / delta);
     }
     return 0;
 }
