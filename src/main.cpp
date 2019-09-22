@@ -16,6 +16,7 @@
 
 #include <thread>
 #include <chrono>
+#include <string>
 
 #include "window.h"
 #include "shader.h"
@@ -24,6 +25,7 @@
 
 #include "obj.h"
 #include "keyframe.h"
+#include "boundingbox.h"
 
 #define STB_IMAGE_IMPLEMENTATION
 //#include "../stb/stb_image.h"
@@ -92,7 +94,9 @@ static u32 boxConn[] = {
     6, 7, 3
 };
 
-void InitGL() {
+#define ArraySize(X) (sizeof(X) / sizeof(X[0]))
+
+Window *InitGL() {
     if (!glfwInit()) {
         fprintf(stderr, "Failed to init GLFW\n");
         exit(EXIT_FAILURE);
@@ -105,14 +109,7 @@ void InitGL() {
 	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE); // To make MacOS happy; should not be needed
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 #endif
-}
-
-int main(int argc, char **argv) {
-    (void)argc;
-    (void)argv;
-
-    InitGL();
-    Window window{width, height};
+    Window *window = new Window{width, height};
 
     GLenum err = glewInit();
     if (err != GLEW_OK) {
@@ -121,6 +118,14 @@ int main(int argc, char **argv) {
         exit(EXIT_FAILURE);
     }
     glfwSwapInterval(1);
+    return window;
+}
+
+int main(int argc, char **argv) {
+    (void)argc;
+    (void)argv;
+
+    Window *window = InitGL();
 
     printf("%s\n", glGetString(GL_VERSION));
 
@@ -130,22 +135,28 @@ int main(int argc, char **argv) {
     Shader shader{{"../shaders/macshader.vert", "../shaders/macshader.frag"}};
 #endif
 
-    VertexArray squareVertexArray{};
-    squareVertexArray.AddVertexBuffer(new VertexBuffer(boxVerts, sizeof(boxVerts) / sizeof(f32),
-        {{"boxVerts", 4, 0, 0, GL_FLOAT}}));
-    squareVertexArray.AddVertexBuffer(new VertexBuffer(boxColors, sizeof(boxColors) / sizeof(f32),
+    Ray ray{glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, -1.0f)};
+    BoundingBox bb{glm::vec3(-1.0f, -1.0f, -5.0f), glm::vec3(1.0f, 1.0f, -2.0f)};
+    bool intersect = bb.IntersectRay(ray);
+
+    ObjReader objReader{"../objData/block.obj"};
+    std::unique_ptr<Mesh> mesh{objReader.Parse()};
+
+    VertexArray boxObjVA{};
+    boxObjVA.AddVertexBuffer(new VertexBuffer(mesh->vertecies.data(), 
+        mesh->vertecies.size() , {{"boxVerts", 3, 0, 0, GL_FLOAT}}));
+    boxObjVA.AddVertexBuffer(new VertexBuffer(boxColors, ArraySize(boxColors),
         {{"boxColors", 3, 0, 1, GL_FLOAT}}));
-    squareVertexArray.AddIndexBuffer(new IndexBuffer(boxConn, sizeof(boxConn) / sizeof(u32)));
+    boxObjVA.AddIndexBuffer(new IndexBuffer(mesh->connections.data(), mesh->connections.size()));
+    
 
     shader.Bind();
     shader.SetUniformMat4("projection", glm::perspective(90.0f, 16.0f / 9.0f, 0.01f, 100.0f));
-    shader.SetUniformMat4("transform", glm::mat4(1.0f));
+    shader.SetUniformMat4("transform", glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -5.0f)));
     shader.SetUniformMat4("camera", glm::lookAt(glm::vec3{0.0f, 0.0f, 0.0f},
                                                 glm::vec3{0.0f, 0.0f, -1.0f},
                                                 glm::vec3{0.0f, 1.0f, 0.0f}));
 
-    KeyFrameGroup keyFrameGroup{};
-    keyFrameGroup.LoadFromFile("../keyframe-input.txt");
 
 
     glEnable(GL_DEPTH_TEST);
@@ -156,31 +167,31 @@ int main(int argc, char **argv) {
     glDepthFunc(GL_LESS);
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    glfwSwapBuffers(window.m_glWindow);
-    do {
-        glfwPollEvents();
-    } while (glfwGetKey(window.m_glWindow, GLFW_KEY_G) != GLFW_PRESS);
+    glfwSwapBuffers(window->m_glWindow);
+    //do {
+    //    glfwPollEvents();
+    //} while (glfwGetKey(window->m_glWindow, GLFW_KEY_G) != GLFW_PRESS);
 
     glfwSetTime(0.0);
     f64 lastTime = glfwGetTime();
     f32 t = 0.0;
-    while (!glfwWindowShouldClose(window.m_glWindow)) {
+    while (!glfwWindowShouldClose(window->m_glWindow)) {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         f64 currentTime = glfwGetTime();
         f64 delta = (currentTime - lastTime);// * 1000.0;
         t += delta;//lastTime / 60.0f;
-        printf("t: %f\n", t);
         glfwPollEvents();
+
 
 
         lastTime = glfwGetTime();
 
         shader.Bind();
 
-        squareVertexArray.Bind();
-        glDrawElements(GL_TRIANGLES, squareVertexArray.IndexCount(), GL_UNSIGNED_INT, (void*)0);
+        boxObjVA.Bind();
+        glDrawElements(GL_TRIANGLES, boxObjVA.IndexCount(), GL_UNSIGNED_INT, (void*)0);
 
-        glfwSwapBuffers(window.m_glWindow);
+        glfwSwapBuffers(window->m_glWindow);
     }
     return 0;
 }

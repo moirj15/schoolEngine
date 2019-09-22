@@ -10,21 +10,25 @@
 #include "VertexBuffer.h"
 
 struct Mesh {
-    std::vector<f32> vertecies;
-    std::vector<u32> connections;
-    u32 vertexSize;
+    std::vector<f32> vertecies = {};
+    std::vector<u32> connections = {};
+    std::vector<f32> normals = {};
+    u32 vertexSize = 3;
 
     Mesh() = default;
     Mesh(Mesh &&m) :
         vertecies(std::move(m.vertecies)),
         connections(std::move(m.connections)),
+        normals(std::move(m.normals)),
         vertexSize(m.vertexSize) {}
 };
 
 class ObjReader
 {
     std::string m_filename;
-    std::vector<char> m_data;
+    //std::vector<char> m_data;
+    std::unique_ptr<char[]> m_data;
+    size_t m_dataLen;
 
     size_t m_pos;
 
@@ -44,10 +48,11 @@ class ObjReader
     };
 
 public:
-    ObjReader(std::string &filename);
+    ObjReader(char *filename);
 
     Mesh *Parse();
 
+    void Clear();
 
 private:
     DataType ParseType();
@@ -55,6 +60,8 @@ private:
     inline char Token() { return m_data[m_pos]; }
 
     void ParseVertex();
+
+    void ParseNormal();
 
     void ParseFace();
 
