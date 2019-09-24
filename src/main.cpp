@@ -7,9 +7,6 @@
 #endif
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
-//#include <OpenGL/gl.h>
-//#include <OpenGL/glu.h>
-//#include <GLUT/glut.h>
 #include <glm/glm.hpp>
 #include <glm/gtx/normal.hpp>
 #include <glm/gtx/transform.hpp>
@@ -24,6 +21,7 @@
 
 #include "obj.h"
 #include "keyframe.h"
+#include "interpolation.h"
 
 #define STB_IMAGE_IMPLEMENTATION
 //#include "../stb/stb_image.h"
@@ -124,11 +122,10 @@ int main(int argc, char **argv) {
 
     printf("%s\n", glGetString(GL_VERSION));
 
-#ifndef __APPLE__
+    DCCSpline(0.0f, glm::vec3{-1.0f, 0.0f, 0.0f}, glm::vec3{0.0f, 0.5f, 0.0f}, glm::vec3{1.0f, 0.0f, 0.0f});
+
+
     Shader shader{{"../shaders/shader.vert", "../shaders/shader.frag"}};
-#else
-    Shader shader{{"../shaders/macshader.vert", "../shaders/macshader.frag"}};
-#endif
 
     VertexArray squareVertexArray{};
     squareVertexArray.AddVertexBuffer(new VertexBuffer(boxVerts, sizeof(boxVerts) / sizeof(f32),
@@ -140,7 +137,7 @@ int main(int argc, char **argv) {
     shader.Bind();
     shader.SetUniformMat4("projection", glm::perspective(90.0f, 16.0f / 9.0f, 0.01f, 100.0f));
     shader.SetUniformMat4("transform", glm::mat4(1.0f));
-    shader.SetUniformMat4("camera", glm::lookAt(glm::vec3{0.0f, 0.0f, 0.0f},
+    shader.SetUniformMat4("camera", glm::lookAt(glm::vec3{0.0f, 0.0f, -10.0f},
                                                 glm::vec3{0.0f, 0.0f, -1.0f},
                                                 glm::vec3{0.0f, 1.0f, 0.0f}));
 
@@ -171,6 +168,8 @@ int main(int argc, char **argv) {
         t += delta;//lastTime / 60.0f;
         printf("t: %f\n", t);
         glfwPollEvents();
+        glm::mat4 transform = keyFrameGroup.GenerateTranslationMat(t);
+        shader.SetUniformMat4("transform", transform);
 
 
         lastTime = glfwGetTime();

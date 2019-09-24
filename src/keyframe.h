@@ -18,13 +18,16 @@ struct KeyFrame {
 
 class KeyFrameGroup {
     std::vector<KeyFrame> m_keyFrames = {};
+    size_t m_startFrame = 0;
+    size_t m_middleFrame = 1;
+    size_t m_endFrame = 2;
 public:
     KeyFrameGroup() = default;
     void LoadFromFile(const std::string &filename);
 
     glm::mat4 GenerateTranslationMat(const f32 time);
 private:
-    std::array<KeyFrame, 2> GenerateControlPoints(const glm::vec3 &start, const glm::vec3 &end);
+    void UpdateFramePoints(const f32 t);
 };
 
 #endif // KEYFRAME_H
