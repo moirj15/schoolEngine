@@ -21,8 +21,7 @@ glm::mat4 KeyFrameGroup::GenerateTranslationMat(const f32 time) {
     f32 u = (time - m_keyFrames[m_startFrame].time);
     glm::vec3 newPos = DCCSpline(u, m_keyFrames[m_startFrame].pos, m_keyFrames[m_middleFrame].pos,
         m_keyFrames[m_endFrame].pos);
-    glm::mat4 translation = glm::translate(glm::mat4(1.0f), newPos);
-    return translation;
+    return glm::translate(glm::mat4(1.0f), newPos);
 }
 
 void KeyFrameGroup::UpdateFramePoints(const f32 t) {

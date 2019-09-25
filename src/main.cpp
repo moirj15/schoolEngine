@@ -122,8 +122,6 @@ int main(int argc, char **argv) {
 
     printf("%s\n", glGetString(GL_VERSION));
 
-    DCCSpline(0.0f, glm::vec3{-1.0f, 0.0f, 0.0f}, glm::vec3{0.0f, 0.5f, 0.0f}, glm::vec3{1.0f, 0.0f, 0.0f});
-
 
     Shader shader{{"../shaders/shader.vert", "../shaders/shader.frag"}};
 
@@ -137,7 +135,7 @@ int main(int argc, char **argv) {
     shader.Bind();
     shader.SetUniformMat4("projection", glm::perspective(90.0f, 16.0f / 9.0f, 0.01f, 100.0f));
     shader.SetUniformMat4("transform", glm::mat4(1.0f));
-    shader.SetUniformMat4("camera", glm::lookAt(glm::vec3{0.0f, 0.0f, -10.0f},
+    shader.SetUniformMat4("camera", glm::lookAt(glm::vec3{0.0f, 0.0f, 10.0f},
                                                 glm::vec3{0.0f, 0.0f, -1.0f},
                                                 glm::vec3{0.0f, 1.0f, 0.0f}));
 
@@ -166,7 +164,7 @@ int main(int argc, char **argv) {
         f64 currentTime = glfwGetTime();
         f64 delta = (currentTime - lastTime);// * 1000.0;
         t += delta;//lastTime / 60.0f;
-        printf("t: %f\n", t);
+        //printf("t: %f\n", t);
         glfwPollEvents();
         glm::mat4 transform = keyFrameGroup.GenerateTranslationMat(t);
         shader.SetUniformMat4("transform", transform);
