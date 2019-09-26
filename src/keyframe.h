@@ -21,6 +21,7 @@ class KeyFrameGroup {
     size_t m_startFrame = 0;
     size_t m_middleFrame = 1;
     size_t m_endFrame = 2;
+    f32 m_timeFrameStart = 0.0;
 public:
     KeyFrameGroup() = default;
     void LoadFromFile(const std::string &filename);
