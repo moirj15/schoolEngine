@@ -1,10 +1,8 @@
 #define GLM_ENABLE_EXPERIMENTAL
 #define IMGUI_IMPL_OPENGL_LOADER_GLEW
-#if 0
 #include "../imgui/imgui.h"
 #include "../imgui/imgui_impl_glfw.h"
 #include "../imgui/imgui_impl_opengl3.h"
-#endif
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 //#include <OpenGL/gl.h>
@@ -17,6 +15,7 @@
 #include <thread>
 #include <chrono>
 #include <string>
+
 
 #include "window.h"
 #include "shader.h"
@@ -111,6 +110,7 @@ Window *InitGL() {
 #endif
     Window *window = new Window{width, height};
 
+    glfwMakeContextCurrent(window->m_glWindow);
     GLenum err = glewInit();
     if (err != GLEW_OK) {
         fprintf(stderr, "glew error: %s\n", glewGetErrorString(err));
@@ -118,7 +118,21 @@ Window *InitGL() {
         exit(EXIT_FAILURE);
     }
     glfwSwapInterval(1);
+    glEnable(GL_DEPTH_TEST);
+    glCullFace(GL_BACK);
+    glClearColor(0.0, 0.0, 0.0, 1.0);
+    glPolygonMode(GL_FRONT, GL_FILL);
+    glClearDepth(4.0);
+    glDepthFunc(GL_LESS);
     return window;
+}
+
+void InitIMGUI(Window *window) {
+    IMGUI_CHECKVERSION();
+    ImGui::CreateContext();
+    ImGuiIO &io = ImGui::GetIO();
+    ImGui_ImplGlfw_InitForOpenGL(window->m_glWindow, true);
+    ImGui_ImplOpenGL3_Init("#version 150");
 }
 
 int main(int argc, char **argv) {
@@ -126,6 +140,7 @@ int main(int argc, char **argv) {
     (void)argv;
 
     Window *window = InitGL();
+    InitIMGUI(window);
 
     printf("%s\n", glGetString(GL_VERSION));
 
@@ -148,7 +163,6 @@ int main(int argc, char **argv) {
     boxObjVA.AddVertexBuffer(new VertexBuffer(boxColors, ArraySize(boxColors),
         {{"boxColors", 3, 0, 1, GL_FLOAT}}));
     boxObjVA.AddIndexBuffer(new IndexBuffer(mesh->connections.data(), mesh->connections.size()));
-    
 
     shader.Bind();
     shader.SetUniformMat4("projection", glm::perspective(90.0f, 16.0f / 9.0f, 0.01f, 100.0f));
@@ -157,41 +171,51 @@ int main(int argc, char **argv) {
                                                 glm::vec3{0.0f, 0.0f, -1.0f},
                                                 glm::vec3{0.0f, 1.0f, 0.0f}));
 
-
-
-    glEnable(GL_DEPTH_TEST);
-    glCullFace(GL_BACK);
-    glClearColor(0.0, 0.0, 0.0, 1.0);
-    glPolygonMode(GL_FRONT, GL_FILL);
-    glClearDepth(4.0);
-    glDepthFunc(GL_LESS);
-
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    glfwSwapBuffers(window->m_glWindow);
-    //do {
-    //    glfwPollEvents();
-    //} while (glfwGetKey(window->m_glWindow, GLFW_KEY_G) != GLFW_PRESS);
-
     glfwSetTime(0.0);
     f64 lastTime = glfwGetTime();
     f32 t = 0.0;
     while (!glfwWindowShouldClose(window->m_glWindow)) {
+        glfwPollEvents();
+
+        // Start the Dear ImGui frame
+        ImGui_ImplOpenGL3_NewFrame();
+        ImGui_ImplGlfw_NewFrame();
+        ImGui::NewFrame();
+
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         f64 currentTime = glfwGetTime();
         f64 delta = (currentTime - lastTime);// * 1000.0;
         t += delta;//lastTime / 60.0f;
-        glfwPollEvents();
-
-
 
         lastTime = glfwGetTime();
+
+        ImGui::Begin("Controls");
+        ImGui::Text("This is where the controls will go");
+
+        ImGui::End();
+
+
+        ImGui::Render();
+        int display_w, display_h;
+        glfwMakeContextCurrent(window->m_glWindow);
+        glfwGetFramebufferSize(window->m_glWindow, &display_w, &display_h);
+        glViewport(0, 0, display_w, display_h);
+        glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+        glClear(GL_COLOR_BUFFER_BIT);
+        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
         shader.Bind();
 
         boxObjVA.Bind();
         glDrawElements(GL_TRIANGLES, boxObjVA.IndexCount(), GL_UNSIGNED_INT, (void*)0);
 
+        glfwMakeContextCurrent(window->m_glWindow);
         glfwSwapBuffers(window->m_glWindow);
     }
+
+    ImGui_ImplOpenGL3_Shutdown();
+    ImGui_ImplGlfw_Shutdown();
+    ImGui::DestroyContext();
+
     return 0;
 }
