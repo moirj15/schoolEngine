@@ -26,15 +26,19 @@ glm::mat4 KeyFrameGroup::GenerateTranslationMat(const f32 time) {
     if (m_endFrame >= m_keyFrames.size()) {
         f32 u = (t - m_keyFrames[m_startFrame].time) / 
             (m_keyFrames[m_middleFrame].time - m_keyFrames[m_startFrame].time);
+
         newPos = DCCSpline(u, m_keyFrames[m_startFrame].pos, 
             m_keyFrames[m_middleFrame].pos, m_keyFrames[m_middleFrame].pos);
+
         newRot = DCCSpline(u, m_keyFrames[m_startFrame], 
             m_keyFrames[m_middleFrame], m_keyFrames[m_middleFrame]);
     } else {
         f32 u = (t - m_keyFrames[m_startFrame].time) / 
             (m_keyFrames[m_endFrame].time - m_keyFrames[m_startFrame].time);
+
         newPos = DCCSpline(u, m_keyFrames[m_startFrame].pos, 
             m_keyFrames[m_middleFrame].pos, m_keyFrames[m_endFrame].pos);
+
         newRot = DCCSpline(u, m_keyFrames[m_startFrame], 
             m_keyFrames[m_middleFrame], m_keyFrames[m_endFrame]);
     }

@@ -46,9 +46,9 @@ glm::vec3 DCCSpline(const f32 u, const glm::vec3 &start, const glm::vec3 &p,
 }
 
 glm::quat DCCSpline(const f32 u, const KeyFrame &start, const KeyFrame &p, const KeyFrame &end) {
-    glm::quat startQuat{glm::angleAxis(start.angle, start.axis)};
-    glm::quat pQuat{glm::angleAxis(p.angle, p.axis)};
-    glm::quat endQuat{glm::angleAxis(end.angle, end.axis)};
+    glm::quat startQuat{glm::angleAxis(glm::radians(start.angle), glm::normalize(start.axis))};
+    glm::quat pQuat{glm::angleAxis(glm::radians(p.angle), glm::normalize(p.axis))};
+    glm::quat endQuat{glm::angleAxis(glm::radians(end.angle), glm::normalize(end.axis))};
 
     const auto controlPoints = CreateControlPoints(startQuat, pQuat, endQuat);
     const auto q0 = glm::normalize(glm::slerp(controlPoints[0], controlPoints[1], u));
@@ -56,5 +56,5 @@ glm::quat DCCSpline(const f32 u, const KeyFrame &start, const KeyFrame &p, const
     const auto q2 = glm::normalize(glm::slerp(controlPoints[2], controlPoints[3], u));
     const auto r0 = glm::normalize(glm::slerp(q0, q1, u));
     const auto r1 = glm::normalize(glm::slerp(q1, q2, u));
-    return glm::normalize(glm::slerp(r0, r1, u)); 
+    return glm::normalize(glm::slerp(r0, r1, u));
 }
