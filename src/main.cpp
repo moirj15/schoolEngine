@@ -25,6 +25,7 @@
 #include "obj.h"
 #include "keyframe.h"
 #include "boundingbox.h"
+#include "debugdraw.h"
 
 #define STB_IMAGE_IMPLEMENTATION
 //#include "../stb/stb_image.h"
@@ -93,7 +94,6 @@ static u32 boxConn[] = {
     6, 7, 3
 };
 
-#define ArraySize(X) (sizeof(X) / sizeof(X[0]))
 
 Window *InitGL() {
     if (!glfwInit()) {
@@ -174,6 +174,8 @@ int main(int argc, char **argv) {
     glfwSetTime(0.0);
     f64 lastTime = glfwGetTime();
     f32 t = 0.0;
+    DebugDraw::Init();
+    DebugDraw::AddBox({-1.0f, -1.0f, -1.0f}, {1.0f, 1.0f, 1.0f}, {5.0f, 5.0f, -5.0f});
     while (!glfwWindowShouldClose(window->m_glWindow)) {
         glfwPollEvents();
 
@@ -208,6 +210,18 @@ int main(int argc, char **argv) {
 
         boxObjVA.Bind();
         glDrawElements(GL_TRIANGLES, boxObjVA.IndexCount(), GL_UNSIGNED_INT, (void*)0);
+
+        for (const auto &dm : DebugDraw::DebugMeshes()) {
+            dm.shader->Bind();
+            dm.shader->SetUniformMat4("projection", glm::perspective(90.0f, 16.0f / 9.0f, 0.01f, 100.0f));
+            dm.shader->SetUniformMat4("transform", dm.transformMat);
+            dm.shader->SetUniformMat4("camera", glm::lookAt(glm::vec3{0.0f, 0.0f, 0.0f},
+                                                        glm::vec3{0.0f, 0.0f, -1.0f},
+                                                        glm::vec3{0.0f, 1.0f, 0.0f}));
+            dm.vertexArray->Bind();
+            glDrawElements(GL_LINES, dm.vertexArray->IndexCount(), GL_UNSIGNED_INT, (void*)0);
+
+        }
 
         glfwMakeContextCurrent(window->m_glWindow);
         glfwSwapBuffers(window->m_glWindow);

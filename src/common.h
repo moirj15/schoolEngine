@@ -18,6 +18,8 @@ typedef int64_t s64;
 typedef float f32;
 typedef double f64;
 
+#define ArraySize(X) (sizeof(X) / sizeof(X[0]))
+
 inline FILE *OpenFile(const char *file, const char *perm) {
     FILE *ret = NULL;
     ret = fopen(file, perm);

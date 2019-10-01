@@ -17,14 +17,17 @@
 class Shader {
     u32 m_programHandle;
     std::vector<std::string> m_filePaths;
-    std::unordered_map<std::string, u32> m_uniformCache;
+    std::unordered_map<std::string, s32> m_uniformCache;
 public:
-    explicit Shader(const std::vector<std::string> &filePaths);
+    Shader() = default;
+    Shader(const std::vector<std::string> &filePaths);
 
     inline void Bind() const { glUseProgram(m_programHandle); }
     inline void Unbind() const { glUseProgram(0); }
 
     inline u32 Handle() const { return m_programHandle; }
+
+    void Compile(const std::vector<std::string> &filePaths);
 
     void SetUniform1F(const std::string &name, const f32 value);
     void SetUniform2F(const std::string &name, const glm::vec2 &value);

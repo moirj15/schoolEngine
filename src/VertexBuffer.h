@@ -35,8 +35,8 @@ public:
     VertexBuffer(const f32 *vertecies, const size_t size, std::vector<BufferLayout> layout);
     ~VertexBuffer();
 
-    void Bind();
-    void Unbind();
+    void Bind() const;
+    void Unbind() const;
     inline const std::vector<BufferLayout> &Layout() const { return m_layout; }
 };
 
@@ -48,8 +48,8 @@ public:
     IndexBuffer(const u32 *indecies, const size_t size);
     ~IndexBuffer();
 
-    void Bind();
-    void Unbind();
+    void Bind() const;
+    void Unbind() const;
 
     u64 Count() const { return m_count; }
 };
@@ -66,8 +66,8 @@ public:
     void AddVertexBuffer(VertexBuffer *vertexBuffer);
     void AddIndexBuffer(IndexBuffer* indexBuffer);
 
-    void Bind();
-    void Unbind();
+    void Bind() const;
+    void Unbind() const;
     u64 IndexCount() const { return m_indexBuffer->Count(); }
 };
 
