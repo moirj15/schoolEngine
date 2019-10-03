@@ -1,0 +1,8 @@
+build/*
+build2/*
+.vs/*
+out/*
+objData/*
+qt-build/*
+
+
