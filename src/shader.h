@@ -13,6 +13,20 @@
 
 #include "common.h"
 
+struct ShaderData {
+    std::string name;
+
+    enum {
+        Vec3,
+        Vec4,
+        Mat4
+    } type;
+    union {
+        glm::vec3 v3;
+        glm::vec4 v4;
+        glm::mat4 m4;
+    };
+};
 
 class Shader {
     u32 m_programHandle;
@@ -35,6 +49,9 @@ public:
     void SetUniform4F(const std::string &name, const glm::vec4 &value);
 
     void SetUniformMat4(const std::string &name, const glm::mat4 &value);
+
+    void SetShaderData(const ShaderData &shaderData);
+    void SetShaderData(const std::vector<ShaderData> &shaderData);
 
 private:
     s32 LocationFromCache(const std::string &name);

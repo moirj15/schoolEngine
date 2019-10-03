@@ -104,6 +104,26 @@ void Shader::SetUniformMat4(const std::string &name, const glm::mat4 &value) {
     glUniformMatrix4fv(location, 1, false, glm::value_ptr(value));
 }
 
+void Shader::SetShaderData(const ShaderData &shaderData) {
+    switch (shaderData.type) {
+    case ShaderData::Vec3:
+        SetUniform3F(shaderData.name, shaderData.v3);
+        break;
+    case ShaderData::Vec4:
+        SetUniform4F(shaderData.name, shaderData.v4);
+        break;
+    case ShaderData::Mat4:
+        SetUniformMat4(shaderData.name, shaderData.m4);
+        break;
+    }
+}
+
+void Shader::SetShaderData(const std::vector<ShaderData> &shaderData) {
+    for (const auto &sd : shaderData) {
+        SetShaderData(sd);
+    }
+}
+
 // Private
 s32 Shader::LocationFromCache(const std::string &name) {
     if (m_uniformCache.find(name) != m_uniformCache.end()) {

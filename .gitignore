@@ -3,4 +3,6 @@ build2/*
 .vs/*
 out/*
 objData/*
-
+qt-build/*
+CMakeLists.txt.*
+CMakeSettings.*

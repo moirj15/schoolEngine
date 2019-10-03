@@ -7,6 +7,8 @@
 class Shader;
 class VertexArray;
 
+struct ShaderData;
+
 namespace Renderer {
 
 enum Command {
@@ -18,6 +20,7 @@ enum Command {
 
 struct Drawable {
     std::vector<Command> commands;
+    std::vector<ShaderData> shaderData;
     VertexArray *vertexArray;
     Shader *shader;
     glm::mat4 transforms;
