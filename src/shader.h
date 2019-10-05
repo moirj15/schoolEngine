@@ -26,6 +26,10 @@ struct ShaderData {
         glm::vec4 v4;
         glm::mat4 m4;
     };
+
+    ShaderData() = default;
+    ShaderData(const std::string &n, const glm::mat4 &m) :
+        name(n), type(Mat4), m4(m) {}
 };
 
 class Shader {

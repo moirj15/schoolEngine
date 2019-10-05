@@ -4,19 +4,13 @@
 #include <glm/glm.hpp>
 #include <memory>
 #include <vector>
+
+#include "shader.h"
+
 class VertexArray;
-class Shader;
+namespace Renderer { struct Drawable; }
 
 namespace DebugDraw {
-
-struct DebugMesh {
-    glm::mat4 transformMat;
-    Shader *shader;
-    std::unique_ptr<VertexArray> vertexArray;
-
-    DebugMesh(glm::mat4 &t, Shader *s, VertexArray *v) :
-        transformMat(std::move(t)), shader(s), vertexArray(v) {}
-};
 
 /**
  * Initilize the DebugDraw Module.
@@ -37,7 +31,7 @@ void AddLine(const glm::vec3 &start, const glm::vec3 &end);
  * Getter for the DebugMeshes from the DebugDraw module.
  * @return: The DebugMeshes
  */
-const std::vector<DebugMesh> &DebugMeshes();
+const std::vector<Renderer::Drawable> &DebugMeshes();
 }
 
 #endif // DEBUGDRAW_H

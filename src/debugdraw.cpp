@@ -1,6 +1,7 @@
 #include "debugdraw.h"
 #include "shader.h"
 #include "VertexBuffer.h"
+#include "renderer.h"
 
 #include <vector>
 #include <array>
@@ -8,7 +9,7 @@
 namespace DebugDraw {
 
 
-static std::vector<DebugMesh> s_debugMeshes;
+static std::vector<Renderer::Drawable> s_debugDrawables;
 static Shader s_debugShader;
 
 static f32 boxVerts[] = {
@@ -86,15 +87,16 @@ void AddBox(const glm::vec3 &min, const glm::vec3 &max, const glm::vec3 &pos) {
     vertArray->AddVertexBuffer(new VertexBuffer(verts, ArraySize(verts),
                                                {{"DBBox", 3, 0, 0, GL_FLOAT}}));
     vertArray->AddIndexBuffer(new IndexBuffer(conn, ArraySize(conn)));
-    s_debugMeshes.emplace_back(glm::translate(glm::mat4(1.0f), pos), &s_debugShader, vertArray);
+    ShaderData shaderData{"transform", glm::translate(glm::mat4(1.0f), pos)};
+    s_debugDrawables.push_back({{}, {shaderData}, vertArray, &s_debugShader});
 }
 
 void AddLine(const glm::vec3 &start, const glm::vec3 &end) {
 
 }
 
-const std::vector<DebugMesh> &DebugMeshes() {
-    return s_debugMeshes;
+const std::vector<Renderer::Drawable> &DebugMeshes() {
+    return s_debugDrawables;
 }
 
 }

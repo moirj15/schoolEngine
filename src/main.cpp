@@ -25,6 +25,7 @@
 #include "obj.h"
 #include "keyframe.h"
 #include "boundingbox.h"
+#include "renderer.h"
 #include "debugdraw.h"
 
 #define STB_IMAGE_IMPLEMENTATION
@@ -157,20 +158,19 @@ int main(int argc, char **argv) {
     ObjReader objReader{"../objData/block.obj"};
     std::unique_ptr<Mesh> mesh{objReader.Parse()};
 
-    VertexArray boxObjVA{};
-    boxObjVA.AddVertexBuffer(new VertexBuffer(mesh->vertecies.data(), 
+    VertexArray boxObjVA;
+    boxObjVA.AddVertexBuffer(new VertexBuffer(mesh->vertecies.data(),
         mesh->vertecies.size() , {{"boxVerts", 3, 0, 0, GL_FLOAT}}));
     boxObjVA.AddVertexBuffer(new VertexBuffer(boxColors, ArraySize(boxColors),
         {{"boxColors", 3, 0, 1, GL_FLOAT}}));
     boxObjVA.AddIndexBuffer(new IndexBuffer(mesh->connections.data(), mesh->connections.size()));
 
-    shader.Bind();
-    shader.SetUniformMat4("projection", glm::perspective(90.0f, 16.0f / 9.0f, 0.01f, 100.0f));
-    shader.SetUniformMat4("transform", glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -5.0f)));
-    shader.SetUniformMat4("camera", glm::lookAt(glm::vec3{0.0f, 0.0f, 0.0f},
-                                                glm::vec3{0.0f, 0.0f, -1.0f},
-                                                glm::vec3{0.0f, 1.0f, 0.0f}));
+    auto perspective = glm::perspective(90.0f, 16.0f / 9.0f, 0.01f, 100.0f);
+    auto camera =  glm::lookAt(glm::vec3{0.0f, 0.0f, 0.0f}, glm::vec3{0.0f, 0.0f, -1.0f},
+                               glm::vec3{0.0f, 1.0f, 0.0f});
 
+    auto transform = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -5.0f));
+    Renderer::Drawable drawable = {{}, {{"transform", transform}}, &boxObjVA, &shader};
     glfwSetTime(0.0);
     f64 lastTime = glfwGetTime();
     f32 t = 0.0;
@@ -184,7 +184,8 @@ int main(int argc, char **argv) {
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
 
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+//        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        Renderer::Clear();
         f64 currentTime = glfwGetTime();
         f64 delta = (currentTime - lastTime);// * 1000.0;
         t += delta;//lastTime / 60.0f;
@@ -196,7 +197,6 @@ int main(int argc, char **argv) {
 
         ImGui::End();
 
-
         ImGui::Render();
         int display_w, display_h;
         glfwMakeContextCurrent(window->m_glWindow);
@@ -205,26 +205,31 @@ int main(int argc, char **argv) {
         glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
         glClear(GL_COLOR_BUFFER_BIT);
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-
-        shader.Bind();
-
-        boxObjVA.Bind();
-        glDrawElements(GL_TRIANGLES, boxObjVA.IndexCount(), GL_UNSIGNED_INT, (void*)0);
-
-        for (const auto &dm : DebugDraw::DebugMeshes()) {
-            dm.shader->Bind();
-            dm.shader->SetUniformMat4("projection", glm::perspective(90.0f, 16.0f / 9.0f, 0.01f, 100.0f));
-            dm.shader->SetUniformMat4("transform", dm.transformMat);
-            dm.shader->SetUniformMat4("camera", glm::lookAt(glm::vec3{0.0f, 0.0f, 0.0f},
-                                                        glm::vec3{0.0f, 0.0f, -1.0f},
-                                                        glm::vec3{0.0f, 1.0f, 0.0f}));
-            dm.vertexArray->Bind();
-            glDrawElements(GL_LINES, dm.vertexArray->IndexCount(), GL_UNSIGNED_INT, (void*)0);
-
-        }
-
+        Renderer::AddToDrawQueue(drawable);
         glfwMakeContextCurrent(window->m_glWindow);
-        glfwSwapBuffers(window->m_glWindow);
+        Renderer::Draw(camera, perspective);
+        Renderer::DrawDebug(camera, perspective);
+        Renderer::DisplayDraw(window);
+
+//        shader.Bind();
+
+//        boxObjVA.Bind();
+//        glDrawElements(GL_TRIANGLES, boxObjVA.IndexCount(), GL_UNSIGNED_INT, (void*)0);
+
+//        for (const auto &dm : DebugDraw::DebugMeshes()) {
+//            dm.shader->Bind();
+//            dm.shader->SetUniformMat4("projection", glm::perspective(90.0f, 16.0f / 9.0f, 0.01f, 100.0f));
+//            dm.shader->SetUniformMat4("transform", dm.transformMat);
+//            dm.shader->SetUniformMat4("camera", glm::lookAt(glm::vec3{0.0f, 0.0f, 0.0f},
+//                                                        glm::vec3{0.0f, 0.0f, -1.0f},
+//                                                        glm::vec3{0.0f, 1.0f, 0.0f}));
+//            dm.vertexArray->Bind();
+//            glDrawElements(GL_LINES, dm.vertexArray->IndexCount(), GL_UNSIGNED_INT, (void*)0);
+
+//        }
+
+//        glfwMakeContextCurrent(window->m_glWindow);
+//        glfwSwapBuffers(window->m_glWindow);
     }
 
     ImGui_ImplOpenGL3_Shutdown();

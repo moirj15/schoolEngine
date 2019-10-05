@@ -6,6 +6,7 @@
 
 class Shader;
 class VertexArray;
+struct Window;
 
 struct ShaderData;
 
@@ -23,16 +24,18 @@ struct Drawable {
     std::vector<ShaderData> shaderData;
     VertexArray *vertexArray;
     Shader *shader;
-    glm::mat4 transforms;
 };
 
-void AddToDrawQueue(Drawable &drawable);
+/**
+ * Adds the given drawable to the draw queue.
+ */
+void AddToDrawQueue(const Drawable &drawable);
 
-void Draw();
+void Draw(const glm::mat4 &camera, const glm::mat4 &perspective);
 
-void DrawDebug();
+void DrawDebug(const glm::mat4 &camera, const glm::mat4 &perspective);
 
-void DisplayDraw();
+void DisplayDraw(const Window *window);
 
 void Clear();
 
