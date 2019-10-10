@@ -3,7 +3,7 @@
 #include <GL/glew.h>
 
 
-VertexBuffer::VertexBuffer(const f32 const *vertecies, const size_t size, 
+VertexBuffer::VertexBuffer(const f32 *vertecies, const size_t size, 
         std::vector<BufferLayout> layout) :
         m_vertexBufferHandle(0),
         m_layout{std::move(layout)} {

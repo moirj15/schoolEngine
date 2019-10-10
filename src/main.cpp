@@ -34,7 +34,7 @@
 #ifdef __APPLE__
 constexpr s32 width = 480;
 constexpr s32 height = 360;
-#elif _WIN32
+#else
 constexpr s32 width = 1920;
 constexpr s32 height = 1080;
 #endif
@@ -174,8 +174,10 @@ int main(int argc, char **argv) {
     glfwSetTime(0.0);
     f64 lastTime = glfwGetTime();
     f32 t = 0.0;
+    
     DebugDraw::Init();
     DebugDraw::AddBox({-1.0f, -1.0f, -1.0f}, {1.0f, 1.0f, 1.0f}, {5.0f, 5.0f, -5.0f});
+    
     while (!glfwWindowShouldClose(window->m_glWindow)) {
         glfwPollEvents();
 

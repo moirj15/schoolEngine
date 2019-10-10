@@ -2,7 +2,10 @@
 #include "shader.h"
 #include "VertexBuffer.h"
 #include "renderer.h"
-
+#define GLM_ENABLE_EXPERIMENTAL
+#include <glm/glm.hpp>
+#include <glm/gtx/normal.hpp>
+#include <glm/gtx/transform.hpp>
 #include <vector>
 #include <array>
 
