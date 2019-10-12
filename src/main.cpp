@@ -19,6 +19,7 @@
 
 #include "window.h"
 #include "shader.h"
+#include "common.h"
 
 #include "VertexBuffer.h"
 
