@@ -6,6 +6,7 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/quaternion.hpp>
 #include <optional>
+#include <tuple>
 #include <vector>
 
 namespace Renderer {
@@ -33,6 +34,7 @@ struct Physics : public Entity {
   glm::quat angularMomentum = {};
   glm::vec3 momentum = {};
   f32 mass = 0.0f;
+  f32 frictionCoef = 0.0f;
 
   Physics(EntityID eid) : Entity{eid} {}
 };
@@ -57,17 +59,6 @@ enum class Type : u32 {
   Transform = 1 << 26,
 };
 
-void Init();
-
-void DeInit();
-
-EntityID CreateEntity(u32 type);
-
-std::optional<Physics *> GetPhysicsComponent(EntityID id);
-
-std::vector<Physics *> GetPhysics();
-
-#include <tuple>
 class ComponentManager {
   using CompTuple = std::tuple<std::vector<Physics *>,
       std::vector<Renderable *>, std::vector<Transform *>>;
@@ -78,6 +69,8 @@ public:
   ~ComponentManager();
 
   EntityID CreateEntity(u32 type);
+
+  void DestroyEntity(EntityID id);
 
   template<typename T>
   T *GetComponent(EntityID id) {

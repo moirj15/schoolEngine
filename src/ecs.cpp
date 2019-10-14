@@ -2,12 +2,13 @@
 
 namespace ECS {
 
-void Init() {
-  // TODO
-}
-
-void DeInit() {
-  // TODO
+ComponentManager::~ComponentManager() {
+  auto [physics, renderables, transforms] = m_components;
+  for (u32 i = 0; i < physics.size(); i++) {
+    delete (physics[i]);
+    delete (renderables[i]);
+    delete (transforms[i]);
+  }
 }
 
 EntityID ComponentManager::CreateEntity(u32 type) {
@@ -24,15 +25,23 @@ EntityID ComponentManager::CreateEntity(u32 type) {
   return id;
 }
 
-// TODO: Consider templating this
-std::optional<Physics *> GetPhysicsComponent(EntityID id) {
-  u32 index = id && 0x0000ffff;
-  u32 count = (id && 0x00ff0000) >> 16;
-  if ((index < s_physicsEntities.size()) && s_physicsEntities[index]) {
-    return s_physicsEntities[id];
+void ComponentManager::DestroyEntity(EntityID id) {
+  auto [physics, renderables, transforms] = m_components;
+  u32 index = id & 0x0000ffff;
+  if (id & static_cast<u32>(Type::Physics)) {
+    delete (physics[id]);
+    physics[id] = nullptr;
   }
-  return {};
+  if (id & static_cast<u32>(Type::Renderable)) {
+    delete (renderables[id]);
+    renderables[id] = nullptr;
+  }
+  if (id & static_cast<u32>(Type::Transform)) {
+    delete (transforms[id]);
+    transforms[id] = nullptr;
+  }
 }
+
 EntityID ComponentManager::NextID() {
   static EntityID id = 0;
   id++;
