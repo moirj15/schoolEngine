@@ -18,7 +18,9 @@
 #include "obj.h"
 #include "physicsManager.h"
 #include "renderer.h"
+#include "rendererablemanager.h"
 #include "shader.h"
+#include "shaterableManager.h"
 #include "window.h"
 
 #include <chrono>
@@ -227,12 +229,17 @@ int main(int argc, char **argv) {
 
   ECS::ComponentManager componentManager;
   PhysicsManager physicsManager{&componentManager};
+  ShaterableManager shaterableManager{&componentManager};
+  RendererableManager rendererManager{&componentManager};
+
   while (!glfwWindowShouldClose(window->m_glWindow)) {
     glfwPollEvents();
     f64 currentTime = glfwGetTime();
     f64 delta = (currentTime - lastTime); // * 1000.0;
-    t += delta;                           // lastTime / 60.0f;
-    physicsManager.Simulate(lastTime, currentTime);
+    t += (f32)delta;                      // lastTime / 60.0f;
+    physicsManager.Simulate((f32)lastTime, (f32)currentTime);
+    shaterableManager.Simulate((f32)lastTime, (f32)currentTime);
+    rendererManager.DrawComponents();
 
     // Start the Dear ImGui frame
     ImGui_ImplOpenGL3_NewFrame();

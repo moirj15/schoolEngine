@@ -1,4 +1,4 @@
-#include "explodingbox.h"
+#include "shaterableManager.h"
 
 void ShaterableManager::Simulate(f32 prevTimeStep, f32 currTimeStep) {
   auto physicsComponents = m_componentManager->GetComponents<ECS::Physics>();

@@ -10,10 +10,13 @@
 namespace Renderer {
 
 static std::vector<Drawable> s_renderQueue;
-static Shader s_defaultShader{
-    {"../shaders/shader.vert", "../shaders/shader.frag"}};
+static Shader *s_defaultShader = nullptr;
 
 void AddToDrawQueue(const Drawable &drawable) {
+  if (!s_defaultShader) {
+    s_defaultShader =
+        new Shader{{"../shaders/shader.vert", "../shaders/shader.frag"}};
+  }
   s_renderQueue.push_back(drawable);
 }
 
@@ -28,10 +31,10 @@ void Draw(const glm::mat4 &camera, const glm::mat4 &perspective) {
       drawable.shader->SetUniformMat4("projection", perspective);
 
     } else {
-      s_defaultShader.Bind();
-      s_defaultShader.SetShaderData(drawable.shaderData);
-      s_defaultShader.SetUniformMat4("camera", camera);
-      s_defaultShader.SetUniformMat4("projection", perspective);
+      s_defaultShader->Bind();
+      s_defaultShader->SetShaderData(drawable.shaderData);
+      s_defaultShader->SetUniformMat4("camera", camera);
+      s_defaultShader->SetUniformMat4("projection", perspective);
     }
     drawable.vertexArray->Bind();
     glDrawElements(GL_TRIANGLES, drawable.vertexArray->IndexCount(),
