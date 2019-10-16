@@ -13,8 +13,10 @@
 #include "boundingbox.h"
 #include "common.h"
 #include "debugdraw.h"
+#include "ecs.h"
 #include "keyframe.h"
 #include "obj.h"
+#include "physicsManager.h"
 #include "renderer.h"
 #include "shader.h"
 #include "window.h"
@@ -134,13 +136,6 @@ static u32 boxConn[] = {
 
 #if 0
 
-struct sphere {
-  ECS::EntityID entityID;
-
-  sphere() :
-    entityID{ECS::CreateEntity(ECS::Physics | ECS::Renderable | ECS::transform)}
-}
-
 #endif
 
 Window *InitGL() {
@@ -230,19 +225,21 @@ int main(int argc, char **argv) {
   DebugDraw::AddBox(
       {-1.0f, -1.0f, -1.0f}, {1.0f, 1.0f, 1.0f}, {5.0f, 5.0f, -5.0f});
 
+  ECS::ComponentManager componentManager;
+  PhysicsManager physicsManager{&componentManager};
   while (!glfwWindowShouldClose(window->m_glWindow)) {
     glfwPollEvents();
+    f64 currentTime = glfwGetTime();
+    f64 delta = (currentTime - lastTime); // * 1000.0;
+    t += delta;                           // lastTime / 60.0f;
+    physicsManager.Simulate(lastTime, currentTime);
 
     // Start the Dear ImGui frame
     ImGui_ImplOpenGL3_NewFrame();
     ImGui_ImplGlfw_NewFrame();
     ImGui::NewFrame();
 
-    //        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     Renderer::Clear();
-    f64 currentTime = glfwGetTime();
-    f64 delta = (currentTime - lastTime); // * 1000.0;
-    t += delta;                           // lastTime / 60.0f;
 
     lastTime = glfwGetTime();
 
@@ -264,32 +261,6 @@ int main(int argc, char **argv) {
     Renderer::Draw(camera, perspective);
     Renderer::DrawDebug(camera, perspective);
     Renderer::DisplayDraw(window);
-
-    //        shader.Bind();
-
-    //        boxObjVA.Bind();
-    //        glDrawElements(GL_TRIANGLES, boxObjVA.IndexCount(),
-    //        GL_UNSIGNED_INT, (void*)0);
-
-    //        for (const auto &dm : DebugDraw::DebugMeshes()) {
-    //            dm.shader->Bind();
-    //            dm.shader->SetUniformMat4("projection",
-    //            glm::perspective(90.0f, 16.0f / 9.0f, 0.01f, 100.0f));
-    //            dm.shader->SetUniformMat4("transform", dm.transformMat);
-    //            dm.shader->SetUniformMat4("camera",
-    //            glm::lookAt(glm::vec3{0.0f, 0.0f, 0.0f},
-    //                                                        glm::vec3{0.0f,
-    //                                                        0.0f, -1.0f},
-    //                                                        glm::vec3{0.0f, 1.0f,
-    //                                                        0.0f}));
-    //            dm.vertexArray->Bind();
-    //            glDrawElements(GL_LINES, dm.vertexArray->IndexCount(),
-    //            GL_UNSIGNED_INT, (void*)0);
-
-    //        }
-
-    //        glfwMakeContextCurrent(window->m_glWindow);
-    //        glfwSwapBuffers(window->m_glWindow);
   }
 
   ImGui_ImplOpenGL3_Shutdown();

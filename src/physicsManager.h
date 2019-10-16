@@ -1,14 +1,21 @@
 #ifndef PHYSICS_MANAGER_H
 #define PHYSICS_MANAGER_H
 
-namespace PhysicsManager {
+#include "common.h"
 
-void Init();
+namespace ECS {
+class ComponentManager;
+}
 
-void Deinit();
+class PhysicsManager {
+  ECS::ComponentManager *m_componentManager;
 
-void Simulate(f32 prevTimeStep, f32 currTimeStep);
+public:
+  PhysicsManager(ECS::ComponentManager *componenetManager) :
+      m_componentManager{componenetManager} {}
 
-} // namespace PhysicsManager
+  void Simulate(f32 prevTimeStep, f32 currTimeStep);
+
+}; // namespace PhysicsManager
 
 #endif
