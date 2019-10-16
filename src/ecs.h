@@ -52,7 +52,7 @@ struct Transform {
 };
 
 struct Shaterable {
-  bool hasShatered;
+  bool hasShatered = false;
 };
 
 struct Mesh {
@@ -63,10 +63,10 @@ struct Mesh {
 };
 
 struct Collidable {
-  bool hasCollided;
-  EntityID collidedEntity;
-  f32 collisionTime;
-  BoundingBox boundingBox;
+  bool hasCollided = false;
+  EntityID collidedEntity = 0;
+  f32 collisionTime = 0.0f;
+  BoundingBox boundingBox = {};
 };
 
 enum class Type : u32 {
@@ -98,7 +98,8 @@ public:
   template<typename T>
   T *GetComponent(EntityID id) {
     auto component = std::get<std::vector<T *>>(m_components);
-    if (id < component.size()) { return component[id]; }
+    u32 index = id & 0x0000ffff;
+    if (index < component.size()) { return component[index]; }
     return nullptr;
   }
 

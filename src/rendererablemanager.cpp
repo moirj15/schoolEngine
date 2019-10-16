@@ -11,7 +11,7 @@ void RendererableManager::DrawComponents() {
   for (size_t i = 0; i < renderables.size(); i++) {
     auto *drawable = renderables[i];
     auto *transform = transforms[i];
-    if (drawable && transform) {
+    if (drawable && transform && i != 1) {
       // TODO: FIX THIS GOD AWFUL MESS
       auto copy = *drawable;
       auto transformMat = glm::translate(glm::mat4(1.0f), transform->position)

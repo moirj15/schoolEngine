@@ -1,5 +1,8 @@
 #include "shaterableManager.h"
 
+#define GLM_ENABLE_EXPERIMENTAL
+#include <glm/gtx/normal.hpp>
+
 void ShaterableManager::Simulate(f32 prevTimeStep, f32 currTimeStep) {
   auto physicsComponents = m_componentManager->GetComponents<ECS::Physics>();
   auto transformsComponents =
@@ -24,8 +27,12 @@ void ShaterableManager::Simulate(f32 prevTimeStep, f32 currTimeStep) {
 
 std::vector<Triangle> ShaterableManager::ProcessTriangles(ECS::Mesh *mesh) {
   std::vector<Triangle> triangles;
+  const auto &c = mesh->connections;
+  const auto &v = mesh->vertecies;
   for (size_t i = 0; i < mesh->connections.size(); i += 3) {
-    triangles.emplace_back(Triangle{});
+    triangles.push_back({{v[c[i] * 3], v[(c[i] * 3) + 1], v[(c[i] * 3) + 2]},
+        {v[c[i + 1] * 3], v[(c[i + 1] * 3) + 1], v[(c[i + 1] * 3) + 2]},
+        {v[c[i + 2] * 3], v[(c[i + 2] * 3) + 1], v[(c[i + 2] * 3) + 2]}});
   }
   return triangles;
 }
@@ -45,15 +52,15 @@ void ShaterableManager::AddTrianglesToECS(
     renderable->vertexArray = new VertexArray();
     u32 indecies[] = {0, 1, 2};
     f32 verts[] = {
-        -1.0,
-        0.0,
-        -1.0,
-        1.0,
-        1.0,
-        0.0,
-        -1.0,
-        1.0,
-        0.0,
+        triangle.p0.x,
+        triangle.p0.y,
+        triangle.p0.z,
+        triangle.p1.x,
+        triangle.p1.y,
+        triangle.p1.z,
+        triangle.p2.x,
+        triangle.p2.y,
+        triangle.p2.z,
     };
     renderable->vertexArray->AddIndexBuffer(new IndexBuffer{indecies, 3});
     renderable->vertexArray->AddVertexBuffer(
@@ -61,5 +68,8 @@ void ShaterableManager::AddTrianglesToECS(
 
     transform->position = {0.0f, 0.0f, -1.0f};
     transform->rotation = {};
+    physics->velocity =
+        glm::triangleNormal(triangle.p0, triangle.p1, triangle.p2)
+        + triangle.p1;
   }
 }

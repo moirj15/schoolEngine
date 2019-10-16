@@ -1,8 +1,8 @@
 #ifndef RENDERER_H
 #define RENDERER_H
 
-#include <vector>
 #include <glm/glm.hpp>
+#include <vector>
 
 class Shader;
 class VertexArray;
@@ -13,17 +13,17 @@ struct ShaderData;
 namespace Renderer {
 
 enum Command {
-    DrawLine,
-    DrawSolid,
-    CullBack,
-    DisableCull,
+  DrawLine,
+  DrawSolid,
+  CullBack,
+  DisableCull,
 };
 
 struct Drawable {
-    std::vector<Command> commands;
-    std::vector<ShaderData> shaderData;
-    VertexArray *vertexArray;
-    Shader *shader;
+  std::vector<Command> commands;
+  std::vector<ShaderData> shaderData;
+  VertexArray *vertexArray;
+  Shader *shader;
 };
 
 /**
@@ -39,6 +39,7 @@ void DisplayDraw(const Window *window);
 
 void Clear();
 
-}
+void ClearDrawQueue();
+} // namespace Renderer
 
 #endif // RENDERER_H

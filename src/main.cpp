@@ -200,8 +200,9 @@ int main(int argc, char **argv) {
   BoundingBox bb{glm::vec3(-1.0f, -1.0f, -5.0f), glm::vec3(1.0f, 1.0f, -2.0f)};
   bool intersect = bb.IntersectRay(ray);
 
-  ObjReader objReader{"../objData/block.obj"};
-  std::unique_ptr<Mesh> mesh{objReader.Parse()};
+  //  ObjReader objReader{"../objData/block.obj"};
+  ObjReader objReader{"../objData/knife.obj"};
+  Mesh *mesh = objReader.Parse();
 
   //  VertexArray boxObjVA;
   //  boxObjVA.AddVertexBuffer(new VertexBuffer(mesh->vertecies.data(),
@@ -238,8 +239,13 @@ int main(int argc, char **argv) {
                                     | static_cast<u32>(ECS::Type::Transform)
                                     | static_cast<u32>(ECS::Type::Mesh)
                                     | static_cast<u32>(ECS::Type::Shaterable));
+  auto *compMesh = componentManager.GetComponent<ECS::Mesh>(id);
+  for (auto i : mesh->normals) { compMesh->normals.push_back(i); }
+  for (auto i : mesh->vertecies) { compMesh->vertecies.push_back(i); }
+  for (auto i : mesh->connections) { compMesh->connections.push_back(i); }
 
   while (!glfwWindowShouldClose(window->m_glWindow)) {
+    Renderer::ClearDrawQueue();
     glfwPollEvents();
     f64 currentTime = glfwGetTime();
     f64 delta = (currentTime - lastTime); // * 1000.0;

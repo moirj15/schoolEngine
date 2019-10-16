@@ -11,24 +11,24 @@ typedef uint8_t u8;
 typedef uint16_t u16;
 typedef uint32_t u32;
 typedef uint64_t u64;
-typedef int8_t  s8;
+typedef int8_t s8;
 typedef int16_t s16;
 typedef int32_t s32;
 typedef int64_t s64;
 typedef float f32;
 typedef double f64;
+typedef size_t size;
 
 #define ArraySize(X) (sizeof(X) / sizeof(X[0]))
 
 inline FILE *OpenFile(const char *file, const char *perm) {
-    FILE *ret = NULL;
-    ret = fopen(file, perm);
-    if (!ret) {
-        fprintf(stderr, "FAILED TO OPEN FILE: %s\n", file);
-        exit(EXIT_FAILURE);
-    }
-    return ret;
+  FILE *ret = NULL;
+  ret = fopen(file, perm);
+  if (!ret) {
+    fprintf(stderr, "FAILED TO OPEN FILE: %s\n", file);
+    exit(EXIT_FAILURE);
+  }
+  return ret;
 }
-
 
 #endif
