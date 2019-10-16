@@ -12,7 +12,7 @@ void ShaterableManager::Simulate(f32 prevTimeStep, f32 currTimeStep) {
     auto *transform = transformsComponents[i];
     auto *shaterable = shaterablesComponents[i];
     auto *mesh = meshComponents[i];
-    if (physics && transform && shaterable) {
+    if (physics && transform && shaterable && mesh) {
       if (!shaterable->hasShatered) {
         shaterable->hasShatered = true;
         auto triangles = ProcessTriangles(mesh);

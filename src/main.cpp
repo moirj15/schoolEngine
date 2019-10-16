@@ -203,34 +203,41 @@ int main(int argc, char **argv) {
   ObjReader objReader{"../objData/block.obj"};
   std::unique_ptr<Mesh> mesh{objReader.Parse()};
 
-  VertexArray boxObjVA;
-  boxObjVA.AddVertexBuffer(new VertexBuffer(mesh->vertecies.data(),
-      mesh->vertecies.size(), {{"boxVerts", 3, 0, 0, GL_FLOAT}}));
-  boxObjVA.AddVertexBuffer(new VertexBuffer(
-      boxColors, ArraySize(boxColors), {{"boxColors", 3, 0, 1, GL_FLOAT}}));
-  boxObjVA.AddIndexBuffer(
-      new IndexBuffer(mesh->connections.data(), mesh->connections.size()));
+  //  VertexArray boxObjVA;
+  //  boxObjVA.AddVertexBuffer(new VertexBuffer(mesh->vertecies.data(),
+  //      mesh->vertecies.size(), {{"boxVerts", 3, 0, 0, GL_FLOAT}}));
+  //  boxObjVA.AddVertexBuffer(new VertexBuffer(
+  //      boxColors, ArraySize(boxColors), {{"boxColors", 3, 0, 1, GL_FLOAT}}));
+  //  boxObjVA.AddIndexBuffer(
+  //      new IndexBuffer(mesh->connections.data(), mesh->connections.size()));
 
   auto perspective = glm::perspective(90.0f, 16.0f / 9.0f, 0.01f, 100.0f);
-  auto camera = glm::lookAt(glm::vec3{0.0f, 0.0f, 0.0f},
+  auto camera = glm::lookAt(glm::vec3{0.0f, 0.0f, 5.0f},
       glm::vec3{0.0f, 0.0f, -1.0f}, glm::vec3{0.0f, 1.0f, 0.0f});
 
   auto transform =
       glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -5.0f));
-  Renderer::Drawable drawable = {
-      {}, {{"transform", transform}}, &boxObjVA, &shader};
+  //  Renderer::Drawable drawable = {
+  //      {}, {{"transform", transform}}, &boxObjVA, &shader};
   glfwSetTime(0.0);
   f64 lastTime = glfwGetTime();
   f32 t = 0.0;
 
-  DebugDraw::Init();
-  DebugDraw::AddBox(
-      {-1.0f, -1.0f, -1.0f}, {1.0f, 1.0f, 1.0f}, {5.0f, 5.0f, -5.0f});
+  //  DebugDraw::Init();
+  //  DebugDraw::AddBox(
+  //      {-1.0f, -1.0f, -1.0f}, {1.0f, 1.0f, 1.0f}, {5.0f, 5.0f, -5.0f});
 
   ECS::ComponentManager componentManager;
   PhysicsManager physicsManager{&componentManager};
   ShaterableManager shaterableManager{&componentManager};
   RendererableManager rendererManager{&componentManager};
+
+  ECS::EntityID id =
+      componentManager.CreateEntity(static_cast<u32>(ECS::Type::Renderable)
+                                    | static_cast<u32>(ECS::Type::Physics)
+                                    | static_cast<u32>(ECS::Type::Transform)
+                                    | static_cast<u32>(ECS::Type::Mesh)
+                                    | static_cast<u32>(ECS::Type::Shaterable));
 
   while (!glfwWindowShouldClose(window->m_glWindow)) {
     glfwPollEvents();
@@ -263,7 +270,7 @@ int main(int argc, char **argv) {
     glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
     glClear(GL_COLOR_BUFFER_BIT);
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-    Renderer::AddToDrawQueue(drawable);
+    //    Renderer::AddToDrawQueue(drawable);
     glfwMakeContextCurrent(window->m_glWindow);
     Renderer::Draw(camera, perspective);
     Renderer::DrawDebug(camera, perspective);

@@ -14,7 +14,7 @@ ComponentManager::~ComponentManager() {
 
 EntityID ComponentManager::CreateEntity(u32 type) {
   EntityID id = NextID();
-  auto [physics, renderables, transforms, shaterables, meshes, collidables] =
+  auto &[physics, renderables, transforms, shaterables, meshes, collidables] =
       m_components;
   if (type & static_cast<u32>(Type::Renderable)) {
     renderables[id] = new Renderable;
@@ -22,6 +22,13 @@ EntityID ComponentManager::CreateEntity(u32 type) {
   if (type & static_cast<u32>(Type::Physics)) { physics[id] = new Physics; }
   if (type & static_cast<u32>(Type::Transform)) {
     transforms[id] = new Transform;
+  }
+  if (type & static_cast<u32>(Type::Shaterable)) {
+    shaterables[id] = new Shaterable;
+  }
+  if (type & static_cast<u32>(Type::Mesh)) { meshes[id] = new Mesh; }
+  if (type & static_cast<u32>(Type::Collidable)) {
+    collidables[id] = new Collidable;
   }
   id |= type;
   return id;
@@ -32,16 +39,16 @@ void ComponentManager::DestroyEntity(EntityID id) {
       m_components;
   u32 index = id & 0x0000ffff;
   if (id & static_cast<u32>(Type::Physics)) {
-    delete (physics[id]);
-    physics[id] = nullptr;
+    delete (physics[index]);
+    physics[index] = nullptr;
   }
   if (id & static_cast<u32>(Type::Renderable)) {
-    delete (renderables[id]);
-    renderables[id] = nullptr;
+    delete (renderables[index]);
+    renderables[index] = nullptr;
   }
   if (id & static_cast<u32>(Type::Transform)) {
-    delete (transforms[id]);
-    transforms[id] = nullptr;
+    delete (transforms[index]);
+    transforms[index] = nullptr;
   }
 }
 

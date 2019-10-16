@@ -86,7 +86,9 @@ class ComponentManager {
   CompTuple m_components;
 
 public:
-  ComponentManager() = default;
+  ComponentManager() :
+      m_components{{1024, nullptr}, {1024, nullptr}, {1024, nullptr},
+          {1024, nullptr}, {1024, nullptr}, {1024, nullptr}} {}
   ~ComponentManager();
 
   EntityID CreateEntity(u32 type);
