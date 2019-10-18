@@ -4,5 +4,7 @@ build2/*
 out/*
 objData/*
 qt-build/*
-
-
+CMakeLists.txt.*
+CMakeSettings.*
+.vscode/*
+.vs/*

@@ -5,10 +5,12 @@
 
 #include "VertexBuffer.h"
 
-ObjReader::ObjReader(std::string &filename) :
-        m_filename(std::move(filename)) {
+ObjReader::ObjReader(char *filename) :
+        m_filename(std::move(filename)),
+        m_dataLen(0),
+        m_pos(0) {
     FILE *fp = OpenFile(m_filename.c_str(), "r");
-//    char *data = nullptr;
+    char *data = nullptr;
     size_t len = 0;
 
     fseek(fp, 0, SEEK_END);
@@ -19,17 +21,18 @@ ObjReader::ObjReader(std::string &filename) :
         fprintf(stderr, "failed to get file size");
     }
 
-    m_data.reserve(len + 1);
-//    data = new char[len + 1];
-//    len = fread(data, sizeof(char), len, fp);
-    len = fread(m_data.data(), sizeof(char), len, fp);
-//    m_data.reset(data);
+    //m_data.reserve(len + 1);
+    data = new char[len + 1]();
+    m_dataLen = len + 1;
+    len = fread(data, sizeof(char), len, fp);
+    //len = fread(&m_data[0], sizeof(char), len, fp);
+    m_data.reset(data);
 
     fclose(fp);
 }
 
 Mesh *ObjReader::Parse() {
-    while (m_pos < m_data.size()) {
+    while (m_pos < m_dataLen) {
         auto dataType = ParseType();
         switch (dataType) {
         case DataType::Vertex:
@@ -39,7 +42,7 @@ Mesh *ObjReader::Parse() {
             fprintf(stderr, "NOT IMPLEMENTED\n");
             break;
         case DataType::VertexNormal:
-            fprintf(stderr, "NOT IMPLEMENTED\n");
+            ParseNormal();
             break;
         case DataType::ParameterSpaceVertex:
             fprintf(stderr, "NOT IMPLEMENTED\n");
@@ -52,6 +55,7 @@ Mesh *ObjReader::Parse() {
             break;
         case DataType::Object:
             fprintf(stderr, "NOT IMPLEMENTED\n");
+            SkipLine();
             break;
         case DataType::Group:
             fprintf(stderr, "NOT IMPLEMENTED\n");
@@ -61,13 +65,21 @@ Mesh *ObjReader::Parse() {
             break;
         case DataType::Unknown:
             fprintf(stderr, "NOT IMPLEMENTED\n");
+            SkipLine();
             break;
         }
     }
+    Clear();
     // This should clear out m_mesh
     return new Mesh{std::move(m_mesh)};
 }
 
+void ObjReader::Clear() {
+    m_data.reset();
+    m_dataLen = 0;
+    m_pos = 0;
+    m_filename.clear();
+}
 
 // Private
 ObjReader::DataType ObjReader::ParseType() {
@@ -96,6 +108,9 @@ ObjReader::DataType ObjReader::ParseType() {
             return DataType::VertexNormal;
         }
     }
+    else if (Token() == '#') {
+        return DataType::Comment;
+    }
     fprintf(stderr, "Unrecognized OBJ datatype\n");
     return DataType::Unknown;
 }
@@ -103,10 +118,20 @@ ObjReader::DataType ObjReader::ParseType() {
 void ObjReader::ParseVertex() {
     std::stringstream line{ReadLine()};
     f32 val = 0.0f;
-    for (s32 i = 0; i < 4; i++) {
+    for (s32 i = 0; i < 3; i++) {
         line >> val;
         m_mesh.vertecies.emplace_back(val);
     }
+}
+
+void ObjReader::ParseNormal() {
+    std::stringstream line{ReadLine()};
+    f32 val = 0.0f;
+    for (s32 i = 0; i < 3; i++) {
+        line >> val;
+        m_mesh.normals.emplace_back(val);
+    }
+
 }
 
 void ObjReader::ParseFace() {
@@ -123,7 +148,7 @@ void ObjReader::ParseFace() {
 
 std::string ObjReader::ReadLine() {
     std::string line = "";
-    while (Token() != '\n') {
+    while (Token() != '\n' && m_pos < m_dataLen) {
         line += Token();
         m_pos++;
     }
@@ -132,7 +157,7 @@ std::string ObjReader::ReadLine() {
 }
 
 void ObjReader::SkipLine() {
-    while (Token() != '\n') {
+    while (Token() != '\n' && m_pos < m_dataLen) {
         m_pos++;
     }
     m_pos++;

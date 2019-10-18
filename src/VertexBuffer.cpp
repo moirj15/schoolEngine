@@ -3,7 +3,7 @@
 #include <GL/glew.h>
 
 
-VertexBuffer::VertexBuffer(const f32 const *vertecies, const size_t size, 
+VertexBuffer::VertexBuffer(const f32 *vertecies, const size_t size, 
         std::vector<BufferLayout> layout) :
         m_vertexBufferHandle(0),
         m_layout{std::move(layout)} {
@@ -16,11 +16,11 @@ VertexBuffer::~VertexBuffer() {
     glDeleteBuffers(1, &m_vertexBufferHandle);
 }
 
-void VertexBuffer::Bind() {
+void VertexBuffer::Bind() const {
     glBindBuffer(GL_ARRAY_BUFFER, m_vertexBufferHandle);
 }
 
-void VertexBuffer::Unbind() {
+void VertexBuffer::Unbind() const {
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
@@ -36,11 +36,11 @@ IndexBuffer::~IndexBuffer() {
     glDeleteBuffers(1, &m_indexBufferHandle);
 }
 
-void IndexBuffer::Bind() {
+void IndexBuffer::Bind() const {
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_indexBufferHandle);
 }
 
-void IndexBuffer::Unbind() {
+void IndexBuffer::Unbind() const {
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 }
 
@@ -73,10 +73,10 @@ void VertexArray::AddIndexBuffer(IndexBuffer *indexBuffer) {
     m_indexBuffer.reset(indexBuffer);
 }
 
-void VertexArray::Bind() {
+void VertexArray::Bind() const {
     glBindVertexArray(m_vertexArrayHandle);
 }
 
-void VertexArray::Unbind() {
+void VertexArray::Unbind() const {
     glBindVertexArray(0);
 }

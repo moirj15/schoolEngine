@@ -73,29 +73,55 @@ Shader::Shader(const std::vector<std::string> &filePaths) :
     CompileShader();
 }
 
+void Shader::Compile(const std::vector<std::string> &filePaths) {
+    m_programHandle = 0;
+    m_filePaths = filePaths;
+    CompileShader();
+}
+
 void Shader::SetUniform1F(const std::string &name, const f32 value) {
-    const u32 location = LocationFromCache(name);
+    const s32 location = LocationFromCache(name);
     glUniform1f(location, value);
 }
 
 void Shader::SetUniform2F(const std::string &name, const glm::vec2 &value) {
-    const u32 location = LocationFromCache(name);
+    const s32 location = LocationFromCache(name);
     glUniform2fv(location, 1, glm::value_ptr(value));
 }
 
 void Shader::SetUniform3F(const std::string &name, const glm::vec3 &value) {
-    const u32 location = LocationFromCache(name);
+    const s32 location = LocationFromCache(name);
     glUniform3fv(location, 1, glm::value_ptr(value));
 }
 
 void Shader::SetUniform4F(const std::string &name, const glm::vec4 &value) {
-    const u32 location = LocationFromCache(name);
+    const s32 location = LocationFromCache(name);
     glUniform4fv(location, 1, glm::value_ptr(value));
 }
 
 void Shader::SetUniformMat4(const std::string &name, const glm::mat4 &value) {
-    const u32 location = LocationFromCache(name);
+    const s32 location = LocationFromCache(name);
     glUniformMatrix4fv(location, 1, false, glm::value_ptr(value));
+}
+
+void Shader::SetShaderData(const ShaderData &shaderData) {
+    switch (shaderData.type) {
+    case ShaderData::Vec3:
+        SetUniform3F(shaderData.name, shaderData.v3);
+        break;
+    case ShaderData::Vec4:
+        SetUniform4F(shaderData.name, shaderData.v4);
+        break;
+    case ShaderData::Mat4:
+        SetUniformMat4(shaderData.name, shaderData.m4);
+        break;
+    }
+}
+
+void Shader::SetShaderData(const std::vector<ShaderData> &shaderData) {
+    for (const auto &sd : shaderData) {
+        SetShaderData(sd);
+    }
 }
 
 // Private
@@ -113,7 +139,7 @@ void Shader::CompileShader() {
     s32 flag;
     std::vector<GLenum> shaderTypes = DetermineShaderTypes();
 
-    for (s32 i = 0; i < m_filePaths.size(); i++) {
+    for (size_t i = 0; i < m_filePaths.size(); i++) {
         const auto filename = m_filePaths[i].c_str();
         const auto shaderType = shaderTypes[i];
         char *shaderSrc = nullptr;
