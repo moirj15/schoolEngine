@@ -87,9 +87,8 @@ class ComponentManager {
 
 public:
   ComponentManager() :
-      m_components{{1024 * 10, nullptr}, {1024 * 10, nullptr},
-          {1024 * 10, nullptr}, {1024 * 10, nullptr}, {1024 * 10, nullptr},
-          {1024 * 10, nullptr}} {}
+      m_components{{64, nullptr}, {64, nullptr}, {64, nullptr}, {64, nullptr},
+          {64, nullptr}, {64, nullptr}} {}
   ~ComponentManager();
 
   EntityID CreateEntity(u32 type);

@@ -52,6 +52,6 @@ void main() {
 
 		
     // fragmentColor = texture(tex, tex_coord);// + vec4(0.1, 0.0, 0.0, 0.0);//ambient + diffuse + specular;
-    fragmentColor = color;
+    fragmentColor = vec4(1.0, 0.0, 0.0, 0.0);//color;
 }
 

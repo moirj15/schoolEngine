@@ -4,6 +4,8 @@
 #include "VertexBuffer.h"
 #include "common.h"
 
+#include <array>
+#include <glm/glm.hpp>
 #include <memory>
 #include <string>
 #include <vector>
@@ -12,6 +14,7 @@ struct Mesh {
   std::vector<f32> vertecies = {};
   std::vector<u32> connections = {};
   std::vector<f32> normals = {};
+  std::vector<f32> textureCoords = {};
   u32 vertexSize = 3;
 
   Mesh() = default;
@@ -22,8 +25,21 @@ struct Mesh {
 
 class ObjReader {
   std::string m_filename;
-  // std::vector<char> m_data;
   std::unique_ptr<char[]> m_data;
+  std::vector<glm::vec3> m_vertecies;
+  std::vector<glm::vec3> m_normals;
+  std::vector<glm::vec2> m_textureCoords;
+  std::vector<s32> m_faceVertIndecies;
+
+  struct Face {
+    s32 index;
+    glm::vec3 vert;
+    glm::vec3 normal;
+    glm::vec2 textureCoord;
+  };
+
+  std::vector<Face> m_faces;
+
   size_t m_dataLen;
 
   size_t m_pos;
@@ -44,18 +60,22 @@ class ObjReader {
   };
 
 public:
-  ObjReader(char *filename);
+  ObjReader();
 
-  Mesh *Parse();
+  Mesh *Parse(const std::string &filename);
 
   void Clear();
 
 private:
+  void ReadFile(const std::string &filename);
+
   DataType ParseType();
 
   inline char Token() { return m_data[m_pos]; }
 
   void ParseVertex();
+
+  void ParseTextureCoord();
 
   void ParseNormal();
 
@@ -66,6 +86,8 @@ private:
   void SkipLine();
 
   void ReplaceChars(std::string *str, char toReplace, char replacement);
+
+  Mesh *CreateMeshFromFaces();
 };
 
 #endif // OBJ_H

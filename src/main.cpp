@@ -177,6 +177,7 @@ void InitIMGUI(Window *window) {
   IMGUI_CHECKVERSION();
   ImGui::CreateContext();
   ImGuiIO &io = ImGui::GetIO();
+  (void)io;
   ImGui_ImplGlfw_InitForOpenGL(window->m_glWindow, true);
   ImGui_ImplOpenGL3_Init("#version 150");
 }
@@ -196,21 +197,10 @@ int main(int argc, char **argv) {
   Shader shader{{"../shaders/macshader.vert", "../shaders/macshader.frag"}};
 #endif
 
-  Ray ray{glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, -1.0f)};
-  BoundingBox bb{glm::vec3(-1.0f, -1.0f, -5.0f), glm::vec3(1.0f, 1.0f, -2.0f)};
-  bool intersect = bb.IntersectRay(ray);
-
-  //  ObjReader objReader{"../objData/block.obj"};
-  ObjReader objReader{"../objData/knife.obj"};
-  Mesh *mesh = objReader.Parse();
-
-  //  VertexArray boxObjVA;
-  //  boxObjVA.AddVertexBuffer(new VertexBuffer(mesh->vertecies.data(),
-  //      mesh->vertecies.size(), {{"boxVerts", 3, 0, 0, GL_FLOAT}}));
-  //  boxObjVA.AddVertexBuffer(new VertexBuffer(
-  //      boxColors, ArraySize(boxColors), {{"boxColors", 3, 0, 1, GL_FLOAT}}));
-  //  boxObjVA.AddIndexBuffer(
-  //      new IndexBuffer(mesh->connections.data(), mesh->connections.size()));
+  ObjReader objReader;
+  //  std::unique_ptr<Mesh>
+  //  sphereMesh{objReader.Parse("../objData/sphere.obj")};
+  std::unique_ptr<Mesh> mesh{objReader.Parse("../objData/plane.obj")};
 
   auto perspective = glm::perspective(90.0f, 16.0f / 9.0f, 0.01f, 100.0f);
   auto camera = glm::lookAt(glm::vec3{0.0f, 0.0f, 5.0f},
@@ -224,25 +214,30 @@ int main(int argc, char **argv) {
   f64 lastTime = glfwGetTime();
   f32 t = 0.0;
 
-  //  DebugDraw::Init();
-  //  DebugDraw::AddBox(
-  //      {-1.0f, -1.0f, -1.0f}, {1.0f, 1.0f, 1.0f}, {5.0f, 5.0f, -5.0f});
+  DebugDraw::Init();
 
   ECS::ComponentManager componentManager;
   PhysicsManager physicsManager{&componentManager};
   ShaterableManager shaterableManager{&componentManager};
   RendererableManager rendererManager{&componentManager};
 
-  ECS::EntityID id =
-      componentManager.CreateEntity(static_cast<u32>(ECS::Type::Renderable)
-                                    | static_cast<u32>(ECS::Type::Physics)
-                                    | static_cast<u32>(ECS::Type::Transform)
-                                    | static_cast<u32>(ECS::Type::Mesh)
-                                    | static_cast<u32>(ECS::Type::Shaterable));
-  auto *compMesh = componentManager.GetComponent<ECS::Mesh>(id);
-  for (auto i : mesh->normals) { compMesh->normals.push_back(i); }
-  for (auto i : mesh->vertecies) { compMesh->vertecies.push_back(i); }
-  for (auto i : mesh->connections) { compMesh->connections.push_back(i); }
+  auto id = componentManager.CreateEntity((u32)ECS::Type::Renderable
+                                          | (u32)ECS::Type::Mesh
+                                          | (u32)ECS::Type::Transform);
+  auto *ecsMesh = componentManager.GetComponent<ECS::Mesh>(id);
+  ecsMesh->normals = mesh->normals;
+  ecsMesh->vertecies = mesh->vertecies;
+  ecsMesh->connections = mesh->connections;
+  //  ecsMesh-> = mesh->vertecies;
+  auto *ecsRenderable = componentManager.GetComponent<ECS::Renderable>(id);
+  ecsRenderable->vertexArray = new VertexArray;
+  ecsRenderable->vertexArray->AddIndexBuffer(
+      new IndexBuffer(mesh->connections.data(), mesh->connections.size()));
+  ecsRenderable->vertexArray->AddVertexBuffer(
+      new VertexBuffer(mesh->vertecies.data(), mesh->vertecies.size(),
+          {{"testVerts", 3, 0, 0, GL_FLOAT}}));
+  auto *ecsTransform = componentManager.GetComponent<ECS::Transform>(id);
+  ecsTransform->position = {0.0f, 0.0f, -5.0f};
 
   while (!glfwWindowShouldClose(window->m_glWindow)) {
     Renderer::ClearDrawQueue();
@@ -250,34 +245,32 @@ int main(int argc, char **argv) {
     f64 currentTime = glfwGetTime();
     f64 delta = (currentTime - lastTime); // * 1000.0;
     t += (f32)delta;                      // lastTime / 60.0f;
-    if (t > 10.0) {
-      physicsManager.Simulate((f32)lastTime, (f32)currentTime);
-      shaterableManager.Simulate((f32)lastTime, (f32)currentTime);
-      rendererManager.DrawComponents();
-    }
+    physicsManager.Simulate((f32)lastTime, (f32)currentTime);
+    shaterableManager.Simulate((f32)lastTime, (f32)currentTime);
+    rendererManager.DrawComponents();
 
     // Start the Dear ImGui frame
-    ImGui_ImplOpenGL3_NewFrame();
-    ImGui_ImplGlfw_NewFrame();
-    ImGui::NewFrame();
+    //    ImGui_ImplOpenGL3_NewFrame();
+    //    ImGui_ImplGlfw_NewFrame();
+    //    ImGui::NewFrame();
 
     Renderer::Clear();
 
     lastTime = glfwGetTime();
 
-    ImGui::Begin("Controls");
-    ImGui::Text("This is where the controls will go");
+    //    ImGui::Begin("Controls");
+    //    ImGui::Text("This is where the controls will go");
 
-    ImGui::End();
+    //    ImGui::End();
 
-    ImGui::Render();
+    //    ImGui::Render();
     int display_w, display_h;
     glfwMakeContextCurrent(window->m_glWindow);
     glfwGetFramebufferSize(window->m_glWindow, &display_w, &display_h);
     glViewport(0, 0, display_w, display_h);
     glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
     glClear(GL_COLOR_BUFFER_BIT);
-    ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+    //    ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
     //    Renderer::AddToDrawQueue(drawable);
     glfwMakeContextCurrent(window->m_glWindow);
     Renderer::Draw(camera, perspective);
