@@ -8,9 +8,13 @@ class CollisionManager {
 
 public:
   CollisionManager(ECS::ComponentManager *componentManager) :
-    m_componentManager{componentManager} {}
+      m_componentManager{componentManager} {}
 
   void Simulate(f32 prevtimeStep, f32 currTimeStep);
+
+private:
+  void CheckForCollsion(
+      ECS::Collidable *collidable, ECS::Transform *transform, ECS::EntityID id);
 };
 
 #endif // COLLISIONMANAGER_H

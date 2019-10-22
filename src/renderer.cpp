@@ -15,7 +15,10 @@ static Shader *s_defaultShader = nullptr;
 void AddToDrawQueue(const Drawable &drawable) {
   if (!s_defaultShader) {
     s_defaultShader =
-        new Shader{{"../shaders/shader.vert", "../shaders/shader.frag"}};
+        //        new Shader{{"../shaders/shader.vert",
+        //        "../shaders/shader.frag"}};
+        new Shader{
+            {"../shaders/uniformColor.vert", "../shaders/uniformColor.frag"}};
   }
   s_renderQueue.push_back(drawable);
 }

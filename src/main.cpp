@@ -11,6 +11,7 @@
 //#include <GLUT/glut.h>
 #include "VertexBuffer.h"
 #include "boundingbox.h"
+#include "collisionManager.h"
 #include "common.h"
 #include "debugdraw.h"
 #include "ecs.h"
@@ -200,11 +201,14 @@ int main(int argc, char **argv) {
   ObjReader objReader;
   //  std::unique_ptr<Mesh>
   //  sphereMesh{objReader.Parse("../objData/sphere.obj")};
-  std::unique_ptr<Mesh> mesh{objReader.Parse("../objData/plane.obj")};
+  std::unique_ptr<Mesh> mesh{objReader.Parse("../objData/sphere.obj")};
 
-  auto perspective = glm::perspective(90.0f, 16.0f / 9.0f, 0.01f, 100.0f);
-  auto camera = glm::lookAt(glm::vec3{0.0f, 0.0f, 5.0f},
-      glm::vec3{0.0f, 0.0f, -1.0f}, glm::vec3{0.0f, 1.0f, 0.0f});
+  auto perspective =
+      glm::perspective(glm::radians(90.0f), 16.0f / 9.0f, 0.01f, 100.0f);
+  glm::vec3 pos{0.0f, 10.0f, -4.0f};
+  glm::vec3 direction{0.0f, -1.0f, -.00001f};
+  glm::vec3 up{0.0f, 1.0f, 0.0f};
+  auto camera = glm::lookAt(pos, pos + direction, up);
 
   auto transform =
       glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -5.0f));
@@ -220,24 +224,73 @@ int main(int argc, char **argv) {
   PhysicsManager physicsManager{&componentManager};
   ShaterableManager shaterableManager{&componentManager};
   RendererableManager rendererManager{&componentManager};
+  CollisionManager collisionManager{&componentManager};
 
-  auto id = componentManager.CreateEntity((u32)ECS::Type::Renderable
-                                          | (u32)ECS::Type::Mesh
-                                          | (u32)ECS::Type::Transform);
-  auto *ecsMesh = componentManager.GetComponent<ECS::Mesh>(id);
+  std::vector<ECS::EntityID> billiards;
+  std::vector<ECS::Transform *> transforms;
+  for (s32 i = 0; i < 3; i++) {
+    billiards.push_back(componentManager.CreateEntity(
+        (u32)ECS::Type::Renderable | (u32)ECS::Type::Mesh
+        | (u32)ECS::Type::Transform | (u32)ECS::Type::Physics
+        | (u32)ECS::Type::Collidable));
+    auto *ecsMesh = componentManager.GetComponent<ECS::Mesh>(billiards.back());
+    ecsMesh->normals = mesh->normals;
+    ecsMesh->vertecies = mesh->vertecies;
+    ecsMesh->connections = mesh->connections;
+
+    auto *ecsRenderable =
+        componentManager.GetComponent<ECS::Renderable>(billiards.back());
+
+    ecsRenderable->vertexArray = new VertexArray;
+    ecsRenderable->vertexArray->AddIndexBuffer(new IndexBuffer(
+        ecsMesh->connections.data(), ecsMesh->connections.size()));
+    ecsRenderable->vertexArray->AddVertexBuffer(
+        new VertexBuffer(ecsMesh->vertecies.data(), ecsMesh->vertecies.size(),
+            {{"testVerts", 3, 0, 0, GL_FLOAT}}));
+    ecsRenderable->shaderData.push_back({"color", {1.0f, 0.0f, 0.0f}});
+
+    transforms.push_back(
+        componentManager.GetComponent<ECS::Transform>(billiards.back()));
+    auto *collidable =
+        componentManager.GetComponent<ECS::Collidable>(billiards.back());
+    collidable->radius = 1.0f;
+    auto *ecsPhysics =
+        componentManager.GetComponent<ECS::Physics>(billiards.back());
+    ecsPhysics->mass = 0.170f;
+    ecsPhysics->momentum = {0.0f, 0.0f, 0.0f};
+  }
+  transforms[0]->position = {0.0f, 0.0f, -5.0f};
+  transforms[1]->position = {-1.6f, 0.0f, -6.1f};
+  transforms[2]->position = {1.6f, 0.0f, -6.1f};
+
+  auto cueBall = componentManager.CreateEntity(
+      (u32)ECS::Type::Renderable | (u32)ECS::Type::Mesh
+      | (u32)ECS::Type::Transform | (u32)ECS::Type::Physics
+      | (u32)ECS::Type::Collidable);
+
+  auto *ecsMesh = componentManager.GetComponent<ECS::Mesh>(cueBall);
   ecsMesh->normals = mesh->normals;
   ecsMesh->vertecies = mesh->vertecies;
   ecsMesh->connections = mesh->connections;
-  //  ecsMesh-> = mesh->vertecies;
-  auto *ecsRenderable = componentManager.GetComponent<ECS::Renderable>(id);
+
+  auto *ecsRenderable = componentManager.GetComponent<ECS::Renderable>(cueBall);
+  auto *collidable = componentManager.GetComponent<ECS::Collidable>(cueBall);
+  collidable->radius = 1.0f;
+
+  auto *ecsPhysics = componentManager.GetComponent<ECS::Physics>(cueBall);
+  ecsPhysics->velocity = {0.0f, 0.0f, -1.0f};
+  ecsPhysics->mass = 0.170f;
+  ecsPhysics->momentum = ecsPhysics->mass * ecsPhysics->velocity;
+
   ecsRenderable->vertexArray = new VertexArray;
-  ecsRenderable->vertexArray->AddIndexBuffer(
-      new IndexBuffer(mesh->connections.data(), mesh->connections.size()));
+  ecsRenderable->vertexArray->AddIndexBuffer(new IndexBuffer(
+      ecsMesh->connections.data(), ecsMesh->connections.size()));
   ecsRenderable->vertexArray->AddVertexBuffer(
-      new VertexBuffer(mesh->vertecies.data(), mesh->vertecies.size(),
+      new VertexBuffer(ecsMesh->vertecies.data(), ecsMesh->vertecies.size(),
           {{"testVerts", 3, 0, 0, GL_FLOAT}}));
-  auto *ecsTransform = componentManager.GetComponent<ECS::Transform>(id);
-  ecsTransform->position = {0.0f, 0.0f, -5.0f};
+  ecsRenderable->shaderData.push_back({"color", {1.0f, 1.0f, 1.0f}});
+  auto *cueTransform = componentManager.GetComponent<ECS::Transform>(cueBall);
+  cueTransform->position = {0.0f, 0.0f, -2.0f};
 
   while (!glfwWindowShouldClose(window->m_glWindow)) {
     Renderer::ClearDrawQueue();
@@ -245,6 +298,7 @@ int main(int argc, char **argv) {
     f64 currentTime = glfwGetTime();
     f64 delta = (currentTime - lastTime); // * 1000.0;
     t += (f32)delta;                      // lastTime / 60.0f;
+    collisionManager.Simulate((f32)lastTime, (f32)currentTime);
     physicsManager.Simulate((f32)lastTime, (f32)currentTime);
     shaterableManager.Simulate((f32)lastTime, (f32)currentTime);
     rendererManager.DrawComponents();

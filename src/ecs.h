@@ -31,12 +31,14 @@ struct Entity {
 };
 
 struct Physics {
-  glm::vec3 velocity = {};
+  glm::vec3 velocity = {0.0f, 0.0f, 0.0f};
   glm::quat angularVelocity = {};
   glm::quat angularMomentum = {};
-  glm::vec3 momentum = {};
+  glm::vec3 momentum = {0.0f, 0.0f, 0.0f};
+  glm::vec3 impulseVelocity = {0.0f, 0.0f, 0.0f};
   f32 mass = 0.0f;
   f32 frictionCoef = 0.0f;
+  glm::vec3 frictionalForce = {0.0f, 0.0f, 0.0f};
 };
 
 struct Renderable {
@@ -47,7 +49,7 @@ struct Renderable {
 };
 
 struct Transform {
-  glm::vec3 position = {};
+  glm::vec3 position = {0.0f, 0.0f, 0.0f};
   glm::quat rotation = {};
 };
 
@@ -63,7 +65,8 @@ struct Mesh {
 };
 
 struct Collidable {
-  bool hasCollided = false;
+  bool collisionDetected = false;
+  f32 radius = 0.0f;
   EntityID collidedEntity = 0;
   f32 collisionTime = 0.0f;
   BoundingBox boundingBox = {};
