@@ -1,4 +1,6 @@
 #include "physicsManager.h"
+#define GLM_ENABLE_EXPERIMENTAL
+#include <glm/gtx/string_cast.hpp>
 
 #include "ecs.h"
 
@@ -19,7 +21,7 @@ void PhysicsManager::Simulate(f32 prevTimeStep, f32 currTimeStep) {
       // Fn = m*a = m * 9.8 m/s
       if (glm::length(physics->velocity) > 0.0f) {
         physics->frictionalForce =
-            -physics->frictionCoef * (physics->mass * 9.8f) * physics->velocity;
+            -physics->frictionCoef * (physics->mass * 9.8f) * glm::normalize(physics->velocity);
         //            -(physics->frictionCoef * (physics->mass * 9.8f)
         //                * glm::normalize(physics->velocity));
 
@@ -30,11 +32,15 @@ void PhysicsManager::Simulate(f32 prevTimeStep, f32 currTimeStep) {
       transform->position = transform->position + physics->velocity * delta;
       // Update momentum
       physics->momentum = (physics->mass * physics->velocity)
-                          + physics->frictionalForce * delta;
+                      + physics->frictionalForce * delta;
+
+//      printf("%s\n", glm::to_string(physics->momentum).c_str());
 
       // step 3: calculate velocities
       if (collidable->collisionDetected) {
         HandleCollision(collidable, transform, physics);
+      } else {
+        physics->impulseVelocity = {0.0f, 0.0f, 0.0f};
       }
       physics->velocity =
           (physics->momentum / physics->mass) + physics->impulseVelocity;
@@ -52,14 +58,14 @@ void PhysicsManager::HandleCollision(ECS::Collidable *collidableA,
   auto *physicsB =
       m_componentManager->GetComponent<ECS::Physics>(collidedEntity);
   glm::vec3 lineOfActionToB = transformB->position - transformA->position;
-  glm::vec3 lineOfActionToA = -lineOfActionToB;
+  glm::vec3 lineOfActionToA = glm::normalize(-lineOfActionToB);
 
   physicsA->impulseVelocity =
       ((physicsA->mass
-           * ((physicsB->velocity * glm::normalize(lineOfActionToA))
-               - (physicsA->velocity * glm::normalize(lineOfActionToA))))
+           * (glm::dot(physicsB->velocity , lineOfActionToB)
+               - glm::dot(physicsA->velocity , lineOfActionToB)))
           / 2.0f)
-      * glm::normalize(lineOfActionToA);
-  physicsA->impulseVelocity *=
-      glm::dot(physicsA->impulseVelocity, lineOfActionToB);
+      * lineOfActionToB;
+//  physicsA->impulseVelocity *=
+//      glm::dot(physicsA->impulseVelocity, lineOfActionToB);
 }

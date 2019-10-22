@@ -278,7 +278,7 @@ int main(int argc, char **argv) {
   collidable->radius = 1.0f;
 
   auto *ecsPhysics = componentManager.GetComponent<ECS::Physics>(cueBall);
-  ecsPhysics->velocity = {0.0f, 0.0f, -1.0f};
+  ecsPhysics->velocity = {0.0f, 0.0f, -9.0f};
   ecsPhysics->mass = 0.170f;
   ecsPhysics->momentum = ecsPhysics->mass * ecsPhysics->velocity;
 
