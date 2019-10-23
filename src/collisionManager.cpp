@@ -25,8 +25,8 @@ void CollisionManager::CheckForCollsion(
       if (distance <= collidable->radius + c->radius) {
         collidable->collisionDetected = true;
         collidable->collidedEntity = (ECS::EntityID)i;
-        c->collisionDetected = true;
-        c->collidedEntity = id;
+        //        c->collisionDetected = true;
+        //        c->collidedEntity = id;
       }
     }
   }

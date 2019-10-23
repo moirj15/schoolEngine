@@ -260,8 +260,11 @@ int main(int argc, char **argv) {
     ecsPhysics->momentum = {0.0f, 0.0f, 0.0f};
   }
   transforms[0]->position = {0.0f, 0.0f, -5.0f};
-  transforms[1]->position = {-1.6f, 0.0f, -6.1f};
-  transforms[2]->position = {1.6f, 0.0f, -6.1f};
+  transforms[1]->position = {-1.6f, 0.0f, -6.5f};
+  transforms[2]->position = {1.6f, 0.0f, -6.5f};
+  transforms[0]->prevPosition = {0.0f, 0.0f, -5.0f};
+  transforms[1]->prevPosition = {-1.6f, 0.0f, -6.1f};
+  transforms[2]->prevPosition = {1.6f, 0.0f, -6.1f};
 
   auto cueBall = componentManager.CreateEntity(
       (u32)ECS::Type::Renderable | (u32)ECS::Type::Mesh
@@ -278,7 +281,7 @@ int main(int argc, char **argv) {
   collidable->radius = 1.0f;
 
   auto *ecsPhysics = componentManager.GetComponent<ECS::Physics>(cueBall);
-  ecsPhysics->velocity = {0.0f, 0.0f, -9.0f};
+  ecsPhysics->velocity = {0.0f, 0.0f, -1.0f};
   ecsPhysics->mass = 0.170f;
   ecsPhysics->momentum = ecsPhysics->mass * ecsPhysics->velocity;
 
@@ -291,6 +294,7 @@ int main(int argc, char **argv) {
   ecsRenderable->shaderData.push_back({"color", {1.0f, 1.0f, 1.0f}});
   auto *cueTransform = componentManager.GetComponent<ECS::Transform>(cueBall);
   cueTransform->position = {0.0f, 0.0f, -2.0f};
+  cueTransform->prevPosition = {0.0f, 0.0f, -2.0f};
 
   while (!glfwWindowShouldClose(window->m_glWindow)) {
     Renderer::ClearDrawQueue();

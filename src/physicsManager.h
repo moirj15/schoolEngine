@@ -14,7 +14,8 @@ public:
   void Simulate(f32 prevTimeStep, f32 currTimeStep);
 
 private:
-  void HandleCollision(ECS::Collidable *collidable, ECS::Transform *transform,
+  void HandleCollision(f32 prevTimeStep, f32 currTimeStep,
+      ECS::Collidable *collidable, ECS::Transform *transform,
       ECS::Physics *physics);
 
 }; // namespace PhysicsManager
