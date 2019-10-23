@@ -35,12 +35,12 @@ void PhysicsManager::Simulate(f32 prevTimeStep, f32 currTimeStep) {
       transform->position =
           transform->prevPosition + (physics->velocity * delta);
       // Update momentum
-      if (glm::length(physics->momentum) > 0.0f) {
-        physics->momentum += physics->frictionalForce * delta;
-      } else {
-        physics->momentum = (physics->mass * physics->velocity)
-                            + physics->frictionalForce * delta;
-      }
+      //      if (glm::length(physics->momentum) > 0.0f) {
+      //        physics->momentum += physics->frictionalForce * delta;
+      //      } else {
+      physics->momentum = (physics->mass * physics->velocity)
+                          + physics->frictionalForce * delta;
+      //      }
 
       //      printf("%s\n", glm::to_string(physics->momentum).c_str());
 
@@ -68,22 +68,9 @@ void PhysicsManager::HandleCollision(f32 prevTimeStep, f32 currTimeStep,
       m_componentManager->GetComponent<ECS::Collidable>(collidedEntity);
   auto *physicsB =
       m_componentManager->GetComponent<ECS::Physics>(collidedEntity);
+  collidableA->collisionDetected = false;
+  collidableB->collisionDetected = false;
 
-  /*if (glm::length(physicsA->velocity) > 0.0f
-      && glm::length(physicsB->velocity) > 0.0f) {
-    f32 backupDistanceA =
-        glm::length(transformA->position - transformA->prevPosition);
-    f32 backupDeltaA = (backupDistanceA / glm::length(physicsA->velocity));
-    transformA->position =
-        transformA->prevPosition + physicsA->velocity * backupDeltaA;
-
-    f32 backupDistanceB =
-        glm::length(transformB->position - transformB->prevPosition);
-    f32 backupDeltaB = (backupDistanceB / glm::length(physicsB->velocity));
-    transformB->position =
-        transformB->prevPosition + physicsB->velocity * backupDeltaB;
-
-  } else*/
   f32 backupDistanceA =
       glm::length(transformA->position - transformA->prevPosition);
   transformA->position -= backupDistanceA * physicsA->velocity;
@@ -94,19 +81,20 @@ void PhysicsManager::HandleCollision(f32 prevTimeStep, f32 currTimeStep,
   glm::vec3 lineOfAction =
       glm::normalize(transformA->position - transformB->position);
 
+  auto vA = physicsA->velocity * glm::dot(physicsA->velocity, lineOfAction);
+  auto vB = physicsB->velocity * glm::dot(physicsB->velocity, lineOfAction);
   f32 mass = physicsA->mass;
   f32 restitutionCoef = 0.5;
-  f32 impulse = glm::dot(-(physicsA->velocity - physicsB->velocity)
-                             * (restitutionCoef + 1.0f),
-                    lineOfAction)
-                / (2.0f / mass);
-  //  physicsA->impulseVelocity *= glm::dot(physicsA->velocity, lineOfAction);
-  //  physicsB->impulseVelocity =
-  //      ((physicsA->velocity - physicsB->velocity) * (restitutionCoef + 1.0f))
-  //      / (2.0f / mass);
-  //  physicsB->impulseVelocity *= glm::dot(physicsB->velocity, lineOfAction);
-  //  collidableB->collisionDetected = false;
-  //  physicsA->velocity += (physicsA->momentum / mass) * impulse;
-  physicsA->velocity += (impulse * lineOfAction) / mass;
-  physicsB->velocity -= (impulse * lineOfAction) / mass;
+  glm::vec3 impulse =
+      ((mass * (glm::dot(vB, lineOfAction) - glm::dot(vA, lineOfAction)))
+          / 2.0f)
+      * lineOfAction;
+  physicsA->velocity = // impulse;
+      (physicsA->velocity + physicsB->velocity) / 2.0f;
+  physicsB->velocity = //-impulse;
+      -(physicsA->velocity + physicsB->velocity) / 2.0f;
+  //  f32 impulse = glm::dot(-(physicsA->velocity - physicsB->velocity)
+  //                             * (restitutionCoef + 1.0f),
+  //                    lineOfAction)
+  //                / (2.0f / mass);
 }
