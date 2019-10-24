@@ -67,6 +67,9 @@ struct Mesh {
 
 struct Collidable {
   bool collisionDetected = false;
+  bool collisionWithWall = false;
+  // 0 up, 1 right, 2 down, 3 left
+  u32 wall;
   f32 radius = 0.0f;
   EntityID collidedEntity = 0;
   f32 collisionTime = 0.0f;

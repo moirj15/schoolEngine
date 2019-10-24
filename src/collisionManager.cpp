@@ -1,5 +1,34 @@
 #include "collisionManager.h"
 
+f32 top = -7.483;
+f32 bottom = 3.483;
+f32 left = -1.298;
+f32 right = 1.298;
+
+void CheckForWallCollision(ECS::Collidable *collidable, ECS::Transform *transform) {
+    auto p = transform->position;
+    glm::vec3 topV{transform->position.x, 0.0f, top};
+    glm::vec3 bottomV{transform->position.x, 0.0f, bottom};
+    glm::vec3 leftV{transform->position.z, 0.0f, right};
+    glm::vec3 rightV{transform->position.z, 0.0f, left};
+    if (glm::length(p - topV) < collidable->radius) {
+        collidable->collisionWithWall = true;
+        collidable->wall = 0;
+    }
+    if (glm::length(p - bottomV) < collidable->radius) {
+        collidable->collisionWithWall = true;
+        collidable->wall = 2;
+    }
+    if (glm::length(p - leftV) < collidable->radius) {
+        collidable->collisionWithWall = true;
+        collidable->wall = 3;
+    }
+    if (glm::length(p - rightV) < collidable->radius) {
+        collidable->collisionWithWall = true;
+        collidable->wall = 1;
+    }
+}
+
 void CollisionManager::Simulate(f32 prevtimeStep, f32 currTimeStep) {
   auto collidables = m_componentManager->GetComponents<ECS::Collidable>();
   auto transforms = m_componentManager->GetComponents<ECS::Transform>();
@@ -9,6 +38,7 @@ void CollisionManager::Simulate(f32 prevtimeStep, f32 currTimeStep) {
     if (collidable && transform) {
       collidable->collisionDetected = false;
       CheckForCollsion(collidable, transform, i);
+      CheckForWallCollision(collidable, transform);
     }
   }
 }

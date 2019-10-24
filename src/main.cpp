@@ -202,10 +202,11 @@ int main(int argc, char **argv) {
   //  std::unique_ptr<Mesh>
   //  sphereMesh{objReader.Parse("../objData/sphere.obj")};
   std::unique_ptr<Mesh> mesh{objReader.Parse("../objData/sphere.obj")};
+  std::unique_ptr<Mesh> planeMesh{objReader.Parse("../objData/plane.obj")};
 
   auto perspective =
       glm::perspective(glm::radians(90.0f), 16.0f / 9.0f, 0.01f, 100.0f);
-  glm::vec3 pos{0.0f, 10.0f, -4.0f};
+  glm::vec3 pos{0.0f, 3.0f, -5.0f};
   glm::vec3 direction{0.0f, -1.0f, -.00001f};
   glm::vec3 up{0.0f, 1.0f, 0.0f};
   auto camera = glm::lookAt(pos, pos + direction, up);
@@ -241,6 +242,7 @@ int main(int argc, char **argv) {
     auto *ecsRenderable =
         componentManager.GetComponent<ECS::Renderable>(billiards.back());
 
+    ecsRenderable->shader = nullptr;
     ecsRenderable->vertexArray = new VertexArray;
     ecsRenderable->vertexArray->AddIndexBuffer(new IndexBuffer(
         ecsMesh->connections.data(), ecsMesh->connections.size()));
@@ -249,19 +251,23 @@ int main(int argc, char **argv) {
             {{"testVerts", 3, 0, 0, GL_FLOAT}}));
     ecsRenderable->shaderData.push_back({"color", {1.0f, 0.0f, 0.0f}});
 
+    auto tMat = glm::scale(glm::mat4(1.0f), {0.057f, 0.057f, 0.057f});
+
+    ecsRenderable->shaderData.push_back({"transform", tMat});
+
     transforms.push_back(
         componentManager.GetComponent<ECS::Transform>(billiards.back()));
     auto *collidable =
         componentManager.GetComponent<ECS::Collidable>(billiards.back());
-    collidable->radius = 1.0f;
+    collidable->radius = 0.057f;
     auto *ecsPhysics =
         componentManager.GetComponent<ECS::Physics>(billiards.back());
     ecsPhysics->mass = 0.170f;
     ecsPhysics->momentum = {0.0f, 0.0f, 0.0f};
   }
   transforms[0]->position = {0.0f, 0.0f, -5.0f};
-  transforms[1]->position = {-1.6f, 0.0f, -6.5f};
-  transforms[2]->position = {1.6f, 0.0f, -6.5f};
+  transforms[1]->position = {-0.060f, 0.0f, -6.5f};
+  transforms[2]->position = {0.060f, 0.0f, -6.5f};
   transforms[0]->prevPosition = {0.0f, 0.0f, -5.0f};
   transforms[1]->prevPosition = {-1.6f, 0.0f, -6.1f};
   transforms[2]->prevPosition = {1.6f, 0.0f, -6.1f};
@@ -278,13 +284,20 @@ int main(int argc, char **argv) {
 
   auto *ecsRenderable = componentManager.GetComponent<ECS::Renderable>(cueBall);
   auto *collidable = componentManager.GetComponent<ECS::Collidable>(cueBall);
-  collidable->radius = 1.0f;
+  collidable->radius = 0.057f;
 
   auto *ecsPhysics = componentManager.GetComponent<ECS::Physics>(cueBall);
-  ecsPhysics->velocity = {0.0f, 0.0f, -4.0f};
+  ///VELOCITY
+  ///
+  ///
+  ///
+  ///
+  ///
+  ecsPhysics->velocity = {1.0f, 0.0f, 0.0f};
   ecsPhysics->mass = 0.170f;
   ecsPhysics->momentum = ecsPhysics->mass * ecsPhysics->velocity;
 
+ecsRenderable->shader = nullptr;
   ecsRenderable->vertexArray = new VertexArray;
   ecsRenderable->vertexArray->AddIndexBuffer(new IndexBuffer(
       ecsMesh->connections.data(), ecsMesh->connections.size()));
@@ -293,11 +306,31 @@ int main(int argc, char **argv) {
           {{"testVerts", 3, 0, 0, GL_FLOAT}}));
   ecsRenderable->shaderData.push_back({"color", {1.0f, 1.0f, 1.0f}});
   auto *cueTransform = componentManager.GetComponent<ECS::Transform>(cueBall);
-  cueTransform->position = {0.0f, 0.0f, -2.0f};
+  cueTransform->position = {0.0f, 0.0f, -3.2f};
   cueTransform->prevPosition = {0.0f, 0.0f, -2.0f};
+    auto tMat = glm::scale(glm::mat4(1.0f), {0.057f, 0.057f, 0.057f});
+
+    ecsRenderable->shaderData.push_back({"transform", tMat});
+
+  Renderer::Drawable planeDraw;
+  planeDraw.vertexArray = new VertexArray;
+  planeDraw.vertexArray->AddIndexBuffer(new IndexBuffer(
+      planeMesh->connections.data(), planeMesh->connections.size()));
+  planeDraw.vertexArray->AddVertexBuffer(
+      new VertexBuffer(planeMesh->vertecies.data(), planeMesh->vertecies.size(),
+          {{"plane", 3, 0, 0, GL_FLOAT}}));
+
+  auto planeTransform = glm::scale(glm::mat4(1.0f), {1.298f, 0.0f, 2.483f});
+  planeTransform = glm::translate(planeTransform, {0.0f, 0.0f, -2.0f});
+  planeDraw.shaderData.push_back({"transform", planeTransform});
+  planeDraw.shaderData.push_back({"color", {0.0f, 1.0f, 0.0f}});
+  planeDraw.shader = nullptr;
+
+
 
   while (!glfwWindowShouldClose(window->m_glWindow)) {
     Renderer::ClearDrawQueue();
+    Renderer::AddToDrawQueue(planeDraw);
     glfwPollEvents();
     f64 currentTime = glfwGetTime();
     f64 delta = (currentTime - lastTime); // * 1000.0;

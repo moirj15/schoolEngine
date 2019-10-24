@@ -16,7 +16,17 @@ void RendererableManager::DrawComponents() {
       auto copy = *drawable;
       auto transformMat = glm::translate(glm::mat4(1.0f), transform->position)
                           * glm::mat4(transform->rotation);
+      bool found = false;
+      for (auto &sd : copy.shaderData) {
+          if (sd.name == "transform") {
+              sd.m4 = transformMat * sd.m4;
+              found= true;
+          }
+      }
+      if (!found) {
+
       copy.shaderData.push_back({"transform", transformMat});
+      }
 
       Renderer::AddToDrawQueue(
           {copy.commands, copy.shaderData, copy.vertexArray, copy.shader});
