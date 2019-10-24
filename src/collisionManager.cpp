@@ -9,21 +9,30 @@ void CheckForWallCollision(ECS::Collidable *collidable, ECS::Transform *transfor
     auto p = transform->position;
     glm::vec3 topV{transform->position.x, 0.0f, top};
     glm::vec3 bottomV{transform->position.x, 0.0f, bottom};
-    glm::vec3 leftV{transform->position.z, 0.0f, right};
-    glm::vec3 rightV{transform->position.z, 0.0f, left};
+    glm::vec3 leftV{left, 0.0f, transform->position.z};
+    glm::vec3 rightV{right, 0.0f, transform->position.z};
+    auto l = glm::length(p - rightV);
     if (glm::length(p - topV) < collidable->radius) {
+        transform->position = topV;
+        transform->position.z += collidable->radius;
         collidable->collisionWithWall = true;
         collidable->wall = 0;
     }
-    if (glm::length(p - bottomV) < collidable->radius) {
+    else if (glm::length(p - bottomV) < collidable->radius) {
+        transform->position = bottomV;
+        transform->position.z -= collidable->radius;
         collidable->collisionWithWall = true;
         collidable->wall = 2;
     }
-    if (glm::length(p - leftV) < collidable->radius) {
+    else if (glm::length(p - leftV) < collidable->radius) {
+        transform->position = leftV;
+        transform->position.x += collidable->radius;
         collidable->collisionWithWall = true;
         collidable->wall = 3;
     }
-    if (glm::length(p - rightV) < collidable->radius) {
+    else if (glm::length(p - rightV) < collidable->radius) {
+        transform->position = rightV;
+        transform->position.x -= collidable->radius;
         collidable->collisionWithWall = true;
         collidable->wall = 1;
     }

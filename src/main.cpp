@@ -229,6 +229,7 @@ int main(int argc, char **argv) {
 
   std::vector<ECS::EntityID> billiards;
   std::vector<ECS::Transform *> transforms;
+  f32 frictionCoef = 0.01f;
   for (s32 i = 0; i < 3; i++) {
     billiards.push_back(componentManager.CreateEntity(
         (u32)ECS::Type::Renderable | (u32)ECS::Type::Mesh
@@ -263,6 +264,7 @@ int main(int argc, char **argv) {
     auto *ecsPhysics =
         componentManager.GetComponent<ECS::Physics>(billiards.back());
     ecsPhysics->mass = 0.170f;
+    ecsPhysics->frictionCoef = frictionCoef;
     ecsPhysics->momentum = {0.0f, 0.0f, 0.0f};
   }
   transforms[0]->position = {0.0f, 0.0f, -5.0f};
@@ -293,9 +295,10 @@ int main(int argc, char **argv) {
   ///
   ///
   ///
-  ecsPhysics->velocity = {1.0f, 0.0f, 0.0f};
+  ecsPhysics->velocity = {0.0f, 0.0f, -2.0f};
   ecsPhysics->mass = 0.170f;
   ecsPhysics->momentum = ecsPhysics->mass * ecsPhysics->velocity;
+  ecsPhysics->frictionCoef = frictionCoef;
 
 ecsRenderable->shader = nullptr;
   ecsRenderable->vertexArray = new VertexArray;
