@@ -204,45 +204,21 @@ int main(int argc, char **argv) {
   ObjReader objReader{"../objData/knife.obj"};
   Mesh *mesh = objReader.Parse();
 
-  //  VertexArray boxObjVA;
-  //  boxObjVA.AddVertexBuffer(new VertexBuffer(mesh->vertecies.data(),
-  //      mesh->vertecies.size(), {{"boxVerts", 3, 0, 0, GL_FLOAT}}));
-  //  boxObjVA.AddVertexBuffer(new VertexBuffer(
-  //      boxColors, ArraySize(boxColors), {{"boxColors", 3, 0, 1, GL_FLOAT}}));
-  //  boxObjVA.AddIndexBuffer(
-  //      new IndexBuffer(mesh->connections.data(), mesh->connections.size()));
-
   auto perspective = glm::perspective(90.0f, 16.0f / 9.0f, 0.01f, 100.0f);
   auto camera = glm::lookAt(glm::vec3{0.0f, 0.0f, 5.0f},
       glm::vec3{0.0f, 0.0f, -1.0f}, glm::vec3{0.0f, 1.0f, 0.0f});
 
   auto transform =
       glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -5.0f));
-  //  Renderer::Drawable drawable = {
-  //      {}, {{"transform", transform}}, &boxObjVA, &shader};
   glfwSetTime(0.0);
   f64 lastTime = glfwGetTime();
   f32 t = 0.0;
-
-  //  DebugDraw::Init();
-  //  DebugDraw::AddBox(
-  //      {-1.0f, -1.0f, -1.0f}, {1.0f, 1.0f, 1.0f}, {5.0f, 5.0f, -5.0f});
 
   ECS::ComponentManager componentManager;
   PhysicsManager physicsManager{&componentManager};
   ShaterableManager shaterableManager{&componentManager};
   RendererableManager rendererManager{&componentManager};
 
-  ECS::EntityID id =
-      componentManager.CreateEntity(static_cast<u32>(ECS::Type::Renderable)
-                                    | static_cast<u32>(ECS::Type::Physics)
-                                    | static_cast<u32>(ECS::Type::Transform)
-                                    | static_cast<u32>(ECS::Type::Mesh)
-                                    | static_cast<u32>(ECS::Type::Shaterable));
-  auto *compMesh = componentManager.GetComponent<ECS::Mesh>(id);
-  for (auto i : mesh->normals) { compMesh->normals.push_back(i); }
-  for (auto i : mesh->vertecies) { compMesh->vertecies.push_back(i); }
-  for (auto i : mesh->connections) { compMesh->connections.push_back(i); }
 
   while (!glfwWindowShouldClose(window->m_glWindow)) {
     Renderer::ClearDrawQueue();
