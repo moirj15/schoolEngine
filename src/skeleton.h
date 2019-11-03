@@ -15,7 +15,6 @@ class Skeleton {
   std::vector<std::unique_ptr<Skeleton>> m_children;
 
 public:
-  Skeleton();
 };
 
 #endif // SKELETON_H
