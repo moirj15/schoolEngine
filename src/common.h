@@ -31,4 +31,23 @@ inline FILE *OpenFile(const char *file, const char *perm) {
   return ret;
 }
 
+inline char *ReadFile(const char *filename) {
+  FILE *fp = OpenFile(filename, "r");
+  char *data = nullptr;
+  size_t len = 0;
+
+  fseek(fp, 0, SEEK_END);
+  len = ftell(fp);
+  rewind(fp);
+
+  if (len == 0) { fprintf(stderr, "failed to get file size"); }
+
+  data = new char[len + 1]();
+  len = fread(data, sizeof(char), len, fp);
+
+  fclose(fp);
+
+  return data;
+}
+
 #endif

@@ -5,6 +5,7 @@
 
 #include "VertexBuffer.h"
 
+
 ObjReader::ObjReader(char *filename) :
         m_filename(std::move(filename)),
         m_dataLen(0),
@@ -30,6 +31,7 @@ ObjReader::ObjReader(char *filename) :
 
     fclose(fp);
 }
+
 
 Mesh *ObjReader::Parse() {
     while (m_pos < m_dataLen) {
