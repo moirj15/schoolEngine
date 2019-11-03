@@ -26,6 +26,10 @@ enum class TokenType {
   Motion,
   Float,
   Int,
+  Channels,
+  Joint,
+  BeginScope,
+  EndScope
 };
 
 struct Token {
@@ -36,15 +40,15 @@ struct Token {
 };
 
 class Parser {
-  std::unique_ptr<char[]> m_fileData;
-  std::vector<Token> m_tokens;
-  std::stack<SkeletonNode *> m_nodeStack;
-  size m_pos;
-  size m_dataSize;
+  char *m_fileData = nullptr;
+  std::vector<Token> m_tokens = {};
+  std::stack<SkeletonNode *> m_nodeStack = {};
+  size m_pos = 0;
+  size m_dataSize = 0;
 
 public:
   Parser() = default;
-  ~Parser() = default;
+  ~Parser() { delete[](m_fileData); }
 
   Skeleton Parse(const std::string &filename);
 

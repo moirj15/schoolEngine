@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <tuple>
 #include <utility>
 
 typedef uint8_t u8;
@@ -25,13 +26,13 @@ inline FILE *OpenFile(const char *file, const char *perm) {
   FILE *ret = NULL;
   ret = fopen(file, perm);
   if (!ret) {
-    fprintf(stderr, "FAILED TO OPEN FILE: %s\n", file);
+    printf("FAILED TO OPEN FILE: %s\n", file);
     exit(EXIT_FAILURE);
   }
   return ret;
 }
 
-inline char *ReadFile(const char *filename) {
+inline std::tuple<char *, size> ReadFile(const char *filename) {
   FILE *fp = OpenFile(filename, "r");
   char *data = nullptr;
   size_t len = 0;
@@ -40,14 +41,14 @@ inline char *ReadFile(const char *filename) {
   len = ftell(fp);
   rewind(fp);
 
-  if (len == 0) { fprintf(stderr, "failed to get file size"); }
+  if (len == 0) { printf("failed to get file size"); }
 
   data = new char[len + 1]();
   len = fread(data, sizeof(char), len, fp);
 
   fclose(fp);
 
-  return data;
+  return {data, len};
 }
 
 #endif

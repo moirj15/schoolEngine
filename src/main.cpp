@@ -11,6 +11,7 @@
 //#include <GLUT/glut.h>
 #include "VertexBuffer.h"
 #include "boundingbox.h"
+#include "bvhParser.h"
 #include "common.h"
 #include "debugdraw.h"
 #include "ecs.h"
@@ -39,105 +40,6 @@ constexpr s32 height = 360;
 #else
 constexpr s32 width = 1920;
 constexpr s32 height = 1080;
-#endif
-
-static f32 verts[] = {
-    -1.0,
-    0.0,
-    -1.0,
-    1.0,
-    1.0,
-    0.0,
-    -1.0,
-    1.0,
-    0.0,
-    1.0,
-    -1.0,
-    1.0,
-};
-
-static u32 conn[] = {0, 1, 2};
-
-static f32 boxVerts[] = {
-    // front
-    -1.0,
-    -1.0,
-    1.0,
-    1.0,
-    1.0,
-    -1.0,
-    1.0,
-    1.0,
-    1.0,
-    1.0,
-    1.0,
-    1.0,
-    -1.0,
-    1.0,
-    1.0,
-    1.0,
-    // back
-    -1.0,
-    -1.0,
-    -1.0,
-    1.0,
-    1.0,
-    -1.0,
-    -1.0,
-    1.0,
-    1.0,
-    1.0,
-    -1.0,
-    1.0,
-    -1.0,
-    1.0,
-    -1.0,
-    1.0,
-};
-
-static f32 boxColors[] = {
-    0.0,
-    0.0,
-    1.0,
-    0.0,
-    0.0,
-    0.0,
-    0.0,
-    1.0,
-    0.0,
-    0.0,
-    1.0,
-    1.0,
-    1.0,
-    0.0,
-    0.0,
-    1.0,
-    0.0,
-    1.0,
-    1.0,
-    1.0,
-    0.0,
-    1.0,
-    1.0,
-    1.0,
-};
-
-static u32 boxConn[] = {
-    // front
-    0, 1, 2, 2, 3, 0,
-    // right
-    1, 5, 6, 6, 2, 1,
-    // back
-    7, 6, 5, 5, 4, 7,
-    // left
-    4, 0, 3, 3, 7, 4,
-    // bottom
-    4, 5, 1, 1, 0, 4,
-    // top
-    3, 2, 6, 6, 7, 3};
-
-#if 0
-
 #endif
 
 Window *InitGL() {
@@ -187,6 +89,8 @@ int main(int argc, char **argv) {
 
   Window *window = InitGL();
   InitIMGUI(window);
+  bvh::Parser parser;
+  parser.Parse("../Example1.bvh");
 
   printf("%s\n", glGetString(GL_VERSION));
 
@@ -219,7 +123,6 @@ int main(int argc, char **argv) {
   ShaterableManager shaterableManager{&componentManager};
   RendererableManager rendererManager{&componentManager};
 
-
   while (!glfwWindowShouldClose(window->m_glWindow)) {
     Renderer::ClearDrawQueue();
     glfwPollEvents();
@@ -232,29 +135,10 @@ int main(int argc, char **argv) {
       rendererManager.DrawComponents();
     }
 
-    // Start the Dear ImGui frame
-    ImGui_ImplOpenGL3_NewFrame();
-    ImGui_ImplGlfw_NewFrame();
-    ImGui::NewFrame();
-
     Renderer::Clear();
 
     lastTime = glfwGetTime();
 
-    ImGui::Begin("Controls");
-    ImGui::Text("This is where the controls will go");
-
-    ImGui::End();
-
-    ImGui::Render();
-    int display_w, display_h;
-    glfwMakeContextCurrent(window->m_glWindow);
-    glfwGetFramebufferSize(window->m_glWindow, &display_w, &display_h);
-    glViewport(0, 0, display_w, display_h);
-    glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
-    glClear(GL_COLOR_BUFFER_BIT);
-    ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-    //    Renderer::AddToDrawQueue(drawable);
     glfwMakeContextCurrent(window->m_glWindow);
     Renderer::Draw(camera, perspective);
     Renderer::DrawDebug(camera, perspective);
