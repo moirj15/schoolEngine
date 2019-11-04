@@ -13,6 +13,7 @@ SkeletonNode *Parser::Parse(const std::string &filename) {
   m_dataPos = 0;
   Tokenize();
   auto skeleton = ParseTokens();
+  ParseMotions(skeleton);
 
   return skeleton;
 }
@@ -87,6 +88,9 @@ void Parser::CreateKeyWordToken(std::string &word) {
     m_tokens.emplace_back(TokenType::EndSite, word + " " + site);
   } else if (word == "MOTION") {
     m_tokens.emplace_back(TokenType::Motion, word);
+  } else if (word == "Frame") {
+    auto time = ConsumeNonWhiteSpace();
+    m_tokens.emplace_back(TokenType::FrameTime, word + " " + time);
   } else { // Name
     m_tokens.emplace_back(TokenType::Name, word);
   }
@@ -123,12 +127,15 @@ void Parser::ParseSkeletonNode(bool endsite) {
   if (!endsite) { currNode->allowedMotions = ParseChannels(); }
 
   if (m_tokens[m_tokenPos].type == TokenType::Joint) {
-    currNode->m_children.emplace_back(ParseTokens());
+    while (m_tokens[m_tokenPos].type != TokenType::EndScope) {
+      currNode->children.emplace_back(ParseTokens());
+    }
   } else if (m_tokens[m_tokenPos].type == TokenType::EndSite) {
     auto *leafNode = new SkeletonNode{m_tokens[m_tokenPos].value};
     m_tokenPos += 2;
     leafNode->offset = ParseOffset();
-    currNode->m_children.emplace_back(leafNode);
+    currNode->children.emplace_back(leafNode);
+    m_tokenPos++;
   }
 }
 
@@ -174,10 +181,51 @@ u32 Parser::ParseChannels() {
   return ret;
 }
 
-// void Parser::ParseEndSite() {
-//  m_nodeStack.emplace(new SkeletonNode(m_tokens[m_tokenPos].value));
-//  m_tokenPos++;
-//  m_nodeStack.top()->offset = ParseOffset();
-//}
+void Parser::ParseMotions(SkeletonNode *skeleton) {
+  m_tokenPos += 2; // skip over the Motion and Frames tokens
+  const u32 frameCount = std::stoi(m_tokens[m_tokenPos].value);
+  m_tokenPos += 2;
+  const f32 frameTime = std::stof(m_tokens[m_tokenPos].value);
+  m_tokenPos++;
+  auto skeletonNodes = skeleton->ToList();
+  for (auto *node : skeletonNodes) {
+    printf("allowed motions: 0x%x, name: %s\n", node->allowedMotions,
+        node->name.c_str());
+  }
+  for (u32 i = 0; i < frameCount; i++) {
+    for (auto *node : skeletonNodes) {
+      // Don't process end sites, since thy don't have rotation applied to them
+      if (node->children.size() > 0) { ParseMotion(node); }
+    }
+  }
+}
+
+void Parser::ParseMotion(SkeletonNode *skeleton) {
+  const std::vector<u32> masks = {X_POS, Y_POS, Z_POS, Z_ROT, X_ROT, Y_ROT};
+  NodeMotion motion;
+  for (const auto mask : masks) {
+    u32 bit = skeleton->allowedMotions & mask;
+    if (bit == X_POS) {
+      motion.translations.x = std::stof(m_tokens[m_tokenPos].value);
+      m_tokenPos++;
+    } else if (bit == Y_POS) {
+      motion.translations.y = std::stof(m_tokens[m_tokenPos].value);
+      m_tokenPos++;
+    } else if (bit == Z_POS) {
+      motion.translations.z = std::stof(m_tokens[m_tokenPos].value);
+      m_tokenPos++;
+    } else if (bit == Z_ROT) {
+      motion.rotations.z = std::stof(m_tokens[m_tokenPos].value);
+      m_tokenPos++;
+    } else if (bit == X_ROT) {
+      motion.rotations.x = std::stof(m_tokens[m_tokenPos].value);
+      m_tokenPos++;
+    } else if (bit == Y_ROT) {
+      motion.rotations.y = std::stof(m_tokens[m_tokenPos].value);
+      m_tokenPos++;
+    }
+  }
+  skeleton->motions.push_back(motion);
+}
 
 } // namespace bvh

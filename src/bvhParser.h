@@ -29,7 +29,8 @@ enum class TokenType {
   Channels,
   Joint,
   BeginScope,
-  EndScope
+  EndScope,
+  FrameTime,
 };
 
 struct Token {
@@ -80,13 +81,33 @@ private:
    */
   void CreateKeyWordToken(std::string &word);
 
+  /**
+   * Parses the list of tokens into a SkeletonNode.
+   * @return The skeletonNode.
+   */
   SkeletonNode *ParseTokens();
 
+  /**
+   * Parses the tokens starting at the current token position and stores them in
+   * the skeletonNode that is at the top of the nodeStack.
+   * @param endsite: Bool denoting if the node being parsed is an endsite.
+   */
   void ParseSkeletonNode(bool endsite = false);
 
+  /**
+   * Parses the offset values into a vec3.
+   * @return: The vec3 containing the offset values.
+   */
   glm::vec3 ParseOffset();
 
+  /**
+   * Parses the allowed channels into a bitmap.
+   * @return: The bitmap containing the allowed channels.
+   */
   u32 ParseChannels();
+
+  void ParseMotions(SkeletonNode *skeleton);
+  void ParseMotion(SkeletonNode *skeleton);
 };
 
 } // namespace bvh

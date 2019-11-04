@@ -100,20 +100,13 @@ int main(int argc, char **argv) {
   Shader shader{{"../shaders/macshader.vert", "../shaders/macshader.frag"}};
 #endif
 
-  Ray ray{glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, -1.0f)};
-  BoundingBox bb{glm::vec3(-1.0f, -1.0f, -5.0f), glm::vec3(1.0f, 1.0f, -2.0f)};
-  bool intersect = bb.IntersectRay(ray);
-
-  //  ObjReader objReader{"../objData/block.obj"};
-  ObjReader objReader{"../objData/knife.obj"};
-  Mesh *mesh = objReader.Parse();
-
   auto perspective = glm::perspective(90.0f, 16.0f / 9.0f, 0.01f, 100.0f);
   auto camera = glm::lookAt(glm::vec3{0.0f, 0.0f, 5.0f},
       glm::vec3{0.0f, 0.0f, -1.0f}, glm::vec3{0.0f, 1.0f, 0.0f});
 
   auto transform =
       glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -5.0f));
+
   glfwSetTime(0.0);
   f64 lastTime = glfwGetTime();
   f32 t = 0.0;
