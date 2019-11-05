@@ -194,7 +194,7 @@ void Parser::ParseMotions(SkeletonNode *skeleton) {
   }
   for (u32 i = 0; i < frameCount; i++) {
     for (auto *node : skeletonNodes) {
-      // Don't process end sites, since thy don't have rotation applied to them
+      // Don't process end sites, since they don't have rotation applied to them
       if (node->children.size() > 0) { ParseMotion(node); }
     }
   }

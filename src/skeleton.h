@@ -6,6 +6,7 @@
 #include <glm/glm.hpp>
 #include <memory>
 #include <string>
+#include <utility>
 #include <vector>
 
 constexpr u32 X_POS = 1 << 0;
@@ -29,6 +30,9 @@ struct SkeletonNode {
   SkeletonNode(const std::string &n) : name{n} {}
 
   std::vector<SkeletonNode *> ToList();
+
+  using BoneList = std::vector<std::vector<std::pair<glm::vec3, glm::vec3>>>;
+  BoneList ApplyMatricies(const glm::mat4 &parent = glm::mat4{1.0f});
 };
 
 #endif // SKELETON_H

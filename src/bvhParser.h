@@ -38,6 +38,7 @@ struct Token {
   std::string value;
 
   Token(TokenType t, std::string &value) : type{t}, value{std::move(value)} {}
+  Token(TokenType t, const std::string &value) : type{t}, value{value} {}
 };
 
 class Parser {

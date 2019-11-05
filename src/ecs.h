@@ -21,14 +21,7 @@ class VertexArray;
 
 namespace ECS {
 
-using EntityID = u32;
-
-struct Entity {
-  EntityID id;
-
-  Entity(EntityID eid) : id(eid) {}
-  virtual ~Entity() = default;
-};
+using EntityID = u64;
 
 struct Physics {
   glm::vec3 velocity = {};
@@ -69,30 +62,48 @@ struct Collidable {
   BoundingBox boundingBox = {};
 };
 
-enum class Type : u32 {
+struct NodeMotion {
+  glm::vec3 translations = {};
+  glm::vec3 rotations = {};
+};
+
+struct Skeleton {
+  u32 allowedMotions = 0;
+  glm::vec3 offset = {};
+  std::string name = {};
+  std::vector<NodeMotion> motions;
+  std::vector<std::unique_ptr<Skeleton>> children = {};
+  Skeleton() = default;
+  Skeleton(const std::string &n) : name{n} {}
+
+  std::vector<Skeleton *> ToList();
+};
+
+enum class Type : u64 {
   Renderable = 1 << 24,
   Physics = 1 << 25,
   Transform = 1 << 26,
   Shaterable = 1 << 27,
   Mesh = 1 << 28,
-  Collidable = 1 << 29
+  Collidable = 1 << 29,
+  Skeleton = 1 << 30,
 };
 
 class ComponentManager {
-  using CompTuple =
-      std::tuple<std::vector<Physics *>, std::vector<Renderable *>,
-          std::vector<Transform *>, std::vector<Shaterable *>,
-          std::vector<Mesh *>, std::vector<Collidable *>>;
+  using CompTuple = std::tuple<std::vector<Physics *>,
+      std::vector<Renderable *>, std::vector<Transform *>,
+      std::vector<Shaterable *>, std::vector<Mesh *>, std::vector<Collidable *>,
+      std::vector<Skeleton *>>;
   CompTuple m_components;
 
 public:
   ComponentManager() :
       m_components{{1024 * 10, nullptr}, {1024 * 10, nullptr},
           {1024 * 10, nullptr}, {1024 * 10, nullptr}, {1024 * 10, nullptr},
-          {1024 * 10, nullptr}} {}
+          {1024 * 10, nullptr}, {1024 * 10, nullptr}} {}
   ~ComponentManager();
 
-  EntityID CreateEntity(u32 type);
+  EntityID CreateEntity(EntityID type);
 
   void DestroyEntity(EntityID id);
 
