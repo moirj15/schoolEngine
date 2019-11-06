@@ -6,7 +6,9 @@ namespace bvh {
 
 SkeletonNode *Parser::Parse(const std::string &filename) {
   auto [data, size] = ReadFile(filename.c_str());
-  if (m_fileData) { delete[](m_fileData); }
+  if (m_fileData) {
+    delete[](m_fileData);
+  }
   m_fileData = data;
   m_dataSize = size;
   m_tokens.clear();
@@ -57,7 +59,9 @@ std::string Parser::ConsumeNonWhiteSpace() {
 }
 
 void Parser::ConsumeWhiteSpace() {
-  while (isspace(m_fileData[m_dataPos])) { m_dataPos++; }
+  while (isspace(m_fileData[m_dataPos])) {
+    m_dataPos++;
+  }
 }
 
 void Parser::CreateKeyWordToken(std::string &word) {
@@ -124,7 +128,9 @@ SkeletonNode *Parser::ParseTokens() {
 void Parser::ParseSkeletonNode(bool endsite) {
   auto *currNode = m_nodeStack.top();
   currNode->offset = ParseOffset();
-  if (!endsite) { currNode->allowedMotions = ParseChannels(); }
+  if (!endsite) {
+    currNode->allowedMotions = ParseChannels();
+  }
 
   if (m_tokens[m_tokenPos].type == TokenType::Joint) {
     while (m_tokens[m_tokenPos].type != TokenType::EndScope) {
@@ -195,7 +201,9 @@ void Parser::ParseMotions(SkeletonNode *skeleton) {
   for (u32 i = 0; i < frameCount; i++) {
     for (auto *node : skeletonNodes) {
       // Don't process end sites, since they don't have rotation applied to them
-      if (node->children.size() > 0) { ParseMotion(node); }
+      if (node->children.size() > 0) {
+        ParseMotion(node);
+      }
     }
   }
 }

@@ -37,7 +37,7 @@ void Draw(const glm::mat4 &camera, const glm::mat4 &perspective) {
       s_defaultShader->SetUniformMat4("projection", perspective);
     }
     drawable.vertexArray->Bind();
-    glDrawElements(GL_TRIANGLES, drawable.vertexArray->IndexCount(),
+    glDrawElements(GL_LINES, drawable.vertexArray->IndexCount(),
         GL_UNSIGNED_INT, (void *)0);
   }
 }

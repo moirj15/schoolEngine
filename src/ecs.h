@@ -8,6 +8,7 @@
 
 #include <glm/glm.hpp>
 #include <glm/gtc/quaternion.hpp>
+#include <memory>
 #include <optional>
 #include <tuple>
 #include <vector>
@@ -111,7 +112,9 @@ public:
   T *GetComponent(EntityID id) {
     auto component = std::get<std::vector<T *>>(m_components);
     u32 index = id & 0x0000ffff;
-    if (index < component.size()) { return component[index]; }
+    if (index < component.size()) {
+      return component[index];
+    }
     return nullptr;
   }
 

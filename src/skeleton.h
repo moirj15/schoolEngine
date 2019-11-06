@@ -21,6 +21,7 @@ struct NodeMotion {
   glm::vec3 rotations = {};
 };
 
+using BoneList = std::vector<std::pair<glm::vec3, glm::vec3>>;
 struct SkeletonNode {
   u32 allowedMotions = 0;
   glm::vec3 offset = {};
@@ -31,8 +32,19 @@ struct SkeletonNode {
 
   std::vector<SkeletonNode *> ToList();
 
-  using BoneList = std::vector<std::vector<std::pair<glm::vec3, glm::vec3>>>;
-  BoneList ApplyMatricies(const glm::mat4 &parent = glm::mat4{1.0f});
+  std::vector<glm::mat4> Transformations(
+      size i, const glm::mat4 &parent = glm::mat4{1.0f});
+
+  BoneList Bones();
+
+private:
+  BoneList ApplyMatriciesRecursive(
+      size motionIndex, const glm::mat4 &parent = glm::mat4(1.0f));
 };
+
+// class Skeleton {
+//  std::unique_ptr<SkeletonNode> m_skeletonTree;
+//  size m_motionCount;
+//};
 
 #endif // SKELETON_H

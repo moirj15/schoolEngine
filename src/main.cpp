@@ -22,6 +22,7 @@
 #include "rendererablemanager.h"
 #include "shader.h"
 #include "shaterableManager.h"
+#include "skeleton.h"
 #include "window.h"
 
 #include <chrono>
@@ -90,9 +91,32 @@ int main(int argc, char **argv) {
   Window *window = InitGL();
   InitIMGUI(window);
   bvh::Parser parser;
-  parser.Parse("../Example1.bvh");
+  std::unique_ptr<SkeletonNode> skeleton{parser.Parse("../Example1.bvh")};
+  //  auto bones = skeleton->ApplyMatricies();
+  auto nodes = skeleton->ToList();
+  auto transforms = skeleton->Transformations(0);
+  std::vector<std::pair<glm::vec3, glm::vec3>> bones{
+      nodes.size() - 1, {{1.0f, 1.0f, 1.0f}, {1.0f, 1.0f, 1.0f}}};
+  std::vector<f32> points;
+  std::vector<u32> indexes;
+  for (size i = 0; i < bones.size(); i++) {
+    indexes.push_back(i);
+    indexes.push_back(i + 1);
+    bones[i].first = transforms[i] * glm::vec4(bones[i].first, 1.0f);
+    bones[i].second = transforms[i + 1] * glm::vec4(bones[i].second, 1.0f);
+    for (size v = 0; v < 3; v++) {
+      points.push_back(bones[i].first[v]);
+    }
+    for (size v = 0; v < 3; v++) {
+      points.push_back(bones[i].second[v]);
+    }
+  }
 
   printf("%s\n", glGetString(GL_VERSION));
+  VertexArray vertexArray;
+  vertexArray.AddIndexBuffer(new IndexBuffer(indexes.data(), indexes.size()));
+  vertexArray.AddVertexBuffer(new VertexBuffer(
+      points.data(), points.size(), {{"points", 3, 0, 0, GL_FLOAT}}));
 
 #ifndef __APPLE__
   Shader shader{{"../shaders/shader.vert", "../shaders/shader.frag"}};
@@ -115,6 +139,7 @@ int main(int argc, char **argv) {
   PhysicsManager physicsManager{&componentManager};
   ShaterableManager shaterableManager{&componentManager};
   RendererableManager rendererManager{&componentManager};
+  glEnable(GL_PROGRAM_POINT_SIZE);
 
   while (!glfwWindowShouldClose(window->m_glWindow)) {
     Renderer::ClearDrawQueue();
@@ -127,6 +152,11 @@ int main(int argc, char **argv) {
       shaterableManager.Simulate((f32)lastTime, (f32)currentTime);
       rendererManager.DrawComponents();
     }
+    //    Renderer::AddToDrawQueue(
+    //        {{}, {{"transform", glm::scale(glm::mat4(1.0f), {0.1f, 0.1f,
+    //        0.1f})}},
+    //            &vertexArray, nullptr});
+    Renderer::AddToDrawQueue({{}, {}, &vertexArray, nullptr});
 
     Renderer::Clear();
 
