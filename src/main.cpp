@@ -71,7 +71,7 @@ Window *InitGL() {
   glEnable(GL_DEPTH_TEST);
   //  glCullFace(GL_BACK);
   glClearColor(0.0, 0.0, 0.0, 1.0);
-  glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+  glPolygonMode(GL_FRONT_AND_BACK, GL_LINES);
   glClearDepth(4.0);
   glDepthFunc(GL_LESS);
   return window;
@@ -93,7 +93,7 @@ int main(int argc, char **argv) {
   InitIMGUI(window);
   bvh::Parser parser;
   Skeleton skeleton{parser.Parse("../Example1.bvh")};
-  //  auto *bones = skeleton.DrawableBones();
+  auto *bones = skeleton.DrawableBones();
   std::unique_ptr<VertexArray> transformedBones{
       skeleton.NextTransformedBones()};
   //    transformedBones2 = skeleton.NextTransformedBones();
@@ -104,9 +104,9 @@ int main(int argc, char **argv) {
   Shader shader{{"../shaders/macshader.vert", "../shaders/macshader.frag"}};
 #endif
 
-  auto perspective = glm::perspective(90.0f, 16.0f / 9.0f, 0.01f, 100.0f);
-  auto camera = glm::lookAt(glm::vec3{0.0f, 50.0f, 50.0f},
-      glm::vec3{0.0f, 50.0f, -1.0f}, glm::vec3{0.0f, 1.0f, 0.0f});
+  auto perspective = glm::perspective(90.0f, 16.0f / 9.0f, 0.01f, 200.0f);
+  auto camera = glm::lookAt(glm::vec3{7.0f, 35.0f, 75.0f},
+      glm::vec3{0.0f, 35.0f, -1.0f}, glm::vec3{0.0f, 1.0f, 0.0f});
 
   auto transform =
       glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -5.0f));
@@ -132,8 +132,8 @@ int main(int argc, char **argv) {
     //      shaterableManager.Simulate((f32)lastTime, (f32)currentTime);
     //      rendererManager.DrawComponents();
     //    }
-    if (t > skeleton.FrameTime()) {
-      //      transformedBones.reset(skeleton.NextTransformedBones());
+    if (t > skeleton.FrameTime() * 10) {
+      transformedBones.reset(skeleton.NextTransformedBones());
       t = 0.0;
     }
     //    Renderer::AddToDrawQueue(

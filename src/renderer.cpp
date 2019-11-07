@@ -23,6 +23,7 @@ void AddToDrawQueue(const Drawable &drawable) {
 // TODO: remove this check for a default shader
 // Maybe create a shader manager
 void Draw(const glm::mat4 &camera, const glm::mat4 &perspective) {
+  glLineWidth(2.0f);
   for (const auto &drawable : s_renderQueue) {
     if (drawable.shader) {
       drawable.shader->Bind();

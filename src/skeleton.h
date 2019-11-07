@@ -31,6 +31,7 @@ struct SkeletonNode {
   std::vector<NodeMotion> motions;
   std::vector<glm::mat4> transforms;
   std::vector<std::unique_ptr<SkeletonNode>> children = {};
+  SkeletonNode *parent = nullptr;
   size frames = 0;
   f32 frameTime = 0.0f;
   SkeletonNode(const std::string &n) : name{n} {}

@@ -134,12 +134,15 @@ void Parser::ParseSkeletonNode(bool endsite) {
 
   if (m_tokens[m_tokenPos].type == TokenType::Joint) {
     while (m_tokens[m_tokenPos].type != TokenType::EndScope) {
-      currNode->children.emplace_back(ParseTokens());
+      auto *childNode = ParseTokens();
+      childNode->parent = currNode;
+      currNode->children.emplace_back(childNode);
     }
   } else if (m_tokens[m_tokenPos].type == TokenType::EndSite) {
     auto *leafNode = new SkeletonNode{m_tokens[m_tokenPos].value};
     m_tokenPos += 2;
     leafNode->offset = ParseOffset();
+    leafNode->parent = currNode;
     currNode->children.emplace_back(leafNode);
     m_tokenPos++;
   }
