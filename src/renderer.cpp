@@ -39,6 +39,8 @@ void Draw(const glm::mat4 &camera, const glm::mat4 &perspective) {
     drawable.vertexArray->Bind();
     glDrawElements(GL_LINES, drawable.vertexArray->IndexCount(),
         GL_UNSIGNED_INT, (void *)0);
+    glDrawElements(GL_POINTS, drawable.vertexArray->IndexCount(),
+        GL_UNSIGNED_INT, (void *)0);
   }
 }
 

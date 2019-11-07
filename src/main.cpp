@@ -28,6 +28,7 @@
 #include <chrono>
 #include <glm/glm.hpp>
 #include <glm/gtx/normal.hpp>
+#include <glm/gtx/string_cast.hpp>
 #include <glm/gtx/transform.hpp>
 #include <string>
 #include <thread>
@@ -68,9 +69,9 @@ Window *InitGL() {
   }
   glfwSwapInterval(1);
   glEnable(GL_DEPTH_TEST);
-  glCullFace(GL_BACK);
+  //  glCullFace(GL_BACK);
   glClearColor(0.0, 0.0, 0.0, 1.0);
-  glPolygonMode(GL_FRONT, GL_FILL);
+  glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
   glClearDepth(4.0);
   glDepthFunc(GL_LESS);
   return window;
@@ -91,32 +92,11 @@ int main(int argc, char **argv) {
   Window *window = InitGL();
   InitIMGUI(window);
   bvh::Parser parser;
-  std::unique_ptr<SkeletonNode> skeleton{parser.Parse("../Example1.bvh")};
-  //  auto bones = skeleton->ApplyMatricies();
-  auto nodes = skeleton->ToList();
-  auto transforms = skeleton->Transformations(0);
-  std::vector<std::pair<glm::vec3, glm::vec3>> bones{
-      nodes.size() - 1, {{1.0f, 1.0f, 1.0f}, {1.0f, 1.0f, 1.0f}}};
-  std::vector<f32> points;
-  std::vector<u32> indexes;
-  for (size i = 0; i < bones.size(); i++) {
-    indexes.push_back(i);
-    indexes.push_back(i + 1);
-    bones[i].first = transforms[i] * glm::vec4(bones[i].first, 1.0f);
-    bones[i].second = transforms[i + 1] * glm::vec4(bones[i].second, 1.0f);
-    for (size v = 0; v < 3; v++) {
-      points.push_back(bones[i].first[v]);
-    }
-    for (size v = 0; v < 3; v++) {
-      points.push_back(bones[i].second[v]);
-    }
-  }
-
-  printf("%s\n", glGetString(GL_VERSION));
-  VertexArray vertexArray;
-  vertexArray.AddIndexBuffer(new IndexBuffer(indexes.data(), indexes.size()));
-  vertexArray.AddVertexBuffer(new VertexBuffer(
-      points.data(), points.size(), {{"points", 3, 0, 0, GL_FLOAT}}));
+  Skeleton skeleton{parser.Parse("../Example1.bvh")};
+  //  auto *bones = skeleton.DrawableBones();
+  std::unique_ptr<VertexArray> transformedBones{
+      skeleton.NextTransformedBones()};
+  //    transformedBones2 = skeleton.NextTransformedBones();
 
 #ifndef __APPLE__
   Shader shader{{"../shaders/shader.vert", "../shaders/shader.frag"}};
@@ -125,8 +105,8 @@ int main(int argc, char **argv) {
 #endif
 
   auto perspective = glm::perspective(90.0f, 16.0f / 9.0f, 0.01f, 100.0f);
-  auto camera = glm::lookAt(glm::vec3{0.0f, 0.0f, 5.0f},
-      glm::vec3{0.0f, 0.0f, -1.0f}, glm::vec3{0.0f, 1.0f, 0.0f});
+  auto camera = glm::lookAt(glm::vec3{0.0f, 50.0f, 50.0f},
+      glm::vec3{0.0f, 50.0f, -1.0f}, glm::vec3{0.0f, 1.0f, 0.0f});
 
   auto transform =
       glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -5.0f));
@@ -147,16 +127,22 @@ int main(int argc, char **argv) {
     f64 currentTime = glfwGetTime();
     f64 delta = (currentTime - lastTime); // * 1000.0;
     t += (f32)delta;                      // lastTime / 60.0f;
-    if (t > 10.0) {
-      physicsManager.Simulate((f32)lastTime, (f32)currentTime);
-      shaterableManager.Simulate((f32)lastTime, (f32)currentTime);
-      rendererManager.DrawComponents();
+                                          //    if (t > 10.0) {
+    //      physicsManager.Simulate((f32)lastTime, (f32)currentTime);
+    //      shaterableManager.Simulate((f32)lastTime, (f32)currentTime);
+    //      rendererManager.DrawComponents();
+    //    }
+    if (t > skeleton.FrameTime()) {
+      //      transformedBones.reset(skeleton.NextTransformedBones());
+      t = 0.0;
     }
     //    Renderer::AddToDrawQueue(
     //        {{}, {{"transform", glm::scale(glm::mat4(1.0f), {0.1f, 0.1f,
     //        0.1f})}},
     //            &vertexArray, nullptr});
-    Renderer::AddToDrawQueue({{}, {}, &vertexArray, nullptr});
+    Renderer::AddToDrawQueue({{}, {}, transformedBones.get(), nullptr});
+    //        Renderer::AddToDrawQueue({{}, {}, transformedBones2, nullptr});
+    //    Renderer::AddToDrawQueue({{}, {}, bones, nullptr});
 
     Renderer::Clear();
 

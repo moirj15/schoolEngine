@@ -193,6 +193,8 @@ void Parser::ParseMotions(SkeletonNode *skeleton) {
   m_tokenPos += 2;
   const f32 frameTime = std::stof(m_tokens[m_tokenPos].value);
   m_tokenPos++;
+  skeleton->frames = frameCount;
+  skeleton->frameTime = frameTime;
   auto skeletonNodes = skeleton->ToList();
   for (auto *node : skeletonNodes) {
     printf("allowed motions: 0x%x, name: %s\n", node->allowedMotions,
