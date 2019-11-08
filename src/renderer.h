@@ -32,6 +32,7 @@ struct Drawable {
 void AddToDrawQueue(const Drawable &drawable);
 
 void Draw(const glm::mat4 &camera, const glm::mat4 &perspective);
+void DrawImmediate(const glm::mat4 &camera, const glm::mat4 &perspective, const Drawable &drawable);
 
 void DrawDebug(const glm::mat4 &camera, const glm::mat4 &perspective);
 

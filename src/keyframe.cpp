@@ -2,8 +2,9 @@
 #include "interpolation.h"
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/quaternion.hpp>
+#include <glm/gtc/matrix_transform.hpp>
 
-
+/*
 void KeyFrameGroup::LoadFromFile(const std::string &filename) {
     FILE *file = OpenFile(filename.c_str(), "r");
     char buffer[256] = {};
@@ -71,4 +72,4 @@ void KeyFrameGroup::UpdateFramePoints(const f32 t) {
         m_endFrame += 2;
     //}
 }
-
+*/

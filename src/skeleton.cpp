@@ -41,32 +41,6 @@ static glm::mat4 CalculateTransform(const NodeMotion &motion,
   return transform;
 }
 
-// void SkeletonNode::Transformations(
-//    size frameCount, const std::vector<glm::mat4> &parent) {
-//  for (size i = 0; i < motions.size(); i++) {
-//    glm::mat4 parentTransform{1.0f};
-//    if (!parent.empty()) {
-//      parentTransform = parent[i];
-//    }
-//    auto transform = CalculateTransform(motions[i], parentTransform, offset);
-//    transforms.emplace_back(transform);
-//  }
-//  if (motions.empty()) {
-//    for (size i = 0; i < frameCount; i++) {
-//      glm::mat4 parentTransform{1.0f};
-//      if (!parent.empty()) {
-//        parentTransform = parent[i];
-//      }
-//      auto transform = CalculateTransform(
-//          {glm::vec3{1.0f}, glm::vec3{1.0f}}, parentTransform, offset);
-//      transforms.emplace_back(transform);
-//    }
-//  }
-//  for (auto &child : children) {
-//    child->Transformations(frameCount, transforms);
-//  }
-//}
-
 static glm::mat4 CalculateRotations(const NodeMotion &motion) {
 
   auto rotateX = glm::rotate(
@@ -75,7 +49,7 @@ static glm::mat4 CalculateRotations(const NodeMotion &motion) {
       glm::mat4(1.0f), glm::radians(motion.rotations.y), {0.0f, 1.0f, 0.0f});
   auto rotateZ = glm::rotate(
       glm::mat4(1.0f), glm::radians(motion.rotations.z), {0.0f, 0.0f, 1.0f});
-  return rotateZ * rotateY * rotateX;
+  return rotateZ * rotateX * rotateY;
 }
 
 void SkeletonNode::Transformations(
@@ -128,32 +102,6 @@ VertexArray *Skeleton::DrawableBones() {
   }
   return BonesToVAO(m_bones);
 }
-// VertexArray *Skeleton::NextTransformedBones() {
-//  static size transformIndex = 0;
-//  if (m_skeletonTree->transforms.empty()) {
-//    m_skeletonTree->Transformations(m_skeletonTree->frames);
-//  }
-//  BoneList transformedBones;
-//  auto nodeList = m_skeletonTree->ToList();
-//  std::vector<std::pair<glm::mat4, glm::mat4>> transforms;
-//  for (const auto *node : nodeList) {
-//    for (const auto &child : node->children) {
-//      transforms.emplace_back(
-//          node->transforms[transformIndex],
-//          child->transforms[transformIndex]);
-//    }
-//  }
-//
-//  for (const auto tPair : transforms) {
-//    transformedBones.emplace_back(
-//        tPair.first * glm::vec4{1.0f, 1.0f, 1.0f, 1.0f},
-//        tPair.first * glm::vec4{1.0f, 1.0f, 1.0f, 1.0f});
-//  }
-//  transformIndex = (transformIndex + 1) % m_skeletonTree->transforms.size();
-//
-//  auto b = m_skeletonTree->Bones();
-//  return BonesToVAO(transformedBones);
-//}
 
 VertexArray *Skeleton::NextTransformedBones() {
   static size transformIndex = 0;
@@ -164,9 +112,6 @@ VertexArray *Skeleton::NextTransformedBones() {
   auto nodes = m_skeletonTree->ToList();
   for (const auto &node : nodes) {
     for (const auto &child : node->children) {
-      //transformedBones.emplace_back(
-      //    node->transforms[transformIndex] * glm::vec4{node->offset, 1.0f},
-      //    child->transforms[transformIndex] * glm::vec4{child->offset, 1.0f});
       transformedBones.emplace_back(
           node->transforms[transformIndex] * glm::vec4{1.0f,1.0f,1.0f, 1.0f},
           child->transforms[transformIndex] * glm::vec4{1.0f,1.0f,1.0f, 1.0f});

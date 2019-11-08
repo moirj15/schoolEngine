@@ -38,11 +38,34 @@ void Draw(const glm::mat4 &camera, const glm::mat4 &perspective) {
       s_defaultShader->SetUniformMat4("projection", perspective);
     }
     drawable.vertexArray->Bind();
+    if (!drawable.commands.empty()) {
+            glDrawElements(GL_TRIANGLES, drawable.vertexArray->IndexCount(),
+                    GL_UNSIGNED_INT, (void *)0);
+    } else {
     glDrawElements(GL_LINES, drawable.vertexArray->IndexCount(),
         GL_UNSIGNED_INT, (void *)0);
     glDrawElements(GL_POINTS, drawable.vertexArray->IndexCount(),
         GL_UNSIGNED_INT, (void *)0);
+    }
   }
+}
+
+void DrawImmediate(const glm::mat4 &camera, const glm::mat4 &perspective, const Drawable &drawable) {
+    if (drawable.shader) {
+      drawable.shader->Bind();
+      drawable.shader->SetShaderData(drawable.shaderData);
+      drawable.shader->SetUniformMat4("camera", camera);
+      drawable.shader->SetUniformMat4("projection", perspective);
+
+    } else {
+      s_defaultShader->Bind();
+      s_defaultShader->SetShaderData(drawable.shaderData);
+      s_defaultShader->SetUniformMat4("camera", camera);
+      s_defaultShader->SetUniformMat4("projection", perspective);
+    }
+    drawable.vertexArray->Bind();
+    glDrawElements(GL_TRIANGLES, drawable.vertexArray->IndexCount(),
+        GL_UNSIGNED_INT, (void *)0);
 }
 
 void DrawDebug(const glm::mat4 &camera, const glm::mat4 &perspective) {

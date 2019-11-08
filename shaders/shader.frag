@@ -4,7 +4,8 @@ in vec4 normal;
 in vec4 pos;
 in vec4 lightPos;
 in vec2 tex_coord;
-in vec4 color;
+//in vec4 color;
+uniform vec3 color;
 
 // TODO: set these in program
 uniform float ambientCoef = 0.5;
@@ -52,6 +53,7 @@ void main() {
 
 		
     // fragmentColor = texture(tex, tex_coord);// + vec4(0.1, 0.0, 0.0, 0.0);//ambient + diffuse + specular;
-    fragmentColor = color;
+//    fragmentColor = vec4(1.0, 0.0, 0.0, 0.0);//color;
+    fragmentColor = vec4(color, 0.0);
 }
 

@@ -4,7 +4,9 @@
 
 #include <array>
 #include <cstdio>
-
+//#include <glm/gtc/quaternion.hpp>
+//#include <glm/gtx/quaternion.hpp>
+/*
 // glm::mat4 basis{-1.0f,  3.0f, -3.0f, 1.0f,
 //                 3.0f, -6.0f, -4.0f, 0.0f,
 //                -3.0f,  3.0f,  0.0f, 0.0f,
@@ -67,4 +69,4 @@ glm::quat DCCSpline(const f32 u, const KeyFrame &start, const KeyFrame &p,
   const auto r0 = glm::normalize(glm::slerp(q0, q1, u));
   const auto r1 = glm::normalize(glm::slerp(q1, q2, u));
   return glm::normalize(glm::slerp(r0, r1, u));
-}
+}*/

@@ -15,7 +15,7 @@
 #include "common.h"
 #include "debugdraw.h"
 #include "ecs.h"
-#include "keyframe.h"
+// #include "keyframe.h"
 #include "obj.h"
 #include "physicsManager.h"
 #include "renderer.h"
@@ -50,14 +50,14 @@ Window *InitGL() {
     exit(EXIT_FAILURE);
   }
 
-#ifdef __APPLE__
+//#ifdef __APPLE__
   glfwWindowHint(GLFW_SAMPLES, 4);
-  glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-  glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+  glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+  glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 5);
   glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT,
       GL_TRUE); // To make MacOS happy; should not be needed
   glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-#endif
+//#endif
   Window *window = new Window{width, height};
 
   glfwMakeContextCurrent(window->m_glWindow);
@@ -71,7 +71,7 @@ Window *InitGL() {
   glEnable(GL_DEPTH_TEST);
   //  glCullFace(GL_BACK);
   glClearColor(0.0, 0.0, 0.0, 1.0);
-  glPolygonMode(GL_FRONT_AND_BACK, GL_LINES);
+  glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
   glClearDepth(4.0);
   glDepthFunc(GL_LESS);
   return window;
@@ -91,21 +91,23 @@ int main(int argc, char **argv) {
 
   Window *window = InitGL();
   InitIMGUI(window);
+  printf("%s\n", glGetString(GL_VERSION));
   bvh::Parser parser;
-  Skeleton skeleton{parser.Parse("../Example1.bvh")};
+//  Skeleton skeleton{parser.Parse("../Example1.bvh")};
+  Skeleton skeleton{parser.Parse("../Sit.bvh")};
   auto *bones = skeleton.DrawableBones();
   std::unique_ptr<VertexArray> transformedBones{
       skeleton.NextTransformedBones()};
   //    transformedBones2 = skeleton.NextTransformedBones();
 
-#ifndef __APPLE__
+//#ifndef __APPLE__
   Shader shader{{"../shaders/shader.vert", "../shaders/shader.frag"}};
-#else
-  Shader shader{{"../shaders/macshader.vert", "../shaders/macshader.frag"}};
-#endif
+//#else
+//  Shader shader{{"../shaders/macshader.vert", "../shaders/macshader.frag"}};
+//#endif
 
   auto perspective = glm::perspective(90.0f, 16.0f / 9.0f, 0.01f, 200.0f);
-  auto camera = glm::lookAt(glm::vec3{7.0f, 35.0f, 75.0f},
+  auto camera = glm::lookAt(glm::vec3{0.0f, 35.0f, 75.0f},
       glm::vec3{0.0f, 35.0f, -1.0f}, glm::vec3{0.0f, 1.0f, 0.0f});
 
   auto transform =
@@ -120,6 +122,16 @@ int main(int argc, char **argv) {
   ShaterableManager shaterableManager{&componentManager};
   RendererableManager rendererManager{&componentManager};
   glEnable(GL_PROGRAM_POINT_SIZE);
+  u32 ind[] = {0, 1, 2, 2, 1, 3};
+  f32 poi[] = {
+    -100.0, 0.0, -100.0,
+    -100.0, 0.0, 100.0,
+    100.0, 0.0, -100.0,
+    100.0, 0.0, 100.0
+  };
+  VertexArray vert;
+  vert.AddIndexBuffer(new IndexBuffer(ind, 6));
+  vert.AddVertexBuffer(new VertexBuffer(poi, 12, {{"points", 3, 0, 0, GL_FLOAT}}));
 
   while (!glfwWindowShouldClose(window->m_glWindow)) {
     Renderer::ClearDrawQueue();
@@ -132,7 +144,7 @@ int main(int argc, char **argv) {
     //      shaterableManager.Simulate((f32)lastTime, (f32)currentTime);
     //      rendererManager.DrawComponents();
     //    }
-    if (t > skeleton.FrameTime() * 10) {
+    if (t > skeleton.FrameTime() / 100.0f) {
       transformedBones.reset(skeleton.NextTransformedBones());
       t = 0.0;
     }
@@ -140,9 +152,8 @@ int main(int argc, char **argv) {
     //        {{}, {{"transform", glm::scale(glm::mat4(1.0f), {0.1f, 0.1f,
     //        0.1f})}},
     //            &vertexArray, nullptr});
-    Renderer::AddToDrawQueue({{}, {}, transformedBones.get(), nullptr});
-    //        Renderer::AddToDrawQueue({{}, {}, transformedBones2, nullptr});
-    //    Renderer::AddToDrawQueue({{}, {}, bones, nullptr});
+    Renderer::AddToDrawQueue({{}, {{"color", {1.0f, 0.0f, 0.0f}}}, transformedBones.get(), nullptr});
+    Renderer::AddToDrawQueue({{Renderer::DrawSolid}, {{"color", {1.0f, 1.0f, 1.0f}}}, &vert, nullptr});
 
     Renderer::Clear();
 
