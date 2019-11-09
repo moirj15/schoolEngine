@@ -45,9 +45,9 @@ class Parser {
   char *m_fileData = nullptr;
   std::vector<Token> m_tokens = {};
   std::stack<SkeletonNode *> m_nodeStack = {};
-  size m_dataPos = 0;
-  size m_dataSize = 0;
-  size m_tokenPos = 0;
+  Size m_dataPos = 0;
+  Size m_dataSize = 0;
+  Size m_tokenPos = 0;
 
 public:
   Parser() = default;

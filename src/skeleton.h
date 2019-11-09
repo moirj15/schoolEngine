@@ -3,7 +3,8 @@
 
 #include "common.h"
 
-#include <glm/glm.hpp>
+#include <glm/mat4x4.hpp>
+#include <glm/vec3.hpp>
 #include <memory>
 #include <string>
 #include <utility>
@@ -32,32 +33,29 @@ struct SkeletonNode {
   std::vector<glm::mat4> transforms;
   std::vector<std::unique_ptr<SkeletonNode>> children = {};
   SkeletonNode *parent = nullptr;
-  size frames = 0;
+  Size frames = 0;
   f32 frameTime = 0.0f;
   SkeletonNode(const std::string &n) : name{n} {}
 
   std::vector<SkeletonNode *> ToList();
 
-  void Transformations(
-      size frameCount, const std::vector<glm::mat4> &parent = {});
+  void Transformations(Size frameCount, const std::vector<glm::mat4> &parent = {});
 
   BoneList Bones(const glm::vec3 parent = glm::vec3(0.0f));
 
 private:
-  BoneList ApplyMatriciesRecursive(
-      size motionIndex, const glm::mat4 &parent = glm::mat4(1.0f));
+  BoneList ApplyMatriciesRecursive(Size motionIndex, const glm::mat4 &parent = glm::mat4(1.0f));
 };
 
 class Skeleton {
   std::unique_ptr<SkeletonNode> m_skeletonTree;
   BoneList m_bones;
   std::vector<std::vector<glm::mat4>> m_transforms;
-  size m_motionCount;
+  Size m_motionCount;
 
 public:
   Skeleton(SkeletonNode *nodes) :
-      m_skeletonTree{nodes}, m_bones{}, m_transforms{},
-      m_motionCount{nodes->motions.size()} {}
+      m_skeletonTree{nodes}, m_bones{}, m_transforms{}, m_motionCount{nodes->motions.size()} {}
 
   VertexArray *DrawableBones();
   VertexArray *NextTransformedBones();

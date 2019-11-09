@@ -103,8 +103,7 @@ void Parser::CreateKeyWordToken(std::string &word) {
 SkeletonNode *Parser::ParseTokens() {
   while (m_tokenPos < m_tokens.size()) {
     auto currToken = m_tokens[m_tokenPos];
-    if (currToken.type == TokenType::Hierarchy
-        || currToken.type == TokenType::Root
+    if (currToken.type == TokenType::Hierarchy || currToken.type == TokenType::Root
         || currToken.type == TokenType::Joint) {
       m_tokenPos++;
     } else if (currToken.type == TokenType::Name) {
@@ -200,8 +199,7 @@ void Parser::ParseMotions(SkeletonNode *skeleton) {
   skeleton->frameTime = frameTime;
   auto skeletonNodes = skeleton->ToList();
   for (auto *node : skeletonNodes) {
-    printf("allowed motions: 0x%x, name: %s\n", node->allowedMotions,
-        node->name.c_str());
+    printf("allowed motions: 0x%x, name: %s\n", node->allowedMotions, node->name.c_str());
   }
   for (u32 i = 0; i < frameCount; i++) {
     for (auto *node : skeletonNodes) {

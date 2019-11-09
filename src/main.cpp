@@ -94,17 +94,13 @@ int main(int argc, char **argv) {
   printf("%s\n", glGetString(GL_VERSION));
   bvh::Parser parser;
 //  Skeleton skeleton{parser.Parse("../Example1.bvh")};
-  Skeleton skeleton{parser.Parse("../Sit.bvh")};
+  Skeleton skeleton{parser.Parse("../Example1.bvh")};
   auto *bones = skeleton.DrawableBones();
   std::unique_ptr<VertexArray> transformedBones{
       skeleton.NextTransformedBones()};
   //    transformedBones2 = skeleton.NextTransformedBones();
 
-//#ifndef __APPLE__
   Shader shader{{"../shaders/shader.vert", "../shaders/shader.frag"}};
-//#else
-//  Shader shader{{"../shaders/macshader.vert", "../shaders/macshader.frag"}};
-//#endif
 
   auto perspective = glm::perspective(90.0f, 16.0f / 9.0f, 0.01f, 200.0f);
   auto camera = glm::lookAt(glm::vec3{0.0f, 35.0f, 75.0f},

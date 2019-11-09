@@ -24,9 +24,9 @@ class ObjReader {
   std::string m_filename;
   // std::vector<char> m_data;
   std::unique_ptr<char[]> m_data;
-  size_t m_dataLen;
+  Size m_dataLen;
 
-  size_t m_pos;
+  Size m_pos;
 
   Mesh m_mesh;
 

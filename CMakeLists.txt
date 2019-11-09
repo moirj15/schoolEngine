@@ -72,9 +72,9 @@ message("not windows hit me")
 	set(CMAKE_CXX_FLAGS "-std=c++17 -g -Wall -Wextra -pedantic -D_DEBUG")
     target_link_libraries(
         schoolEngine
-        opengl32
-        glew32
-        glfw3
+        GL
+        GLEW
+        glfw
 	)
 #set(CMAKE_CXX_FLAGS "-std=c++17 -g -Wall -Wextra -pedantic -D_DEBUG")
 #    include_directories(

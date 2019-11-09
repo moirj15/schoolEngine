@@ -139,7 +139,7 @@ void Shader::CompileShader() {
     s32 flag;
     std::vector<GLenum> shaderTypes = DetermineShaderTypes();
 
-    for (size_t i = 0; i < m_filePaths.size(); i++) {
+    for (Size i = 0; i < m_filePaths.size(); i++) {
         const auto filename = m_filePaths[i].c_str();
         const auto shaderType = shaderTypes[i];
         char *shaderSrc = nullptr;

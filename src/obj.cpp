@@ -12,7 +12,7 @@ ObjReader::ObjReader(char *filename) :
         m_pos(0) {
     FILE *fp = OpenFile(m_filename.c_str(), "r");
     char *data = nullptr;
-    size_t len = 0;
+    Size len = 0;
 
     fseek(fp, 0, SEEK_END);
     len = ftell(fp);
@@ -166,7 +166,7 @@ void ObjReader::SkipLine() {
 }
 
 void ObjReader::ReplaceChars(std::string *str, char toReplace, char replacement) {
-    for (size_t i = 0; i < str->length(); i++) {
+    for (Size i = 0; i < str->length(); i++) {
         if ((*str)[i] == toReplace) {
             (*str)[i] = replacement;
         }

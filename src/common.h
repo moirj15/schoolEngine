@@ -18,7 +18,7 @@ typedef int32_t s32;
 typedef int64_t s64;
 typedef float f32;
 typedef double f64;
-typedef size_t size;
+typedef size_t Size;
 
 #define ArraySize(X) (sizeof(X) / sizeof(X[0]))
 
@@ -32,16 +32,18 @@ inline FILE *OpenFile(const char *file, const char *perm) {
   return ret;
 }
 
-inline std::tuple<char *, size> ReadFile(const char *filename) {
+inline std::tuple<char *, Size> ReadFile(const char *filename) {
   FILE *fp = OpenFile(filename, "r");
   char *data = nullptr;
-  size_t len = 0;
+  Size len = 0;
 
   fseek(fp, 0, SEEK_END);
   len = ftell(fp);
   rewind(fp);
 
-  if (len == 0) { printf("failed to get file size"); }
+  if (len == 0) {
+    printf("failed to get file size");
+  }
 
   data = new char[len + 1]();
   len = fread(data, sizeof(char), len, fp);

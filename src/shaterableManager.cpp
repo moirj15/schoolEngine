@@ -10,7 +10,7 @@ void ShaterableManager::Simulate(f32 prevTimeStep, f32 currTimeStep) {
   auto shaterablesComponents =
       m_componentManager->GetComponents<ECS::Shaterable>();
   auto meshComponents = m_componentManager->GetComponents<ECS::Mesh>();
-  for (size_t i = 0; i < physicsComponents.size(); i++) {
+  for (Size i = 0; i < physicsComponents.size(); i++) {
     auto *physics = physicsComponents[i];
     auto *transform = transformsComponents[i];
     auto *shaterable = shaterablesComponents[i];
@@ -29,7 +29,7 @@ std::vector<Triangle> ShaterableManager::ProcessTriangles(ECS::Mesh *mesh) {
   std::vector<Triangle> triangles;
   const auto &c = mesh->connections;
   const auto &v = mesh->vertecies;
-  for (size_t i = 0; i < mesh->connections.size() - 3; i += 3) {
+  for (Size i = 0; i < mesh->connections.size() - 3; i += 3) {
     triangles.push_back({{v[c[i] * 3], v[(c[i] * 3) + 1], v[(c[i] * 3) + 2]},
         {v[c[i + 1] * 3], v[(c[i + 1] * 3) + 1], v[(c[i + 1] * 3) + 2]},
         {v[c[i + 2] * 3], v[(c[i + 2] * 3) + 1], v[(c[i + 2] * 3) + 2]}});

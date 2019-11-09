@@ -1,9 +1,10 @@
 #include "VertexBuffer.h"
 
 #include <GL/glew.h>
+#include <GLFW/glfw3.h>
 
 VertexBuffer::VertexBuffer(
-    const f32 *vertecies, const size_t size, std::vector<BufferLayout> layout) :
+    const f32 *vertecies, const Size size, std::vector<BufferLayout> layout) :
     m_vertexBufferHandle(0),
     m_layout{std::move(layout)} {
   glGenBuffers(1, &m_vertexBufferHandle);
@@ -23,12 +24,11 @@ void VertexBuffer::Unbind() const {
   glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
-IndexBuffer::IndexBuffer(const u32 *indecies, const size_t size) :
+IndexBuffer::IndexBuffer(const u32 *indecies, const Size size) :
     m_indexBufferHandle(0), m_count(size) {
   glGenBuffers(1, &m_indexBufferHandle);
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_indexBufferHandle);
-  glBufferData(
-      GL_ELEMENT_ARRAY_BUFFER, size * sizeof(u32), indecies, GL_STATIC_DRAW);
+  glBufferData(GL_ELEMENT_ARRAY_BUFFER, size * sizeof(u32), indecies, GL_STATIC_DRAW);
 }
 
 IndexBuffer::~IndexBuffer() {
@@ -43,8 +43,7 @@ void IndexBuffer::Unbind() const {
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 }
 
-VertexArray::VertexArray() :
-    m_vertexArrayHandle(0), m_vertexBuffers{}, m_indexBuffer{} {
+VertexArray::VertexArray() : m_vertexArrayHandle(0), m_vertexBuffers{}, m_indexBuffer{} {
   glGenVertexArrays(1, &m_vertexArrayHandle);
 }
 
@@ -57,8 +56,8 @@ void VertexArray::AddVertexBuffer(VertexBuffer *vertexBuffer) {
   vertexBuffer->Bind();
   for (const auto &layout : vertexBuffer->Layout()) {
     glEnableVertexAttribArray(layout.index);
-    glVertexAttribPointer(layout.index, layout.elementSize, layout.type,
-        GL_FALSE, layout.stride, (void *)0);
+    glVertexAttribPointer(
+        layout.index, layout.elementSize, layout.type, GL_FALSE, layout.stride, (void *)0);
   }
   m_vertexBuffers.emplace_back(vertexBuffer);
 }
