@@ -4,9 +4,10 @@
 #include "common.h"
 
 #include <GL/glew.h>
-#include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
-#include <glm/gtc/type_ptr.hpp>
+#include <glm/mat4x4.hpp>
+#include <glm/vec3.hpp>
+#include <glm/vec4.hpp>
 #include <string>
 #include <unordered_map>
 #include <vector>
@@ -22,10 +23,8 @@ struct ShaderData {
   };
 
   ShaderData() = default;
-  ShaderData(const std::string &n, const glm::mat4 &m) :
-      name(n), type(Mat4), m4(m) {}
-  ShaderData(const std::string &n, const glm::vec3 &v) :
-      name(n), type(Vec3), v3(v) {}
+  ShaderData(const std::string &n, const glm::mat4 &m) : name(n), type(Mat4), m4(m) {}
+  ShaderData(const std::string &n, const glm::vec3 &v) : name(n), type(Vec3), v3(v) {}
 };
 
 class Shader {

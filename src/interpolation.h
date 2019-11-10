@@ -3,8 +3,8 @@
 
 #include "common.h"
 
-#include <glm/glm.hpp>
 #include <glm/gtc/quaternion.hpp>
+#include <glm/vec3.hpp>
 struct KeyFrame;
 
 glm::vec3 DCCSpline(const f32 u, const glm::vec3 &start, const glm::vec3 &p, const glm::vec3 &end);

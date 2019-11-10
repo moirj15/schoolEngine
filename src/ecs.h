@@ -1,10 +1,7 @@
 #ifndef ECS_H
 #define ECS_H
 
-#include "boundingbox.h"
 #include "common.h"
-#include "renderer.h"
-#include "shader.h"
 
 #include <glm/glm.hpp>
 #include <glm/gtc/quaternion.hpp>
@@ -13,8 +10,10 @@
 #include <tuple>
 #include <vector>
 
+class Shader;
+struct BoundingBox;
 namespace Renderer {
-enum Command;
+enum class Command;
 }
 
 struct ShaderData;
@@ -35,7 +34,7 @@ struct Physics {
 
 struct Renderable {
   std::vector<Renderer::Command> commands = {};
-  std::vector<ShaderData> shaderData = {};
+  //  std::vector<ShaderData> shaderData = {};
   VertexArray *vertexArray = nullptr;
   Shader *shader = nullptr;
 };
@@ -60,7 +59,7 @@ struct Collidable {
   bool hasCollided = false;
   EntityID collidedEntity = 0;
   f32 collisionTime = 0.0f;
-  BoundingBox boundingBox = {};
+  //  BoundingBox boundingBox = {};
 };
 
 struct NodeMotion {
@@ -91,17 +90,15 @@ enum class Type : u64 {
 };
 
 class ComponentManager {
-  using CompTuple = std::tuple<std::vector<Physics *>,
-      std::vector<Renderable *>, std::vector<Transform *>,
-      std::vector<Shaterable *>, std::vector<Mesh *>, std::vector<Collidable *>,
-      std::vector<Skeleton *>>;
+  using CompTuple = std::tuple<std::vector<Physics *>, std::vector<Renderable *>,
+      std::vector<Transform *>, std::vector<Shaterable *>, std::vector<Mesh *>,
+      std::vector<Collidable *>, std::vector<Skeleton *>>;
   CompTuple m_components;
 
 public:
   ComponentManager() :
-      m_components{{1024 * 10, nullptr}, {1024 * 10, nullptr},
-          {1024 * 10, nullptr}, {1024 * 10, nullptr}, {1024 * 10, nullptr},
-          {1024 * 10, nullptr}, {1024 * 10, nullptr}} {}
+      m_components{{1024 * 10, nullptr}, {1024 * 10, nullptr}, {1024 * 10, nullptr},
+          {1024 * 10, nullptr}, {1024 * 10, nullptr}, {1024 * 10, nullptr}, {1024 * 10, nullptr}} {}
   ~ComponentManager();
 
   EntityID CreateEntity(EntityID type);

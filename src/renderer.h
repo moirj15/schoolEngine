@@ -1,7 +1,7 @@
 #ifndef RENDERER_H
 #define RENDERER_H
 
-#include <glm/glm.hpp>
+#include <glm/mat4x4.hpp>
 #include <vector>
 
 class Shader;
@@ -12,7 +12,7 @@ struct ShaderData;
 
 namespace Renderer {
 
-enum Command {
+enum class Command {
   DrawLine,
   DrawSolid,
   CullBack,

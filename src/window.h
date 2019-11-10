@@ -3,8 +3,7 @@
 
 #include "common.h"
 
-#include <GL/glew.h>
-#include <GLFW/glfw3.h>
+struct GLFWwindow;
 
 struct Window {
   s32 m_width;

@@ -1,14 +1,15 @@
 #include "shaterableManager.h"
 
+#include "VertexBuffer.h"
+#include "ecs.h"
+
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/normal.hpp>
 
 void ShaterableManager::Simulate(f32 prevTimeStep, f32 currTimeStep) {
   auto physicsComponents = m_componentManager->GetComponents<ECS::Physics>();
-  auto transformsComponents =
-      m_componentManager->GetComponents<ECS::Transform>();
-  auto shaterablesComponents =
-      m_componentManager->GetComponents<ECS::Shaterable>();
+  auto transformsComponents = m_componentManager->GetComponents<ECS::Transform>();
+  auto shaterablesComponents = m_componentManager->GetComponents<ECS::Shaterable>();
   auto meshComponents = m_componentManager->GetComponents<ECS::Mesh>();
   for (Size i = 0; i < physicsComponents.size(); i++) {
     auto *physics = physicsComponents[i];
@@ -37,11 +38,9 @@ std::vector<Triangle> ShaterableManager::ProcessTriangles(ECS::Mesh *mesh) {
   return triangles;
 }
 
-void ShaterableManager::AddTrianglesToECS(
-    const std::vector<Triangle> &triangles) {
+void ShaterableManager::AddTrianglesToECS(const std::vector<Triangle> &triangles) {
   for (const auto &triangle : triangles) {
-    u32 type = static_cast<u32>(ECS::Type::Renderable)
-               | static_cast<u32>(ECS::Type::Physics)
+    u32 type = static_cast<u32>(ECS::Type::Renderable) | static_cast<u32>(ECS::Type::Physics)
                | static_cast<u32>(ECS::Type::Transform);
     ECS::EntityID id = m_componentManager->CreateEntity(type);
     // TODO: do something with physics
@@ -68,8 +67,6 @@ void ShaterableManager::AddTrianglesToECS(
 
     transform->position = {0.0f, 0.0f, -1.0f};
     transform->rotation = {};
-    physics->velocity =
-        glm::triangleNormal(triangle.p0, triangle.p1, triangle.p2)
-        + triangle.p1;
+    physics->velocity = glm::triangleNormal(triangle.p0, triangle.p1, triangle.p2) + triangle.p1;
   }
 }

@@ -1,9 +1,16 @@
 #ifndef EXPLODINGBOX_H
 #define EXPLODINGBOX_H
 
-#include "boundingbox.h"
-#include "ecs.h"
-#include "obj.h"
+#include "common.h"
+
+#include <glm/vec3.hpp>
+#include <vector>
+
+namespace ECS {
+struct Mesh;
+class ComponentManager;
+} // namespace ECS
+
 struct Triangle {
   glm::vec3 p0;
   glm::vec3 p1;

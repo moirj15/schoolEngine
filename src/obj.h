@@ -1,7 +1,6 @@
 #ifndef OBJ_H
 #define OBJ_H
 
-#include "VertexBuffer.h"
 #include "common.h"
 
 #include <memory>

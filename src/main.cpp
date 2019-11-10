@@ -50,14 +50,14 @@ Window *InitGL() {
     exit(EXIT_FAILURE);
   }
 
-//#ifdef __APPLE__
+  //#ifdef __APPLE__
   glfwWindowHint(GLFW_SAMPLES, 4);
   glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
   glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 5);
   glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT,
       GL_TRUE); // To make MacOS happy; should not be needed
   glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-//#endif
+  //#endif
   Window *window = new Window{width, height};
 
   glfwMakeContextCurrent(window->m_glWindow);
@@ -93,21 +93,19 @@ int main(int argc, char **argv) {
   InitIMGUI(window);
   printf("%s\n", glGetString(GL_VERSION));
   bvh::Parser parser;
-//  Skeleton skeleton{parser.Parse("../Example1.bvh")};
+  //  Skeleton skeleton{parser.Parse("../Example1.bvh")};
   Skeleton skeleton{parser.Parse("../Example1.bvh")};
   auto *bones = skeleton.DrawableBones();
-  std::unique_ptr<VertexArray> transformedBones{
-      skeleton.NextTransformedBones()};
+  std::unique_ptr<VertexArray> transformedBones{skeleton.NextTransformedBones()};
   //    transformedBones2 = skeleton.NextTransformedBones();
 
   Shader shader{{"../shaders/shader.vert", "../shaders/shader.frag"}};
 
   auto perspective = glm::perspective(90.0f, 16.0f / 9.0f, 0.01f, 200.0f);
-  auto camera = glm::lookAt(glm::vec3{0.0f, 35.0f, 75.0f},
-      glm::vec3{0.0f, 35.0f, -1.0f}, glm::vec3{0.0f, 1.0f, 0.0f});
+  auto camera = glm::lookAt(
+      glm::vec3{0.0f, 35.0f, 75.0f}, glm::vec3{0.0f, 35.0f, -1.0f}, glm::vec3{0.0f, 1.0f, 0.0f});
 
-  auto transform =
-      glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -5.0f));
+  auto transform = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -5.0f));
 
   glfwSetTime(0.0);
   f64 lastTime = glfwGetTime();
@@ -119,12 +117,7 @@ int main(int argc, char **argv) {
   RendererableManager rendererManager{&componentManager};
   glEnable(GL_PROGRAM_POINT_SIZE);
   u32 ind[] = {0, 1, 2, 2, 1, 3};
-  f32 poi[] = {
-    -100.0, 0.0, -100.0,
-    -100.0, 0.0, 100.0,
-    100.0, 0.0, -100.0,
-    100.0, 0.0, 100.0
-  };
+  f32 poi[] = {-100.0, 0.0, -100.0, -100.0, 0.0, 100.0, 100.0, 0.0, -100.0, 100.0, 0.0, 100.0};
   VertexArray vert;
   vert.AddIndexBuffer(new IndexBuffer(ind, 6));
   vert.AddVertexBuffer(new VertexBuffer(poi, 12, {{"points", 3, 0, 0, GL_FLOAT}}));
@@ -148,8 +141,10 @@ int main(int argc, char **argv) {
     //        {{}, {{"transform", glm::scale(glm::mat4(1.0f), {0.1f, 0.1f,
     //        0.1f})}},
     //            &vertexArray, nullptr});
-    Renderer::AddToDrawQueue({{}, {{"color", {1.0f, 0.0f, 0.0f}}}, transformedBones.get(), nullptr});
-    Renderer::AddToDrawQueue({{Renderer::DrawSolid}, {{"color", {1.0f, 1.0f, 1.0f}}}, &vert, nullptr});
+    Renderer::AddToDrawQueue(
+        {{}, {{"color", {1.0f, 0.0f, 0.0f}}}, transformedBones.get(), nullptr});
+    Renderer::AddToDrawQueue(
+        {{Renderer::Command::DrawSolid}, {{"color", {1.0f, 1.0f, 1.0f}}}, &vert, nullptr});
 
     Renderer::Clear();
 
