@@ -16,6 +16,7 @@
 #include "debugdraw.h"
 #include "ecs.h"
 // #include "keyframe.h"
+#include "camera.h"
 #include "obj.h"
 #include "physicsManager.h"
 #include "renderer.h"
@@ -93,19 +94,18 @@ int main(int argc, char **argv) {
   InitIMGUI(window);
   printf("%s\n", glGetString(GL_VERSION));
   bvh::Parser parser;
-  //  Skeleton skeleton{parser.Parse("../Example1.bvh")};
-  Skeleton skeleton{parser.Parse("../Example1.bvh")};
-  auto *bones = skeleton.DrawableBones();
+  Skeleton skeleton{parser.Parse("../Sit.bvh")};
   std::unique_ptr<VertexArray> transformedBones{skeleton.NextTransformedBones()};
-  //    transformedBones2 = skeleton.NextTransformedBones();
 
   Shader shader{{"../shaders/shader.vert", "../shaders/shader.frag"}};
 
   auto perspective = glm::perspective(90.0f, 16.0f / 9.0f, 0.01f, 200.0f);
-  auto camera = glm::lookAt(
-      glm::vec3{0.0f, 35.0f, 75.0f}, glm::vec3{0.0f, 35.0f, -1.0f}, glm::vec3{0.0f, 1.0f, 0.0f});
 
-  auto transform = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -5.0f));
+  std::unique_ptr<Camera> camera{
+      new Camera({0.0f, 35.0f, 75.0f}, {0.0f, 35.0f, -1.0f}, {0.0f, 1.0f, 0.0f})};
+  //  auto camera = glm::lookAt(
+  //      glm::vec3{0.0f, 35.0f, 75.0f}, glm::vec3{0.0f, 35.0f, -1.0f}, glm::vec3{0.0f, 1.0f,
+  //      0.0f});
 
   glfwSetTime(0.0);
   f64 lastTime = glfwGetTime();
@@ -123,24 +123,17 @@ int main(int argc, char **argv) {
   vert.AddVertexBuffer(new VertexBuffer(poi, 12, {{"points", 3, 0, 0, GL_FLOAT}}));
 
   while (!glfwWindowShouldClose(window->m_glWindow)) {
+    camera->Rotate(t * 100.0f, {0.0f, 1.0f, 0.0f});
     Renderer::ClearDrawQueue();
     glfwPollEvents();
     f64 currentTime = glfwGetTime();
-    f64 delta = (currentTime - lastTime); // * 1000.0;
-    t += (f32)delta;                      // lastTime / 60.0f;
-                                          //    if (t > 10.0) {
-    //      physicsManager.Simulate((f32)lastTime, (f32)currentTime);
-    //      shaterableManager.Simulate((f32)lastTime, (f32)currentTime);
-    //      rendererManager.DrawComponents();
-    //    }
+    f64 delta = (currentTime - lastTime);
+    t += (f32)delta;
+
     if (t > skeleton.FrameTime() / 100.0f) {
       transformedBones.reset(skeleton.NextTransformedBones());
       t = 0.0;
     }
-    //    Renderer::AddToDrawQueue(
-    //        {{}, {{"transform", glm::scale(glm::mat4(1.0f), {0.1f, 0.1f,
-    //        0.1f})}},
-    //            &vertexArray, nullptr});
     Renderer::AddToDrawQueue(
         {{}, {{"color", {1.0f, 0.0f, 0.0f}}}, transformedBones.get(), nullptr});
     Renderer::AddToDrawQueue(
@@ -151,8 +144,8 @@ int main(int argc, char **argv) {
     lastTime = glfwGetTime();
 
     glfwMakeContextCurrent(window->m_glWindow);
-    Renderer::Draw(camera, perspective);
-    Renderer::DrawDebug(camera, perspective);
+    Renderer::Draw(camera->CalculateMatrix(), perspective);
+    Renderer::DrawDebug(camera->CalculateMatrix(), perspective);
     Renderer::DisplayDraw(window);
   }
 
