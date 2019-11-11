@@ -123,7 +123,8 @@ int main(int argc, char **argv) {
   vert.AddVertexBuffer(new VertexBuffer(poi, 12, {{"points", 3, 0, 0, GL_FLOAT}}));
 
   while (!glfwWindowShouldClose(window->m_glWindow)) {
-    camera->Rotate(lastTime * 100.0f, 1.0f, 0.0f);
+    //    camera->Rotate(lastTime * 100.0f, 1.0f, 0.0f);
+    camera->Rotate(lastTime * 100.0f, {0.0f, 1.0f, 0.0f});
     Renderer::ClearDrawQueue();
     glfwPollEvents();
     f64 currentTime = glfwGetTime();
