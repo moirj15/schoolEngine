@@ -12,7 +12,6 @@ class Camera {
   glm::vec3 m_target;
   glm::vec3 m_up;
 
-  //  glm::vec2 m_rotation;
   glm::mat4 m_matrix;
   glm::mat4 m_rotation;
   glm::mat4 m_translation;
