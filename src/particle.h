@@ -1,6 +1,7 @@
 #ifndef PARTICLE_H
 #define PARTICLE_H
 
+#include "VertexBuffer.h"
 #include "common.h"
 
 #include <glm/vec3.hpp>
@@ -19,5 +20,7 @@ struct Particle {
 std::vector<Particle> SpawnRandomParticles(size_t num);
 
 void UpdateParticles(std::vector<Particle> *particles, f32 t);
+
+std::unique_ptr<VertexArray> ParticlesToVA(const std::vector<Particle> &particles);
 
 #endif

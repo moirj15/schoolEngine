@@ -18,6 +18,7 @@
 // #include "keyframe.h"
 #include "camera.h"
 #include "obj.h"
+#include "particle.h"
 #include "physicsManager.h"
 #include "renderer.h"
 #include "rendererablemanager.h"
@@ -40,9 +41,12 @@
 #ifdef __APPLE__
 constexpr s32 width = 480;
 constexpr s32 height = 360;
-#else
+#elif _WIN32
 constexpr s32 width = 1920;
 constexpr s32 height = 1080;
+#else
+constexpr s32 width = 720;
+constexpr s32 height = 480;
 #endif
 
 Window *InitGL() {
@@ -99,7 +103,7 @@ int main(int argc, char **argv) {
   auto perspective = glm::perspective(90.0f, 16.0f / 9.0f, 0.01f, 200.0f);
 
   std::unique_ptr<Camera> camera{
-      new Camera({0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, -1.0f}, {0.0f, 1.0f, 0.0f})};
+      new Camera({0.0f, 0.0f, 5.0f}, {0.0f, 0.0f, -1.0f}, {0.0f, 1.0f, 0.0f})};
 
   glfwSetTime(0.0);
   f64 lastTime = glfwGetTime();
@@ -112,9 +116,12 @@ int main(int argc, char **argv) {
   glEnable(GL_PROGRAM_POINT_SIZE);
   //  u32 ind[] = {0, 1, 2, 2, 1, 3};
   //  f32 poi[] = {-100.0, 0.0, -100.0, -100.0, 0.0, 100.0, 100.0, 0.0, -100.0,
-  //  100.0, 0.0, 100.0}; VertexArray vert; vert.AddIndexBuffer(new
-  //  IndexBuffer(ind, 6)); vert.AddVertexBuffer(new VertexBuffer(poi, 12,
-  //  {{"points", 3, 0, 0, GL_FLOAT}}));
+  //  100.0, 0.0, 100.0};
+  // VertexArray vert;
+  // vert.AddIndexBuffer(new IndexBuffer(ind, 6));
+  // vert.AddVertexBuffer(new VertexBuffer(poi, 12, {{"points", 3, 0, 0, GL_FLOAT}}));
+  auto particles = SpawnRandomParticles(10);
+  auto pva = ParticlesToVA(particles);
 
   while (!glfwWindowShouldClose(window->m_glWindow)) {
     Renderer::ClearDrawQueue();
@@ -130,6 +137,7 @@ int main(int argc, char **argv) {
     //        {{Renderer::Command::DrawSolid}, {{"color", {1.0f, 1.0f, 1.0f}}},
     //        &vert, nullptr});
 
+    Renderer::AddToDrawQueue({{}, {}, pva.get(), &shader});
     Renderer::Clear();
 
     lastTime = glfwGetTime();
