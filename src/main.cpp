@@ -93,19 +93,13 @@ int main(int argc, char **argv) {
   Window *window = InitGL();
   InitIMGUI(window);
   printf("%s\n", glGetString(GL_VERSION));
-  bvh::Parser parser;
-  Skeleton skeleton{parser.Parse("../Sit.bvh")};
-  std::unique_ptr<VertexArray> transformedBones{skeleton.NextTransformedBones()};
 
   Shader shader{{"../shaders/shader.vert", "../shaders/shader.frag"}};
 
   auto perspective = glm::perspective(90.0f, 16.0f / 9.0f, 0.01f, 200.0f);
 
   std::unique_ptr<Camera> camera{
-      new Camera({0.0f, 35.0f, 75.0f}, {0.0f, 0.0f, -1.0f}, {0.0f, 1.0f, 0.0f})};
-  //  auto camera = glm::lookAt(
-  //      glm::vec3{0.0f, 35.0f, 75.0f}, glm::vec3{0.0f, 35.0f, -1.0f}, glm::vec3{0.0f, 1.0f,
-  //      0.0f});
+      new Camera({0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, -1.0f}, {0.0f, 1.0f, 0.0f})};
 
   glfwSetTime(0.0);
   f64 lastTime = glfwGetTime();
@@ -116,29 +110,25 @@ int main(int argc, char **argv) {
   ShaterableManager shaterableManager{&componentManager};
   RendererableManager rendererManager{&componentManager};
   glEnable(GL_PROGRAM_POINT_SIZE);
-  u32 ind[] = {0, 1, 2, 2, 1, 3};
-  f32 poi[] = {-100.0, 0.0, -100.0, -100.0, 0.0, 100.0, 100.0, 0.0, -100.0, 100.0, 0.0, 100.0};
-  VertexArray vert;
-  vert.AddIndexBuffer(new IndexBuffer(ind, 6));
-  vert.AddVertexBuffer(new VertexBuffer(poi, 12, {{"points", 3, 0, 0, GL_FLOAT}}));
+  //  u32 ind[] = {0, 1, 2, 2, 1, 3};
+  //  f32 poi[] = {-100.0, 0.0, -100.0, -100.0, 0.0, 100.0, 100.0, 0.0, -100.0,
+  //  100.0, 0.0, 100.0}; VertexArray vert; vert.AddIndexBuffer(new
+  //  IndexBuffer(ind, 6)); vert.AddVertexBuffer(new VertexBuffer(poi, 12,
+  //  {{"points", 3, 0, 0, GL_FLOAT}}));
 
   while (!glfwWindowShouldClose(window->m_glWindow)) {
-    //    camera->Rotate(lastTime * 100.0f, 1.0f, 0.0f);
-    camera->Rotate(lastTime * 100.0f, {0.0f, 1.0f, 0.0f});
     Renderer::ClearDrawQueue();
     glfwPollEvents();
     f64 currentTime = glfwGetTime();
     f64 delta = (currentTime - lastTime);
     t += (f32)delta;
 
-    if (t > skeleton.FrameTime() / 100.0f) {
-      transformedBones.reset(skeleton.NextTransformedBones());
-      t = 0.0;
-    }
-    Renderer::AddToDrawQueue(
-        {{}, {{"color", {1.0f, 0.0f, 0.0f}}}, transformedBones.get(), nullptr});
-    Renderer::AddToDrawQueue(
-        {{Renderer::Command::DrawSolid}, {{"color", {1.0f, 1.0f, 1.0f}}}, &vert, nullptr});
+    //    Renderer::AddToDrawQueue(
+    //        {{}, {{"color", {1.0f, 0.0f, 0.0f}}}, transformedBones.get(),
+    //        nullptr});
+    //    Renderer::AddToDrawQueue(
+    //        {{Renderer::Command::DrawSolid}, {{"color", {1.0f, 1.0f, 1.0f}}},
+    //        &vert, nullptr});
 
     Renderer::Clear();
 
