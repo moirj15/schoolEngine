@@ -56,14 +56,14 @@ Window *InitGL() {
   }
 
   //#ifdef __APPLE__
-  glfwWindowHint(GLFW_SAMPLES, 4);
-  glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
-  glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 5);
-  glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT,
-      GL_TRUE); // To make MacOS happy; should not be needed
-  glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+  // glfwWindowHint(GLFW_SAMPLES, 4);
+  // glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+  // glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 5);
+  // glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT,
+  //    GL_TRUE); // To make MacOS happy; should not be needed
+  // glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
   //#endif
-  Window *window = new Window{width, height};
+  Window *window = new Window(width, height);
 
   glfwMakeContextCurrent(window->m_glWindow);
   GLenum err = glewInit();
@@ -72,7 +72,7 @@ Window *InitGL() {
     glfwTerminate();
     exit(EXIT_FAILURE);
   }
-  glfwSwapInterval(1);
+  glfwSwapInterval(0);
   glEnable(GL_DEPTH_TEST);
   //  glCullFace(GL_BACK);
   glClearColor(0.0, 0.0, 0.0, 1.0);
@@ -95,7 +95,7 @@ int main(int argc, char **argv) {
   (void)argv;
 
   Window *window = InitGL();
-  InitIMGUI(window);
+  // InitIMGUI(window);
   printf("%s\n", glGetString(GL_VERSION));
 
   Shader shader{{"../shaders/shader.vert", "../shaders/shader.frag"}};
@@ -105,7 +105,7 @@ int main(int argc, char **argv) {
   std::unique_ptr<Camera> camera{
       new Camera({0.0f, 0.0f, 5.0f}, {0.0f, 0.0f, -1.0f}, {0.0f, 1.0f, 0.0f})};
 
-  glfwSetTime(0.0);
+  ////glfwSetTime(0.0);
   f64 lastTime = glfwGetTime();
   f32 t = 0.0;
 
@@ -113,7 +113,7 @@ int main(int argc, char **argv) {
   PhysicsManager physicsManager{&componentManager};
   ShaterableManager shaterableManager{&componentManager};
   RendererableManager rendererManager{&componentManager};
-  glEnable(GL_PROGRAM_POINT_SIZE);
+  // glEnable(GL_PROGRAM_POINT_SIZE);
   //  u32 ind[] = {0, 1, 2, 2, 1, 3};
   //  f32 poi[] = {-100.0, 0.0, -100.0, -100.0, 0.0, 100.0, 100.0, 0.0, -100.0,
   //  100.0, 0.0, 100.0};
@@ -148,9 +148,9 @@ int main(int argc, char **argv) {
     Renderer::DisplayDraw(window);
   }
 
-  ImGui_ImplOpenGL3_Shutdown();
-  ImGui_ImplGlfw_Shutdown();
-  ImGui::DestroyContext();
+  // ImGui_ImplOpenGL3_Shutdown();
+  // ImGui_ImplGlfw_Shutdown();
+  // ImGui::DestroyContext();
 
   return 0;
 }

@@ -50,7 +50,7 @@ if (WIN32)
         #D:/libraries/glew-2.1.0/lib/Release/x64/glew32s.lib
         D:/libraries/glew-2.1.0/lib/Release/x64/glew32.lib
         #D:/libraries/glew-2.1.0/lib/Release/x64/glew32.dll
-        D:/libraries/glfw-3.2.1.bin.WIN64/lib-vc2015/glfw3.lib
+        D:/libraries/glfw-3.3.bin.WIN64/lib-vc2019/glfw3.lib
         #D:/libraries/glfw-3.2.1.bin.WIN64/lib-mingw-w64/libglfw3.a
     )
 elseif(APPLE)
