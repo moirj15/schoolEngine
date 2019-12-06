@@ -39,7 +39,7 @@ if (WIN32)
         D:/libraries/glfw-3.2.1.bin.WIN64/include;
         D:/libraries/glew-2.1.0/include
     )
-  set(CMAKE_CXX_FLAGS "/std:c++17 /DEBUG:FULL /MP /GS /TP /W3 -D_CRT_SECURE_NO_WARNINGS")
+  set(CMAKE_CXX_FLAGS "/std:c++17 /MP /GS /TP /W3 -D_CRT_SECURE_NO_WARNINGS")
 	#set(CMAKE_CXX_FLAGS "-std=c++17 -g -Wall -Wextra -pedantic -D_DEBUG")
 #    #add_definitions(-DGLEW_STATIC=1)
     target_link_libraries(

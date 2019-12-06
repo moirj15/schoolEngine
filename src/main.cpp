@@ -55,8 +55,7 @@ Window *InitGL() {
   glfwWindowHint(GLFW_SAMPLES, 4);
   glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
   glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 5);
-  glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT,
-      GL_TRUE); // To make MacOS happy; should not be needed
+  glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE); // To make MacOS happy; should not be needed
   glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
   //#endif
   Window *window = new Window{width, height};
@@ -68,7 +67,7 @@ Window *InitGL() {
     glfwTerminate();
     exit(EXIT_FAILURE);
   }
-  glfwSwapInterval(1);
+  glfwSwapInterval(0);
   glEnable(GL_DEPTH_TEST);
   //  glCullFace(GL_BACK);
   glClearColor(0.0, 0.0, 0.0, 1.0);
@@ -94,7 +93,7 @@ int main(int argc, char **argv) {
   InitIMGUI(window);
   printf("%s\n", glGetString(GL_VERSION));
   bvh::Parser parser;
-  Skeleton skeleton{parser.Parse("../Sit.bvh")};
+  Skeleton skeleton{parser.Parse("../wave.bvh")};
   std::unique_ptr<VertexArray> transformedBones{skeleton.NextTransformedBones()};
 
   Shader shader{{"../shaders/shader.vert", "../shaders/shader.frag"}};
@@ -103,9 +102,6 @@ int main(int argc, char **argv) {
 
   std::unique_ptr<Camera> camera{
       new Camera({0.0f, 35.0f, 75.0f}, {0.0f, 0.0f, -1.0f}, {0.0f, 1.0f, 0.0f})};
-  //  auto camera = glm::lookAt(
-  //      glm::vec3{0.0f, 35.0f, 75.0f}, glm::vec3{0.0f, 35.0f, -1.0f}, glm::vec3{0.0f, 1.0f,
-  //      0.0f});
 
   glfwSetTime(0.0);
   f64 lastTime = glfwGetTime();
@@ -121,17 +117,26 @@ int main(int argc, char **argv) {
   VertexArray vert;
   vert.AddIndexBuffer(new IndexBuffer(ind, 6));
   vert.AddVertexBuffer(new VertexBuffer(poi, 12, {{"points", 3, 0, 0, GL_FLOAT}}));
+  f32 elapsedTime = 0.0f;
 
   while (!glfwWindowShouldClose(window->m_glWindow)) {
-    //    camera->Rotate(lastTime * 100.0f, 1.0f, 0.0f);
-    camera->Rotate(lastTime * 100.0f, {0.0f, 1.0f, 0.0f});
     Renderer::ClearDrawQueue();
     glfwPollEvents();
+    // Start the Dear ImGui frame
+    ImGui_ImplOpenGL3_NewFrame();
+    ImGui_ImplGlfw_NewFrame();
+    ImGui::NewFrame();
     f64 currentTime = glfwGetTime();
     f64 delta = (currentTime - lastTime);
     t += (f32)delta;
+    elapsedTime += t;
+    if (elapsedTime > skeleton.MaxFrameTime()) {
+      elapsedTime = 0.0f;
+      glfwSetTime(0.0f);
+    }
 
-    if (t > skeleton.FrameTime() / 100.0f) {
+    f32 timeStep = t;
+    if (t > skeleton.FrameTime()) {
       transformedBones.reset(skeleton.NextTransformedBones());
       t = 0.0;
     }
@@ -143,9 +148,26 @@ int main(int argc, char **argv) {
     Renderer::Clear();
 
     lastTime = glfwGetTime();
+    ImGui::Begin("Controls");
+    ImGui::Text("This is where the controls will go");
+    {
+      ImGui::SliderFloat("Time", &timeStep, 0, skeleton.MaxFrameTime());
+      //
+    }
 
+    ImGui::End();
+
+    ImGui::Render();
+    int display_w, display_h;
+    glfwMakeContextCurrent(window->m_glWindow);
+    glfwGetFramebufferSize(window->m_glWindow, &display_w, &display_h);
+    glViewport(0, 0, display_w, display_h);
+    glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+    glClear(GL_COLOR_BUFFER_BIT);
     glfwMakeContextCurrent(window->m_glWindow);
     Renderer::Draw(camera->CalculateMatrix(), perspective);
+    ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
     Renderer::DrawDebug(camera->CalculateMatrix(), perspective);
     Renderer::DisplayDraw(window);
   }

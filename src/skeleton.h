@@ -25,6 +25,7 @@ struct NodeMotion {
 };
 
 using BoneList = std::vector<std::pair<glm::vec3, glm::vec3>>;
+
 struct SkeletonNode {
   u32 allowedMotions = 0;
   glm::vec3 offset = {};
@@ -62,6 +63,7 @@ public:
 
   BoneList Bones() const { return m_bones; }
   f32 FrameTime() const { return m_skeletonTree->frameTime; }
+  f32 MaxFrameTime() const { return m_skeletonTree->frameTime * m_motionCount; }
 
 private:
   void PopulateBones();
