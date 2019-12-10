@@ -15,6 +15,7 @@ namespace Renderer {
 enum class Command {
   DrawLine,
   DrawSolid,
+  DrawPoints,
   CullBack,
   DisableCull,
 };

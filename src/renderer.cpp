@@ -38,13 +38,25 @@ void Draw(const glm::mat4 &camera, const glm::mat4 &perspective) {
       s_defaultShader->SetUniformMat4("projection", perspective);
     }
     drawable.vertexArray->Bind();
-    if (!drawable.commands.empty()) {
+    switch (drawable.commands.back()) {
+    case Command::DrawSolid:
       glDrawElements(GL_TRIANGLES, drawable.vertexArray->IndexCount(), GL_UNSIGNED_INT, (void *)0);
-    } else {
-      //      glDrawElements(GL_LINES, drawable.vertexArray->IndexCount(), GL_UNSIGNED_INT, (void
-      //      *)0);
+      break;
+    case Command::DrawLine:
+      break;
+    case Command::DrawPoints:
       glDrawElements(GL_POINTS, drawable.vertexArray->IndexCount(), GL_UNSIGNED_INT, (void *)0);
+      break;
     }
+    // if (!drawable.commands.empty()) {
+    //  glDrawElements(GL_TRIANGLES, drawable.vertexArray->IndexCount(), GL_UNSIGNED_INT, (void
+    //  *)0);
+    //} else {
+    //  // glDrawElements(GL_TRIANGLES, drawable.vertexArray->IndexCount(), GL_UNSIGNED_INT, (void
+    //  // *)0);
+    //  // glDrawElements(GL_LINES, drawable.vertexArray->IndexCount(), GL_UNSIGNED_INT, (void *)0);
+    //  glDrawElements(GL_POINTS, drawable.vertexArray->IndexCount(), GL_UNSIGNED_INT, (void *)0);
+    //}
   }
 }
 

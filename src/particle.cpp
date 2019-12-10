@@ -3,51 +3,38 @@
 #include <cstdlib>
 #include <ctime>
 
-static Particle SpawnParticle() {
-  srand(time(nullptr));
-  size_t posRange = 4;
-  size_t velocityRange = 4;
-  size_t colorRange = 256;
-  size_t sizeRange = 10;
-  size_t lifetimeRange = 20;
-  return {{(f32)(rand() % posRange), (f32)(rand() % posRange), (f32)(rand() % posRange)},
-      {(f32)(rand() % velocityRange), (f32)(rand() % velocityRange), (f32)(rand() % velocityRange)},
-      {(f32)(rand() % colorRange) / 256.0f, (f32)(rand() % colorRange) / 256.0f,
-          (f32)(rand() % colorRange) / 256.0f, (f32)(rand() % colorRange) / 256.0f},
-      (f32)(rand() % sizeRange), (f32)(rand() % lifetimeRange), true};
-}
+#define GLM_ENABLE_EXPERIMENTAL
+#include <glm/gtc/random.hpp>
+#include <glm/gtx/transform.hpp>
 
-std::vector<Particle> SpawnRandomParticles(size_t num) {
-  std::vector<Particle> ret;
-  for (size_t i = 0; i < num; i++) {
-    ret.emplace_back(SpawnParticle());
-  }
-  return ret;
-}
-
-void UpdateParticles(std::vector<Particle> *particles, f32 t) {
-  for (auto &particle : *particles) {
-    if (particle.lifetime < 0.0f) {
-      particle = SpawnParticle();
+void ParticleEmitter::Update(f32 timeStep, const glm::mat4 &transform) {
+  printf("%f\n", timeStep);
+  for (size_t i = 0; i < m_particles.size(); i++) {
+    if (m_particles[i].lifetime < 0.0f) {
+      m_particles[i] = SpawnParticle();
     } else {
-      particle.lifetime -= t;
-      particle.position += particle.velocity * t;
+      m_particles[i].lifetime -= timeStep;
+      m_particles[i].position +=
+          glm::vec3(transform * glm::vec4(m_particles[i].velocity, 1.0f)) * timeStep;
+      // m_particles[i].position += m_particles[i].velocity * timeStep;
     }
   }
+  m_position += m_velocity * timeStep;
+  m_position = transform * glm::vec4(1.0f, 0.5f, 1.0f, 1.0f);
 }
 
-std::unique_ptr<VertexArray> ParticlesToVA(const std::vector<Particle> &particles) {
+std::unique_ptr<VertexArray> ParticleEmitter::ParticlesToVA() {
   VertexArray *ret = new VertexArray;
   std::vector<f32> pos;
   std::vector<f32> colors;
   std::vector<u32> index;
   u32 i = 0;
-  for (const auto &particle : particles) {
+  for (const auto &particle : m_particles) {
     for (Size i = 0; i < 3; i++) {
       pos.push_back(particle.position[i]);
     }
     for (Size i = 0; i < 4; i++) {
-      pos.push_back(particle.color[i]);
+      colors.push_back(particle.color[i]);
     }
     index.push_back(i);
     i++;
@@ -56,4 +43,26 @@ std::unique_ptr<VertexArray> ParticlesToVA(const std::vector<Particle> &particle
   ret->AddVertexBuffer(new VertexBuffer(colors.data(), colors.size(), {{"c", 4, 0, 1, GL_FLOAT}}));
   ret->AddIndexBuffer(new IndexBuffer(index.data(), index.size()));
   return std::unique_ptr<VertexArray>(ret);
+}
+
+// Private
+void ParticleEmitter::SpawnRandomParticles(size_t num) {
+  srand(time(nullptr));
+  for (size_t i = 0; i < num; i++) {
+    m_particles.emplace_back(SpawnParticle());
+  }
+}
+
+Particle ParticleEmitter::SpawnParticle() {
+  size_t posRange = 4;
+  size_t velocityRange = 4;
+  size_t colorRange = 256;
+  size_t sizeRange = 10;
+  size_t lifetimeRange = 50;
+  glm::vec3 randBottom(glm::diskRand(m_coneBottomRadius), 0.0f);
+  glm::vec3 randTop(glm::diskRand(m_coneTopRadius), 1.0f);
+  auto position = randBottom;
+  auto velocity = randTop - randBottom;
+  return {position + m_position, velocity, RandomVec4(colorRange) / 255.0f,
+      glm::linearRand(1.0f, (f32)sizeRange), glm::linearRand(1.0f, 2.0f), true};
 }
