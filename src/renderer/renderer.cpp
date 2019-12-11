@@ -1,9 +1,9 @@
 #include "renderer.h"
 
+#include "../window.h"
 #include "VertexBuffer.h"
 #include "debugdraw.h"
 #include "shader.h"
-#include "window.h"
 
 #include <GLFW/glfw3.h>
 #include <vector>
@@ -48,15 +48,6 @@ void Draw(const glm::mat4 &camera, const glm::mat4 &perspective) {
       glDrawElements(GL_POINTS, drawable.vertexArray->IndexCount(), GL_UNSIGNED_INT, (void *)0);
       break;
     }
-    // if (!drawable.commands.empty()) {
-    //  glDrawElements(GL_TRIANGLES, drawable.vertexArray->IndexCount(), GL_UNSIGNED_INT, (void
-    //  *)0);
-    //} else {
-    //  // glDrawElements(GL_TRIANGLES, drawable.vertexArray->IndexCount(), GL_UNSIGNED_INT, (void
-    //  // *)0);
-    //  // glDrawElements(GL_LINES, drawable.vertexArray->IndexCount(), GL_UNSIGNED_INT, (void *)0);
-    //  glDrawElements(GL_POINTS, drawable.vertexArray->IndexCount(), GL_UNSIGNED_INT, (void *)0);
-    //}
   }
 }
 

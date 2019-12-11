@@ -3,31 +3,26 @@
 #include "../imgui/imgui.h"
 #include "../imgui/imgui_impl_glfw.h"
 #include "../imgui/imgui_impl_opengl3.h"
-
-#include <GL/glew.h>
-#include <GLFW/glfw3.h>
-//#include <OpenGL/gl.h>
-//#include <OpenGL/glu.h>
-//#include <GLUT/glut.h>
-#include "VertexBuffer.h"
 #include "boundingbox.h"
 #include "bvhParser.h"
 #include "common.h"
-#include "debugdraw.h"
-#include "ecs.h"
+#include "ecs/ecs.h"
+#include "ecs/physicsManager.h"
+#include "ecs/rendererablemanager.h"
+#include "ecs/shaterableManager.h"
 #include "keyframe.h"
-// #include "keyframe.h"
-#include "camera.h"
 #include "obj.h"
 #include "particle.h"
-#include "physicsManager.h"
-#include "renderer.h"
-#include "rendererablemanager.h"
-#include "shader.h"
-#include "shaterableManager.h"
+#include "renderer/VertexBuffer.h"
+#include "renderer/camera.h"
+#include "renderer/debugdraw.h"
+#include "renderer/renderer.h"
+#include "renderer/shader.h"
 #include "skeleton.h"
 #include "window.h"
 
+#include <GL/glew.h>
+#include <GLFW/glfw3.h>
 #include <chrono>
 #include <glm/glm.hpp>
 #include <glm/gtx/normal.hpp>
@@ -46,8 +41,8 @@ constexpr s32 height = 360;
 constexpr s32 width = 1920;
 constexpr s32 height = 1080;
 #else
-constexpr s32 width = 720;
-constexpr s32 height = 480;
+constexpr s32 width = 1920;
+constexpr s32 height = 1080;
 #endif
 
 Window *InitGL() {

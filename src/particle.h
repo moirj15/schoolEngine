@@ -1,8 +1,8 @@
 #ifndef PARTICLE_H
 #define PARTICLE_H
 
-#include "VertexBuffer.h"
 #include "common.h"
+#include "renderer/VertexBuffer.h"
 
 #include <glm/mat4x4.hpp>
 #include <glm/vec3.hpp>

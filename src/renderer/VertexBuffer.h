@@ -7,7 +7,7 @@
 #include <vector>
 //#include <GLFW/glfw3.h>
 
-#include "common.h"
+#include "../common.h"
 
 using GLHandle = u32;
 

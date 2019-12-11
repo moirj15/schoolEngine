@@ -7,6 +7,8 @@ project(schoolEngine)
 
 file(GLOB IMGUI_FILES "imgui/*")
 file(GLOB SRC_FILES "src/*")
+file(GLOB SRC_ECS_FILES "src/ecs/*")
+file(GLOB SRC_RENDERER_FILES "src/renderer/*")
 file(GLOB_RECURSE GUI_FILES "src/gui/*")
 file(GLOB STB_FILES "stb/*")
 
@@ -19,7 +21,9 @@ file(GLOB STB_FILES "stb/*")
 
 set(SOURCE_LIST 
 	${SRC_FILES}
-	${STB_FILES}
+  ${SRC_ECS_FILES}
+  ${SRC_RENDERER_FILES}
+  ${STB_FILES}
 	${IMGUI_FILES}
 	${GUI_FILES}
 )

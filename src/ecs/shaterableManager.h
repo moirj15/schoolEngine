@@ -1,7 +1,7 @@
 #ifndef EXPLODINGBOX_H
 #define EXPLODINGBOX_H
 
-#include "common.h"
+#include "../common.h"
 
 #include <glm/vec3.hpp>
 #include <vector>

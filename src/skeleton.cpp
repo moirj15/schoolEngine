@@ -1,7 +1,7 @@
 #define GLM_ENABLE_EXPERIMENTAL
 #include "skeleton.h"
 
-#include "VertexBuffer.h"
+#include "renderer/VertexBuffer.h"
 
 #include <glm/gtc/quaternion.hpp>
 #include <glm/gtx/quaternion.hpp>

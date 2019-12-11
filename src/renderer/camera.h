@@ -1,7 +1,7 @@
 #ifndef CAMERA_H
 #define CAMERA_H
 
-#include "common.h"
+#include "../common.h"
 
 #include <glm/gtc/quaternion.hpp>
 #include <glm/mat4x4.hpp>

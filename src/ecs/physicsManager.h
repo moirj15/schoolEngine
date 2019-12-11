@@ -1,7 +1,7 @@
 #ifndef PHYSICS_MANAGER_H
 #define PHYSICS_MANAGER_H
 
-#include "common.h"
+#include "../common.h"
 
 namespace ECS {
 class ComponentManager;

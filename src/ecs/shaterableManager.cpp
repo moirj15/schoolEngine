@@ -1,6 +1,6 @@
 #include "shaterableManager.h"
 
-#include "VertexBuffer.h"
+#include "../renderer/VertexBuffer.h"
 #include "ecs.h"
 
 #define GLM_ENABLE_EXPERIMENTAL

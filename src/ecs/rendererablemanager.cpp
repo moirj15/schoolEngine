@@ -1,6 +1,6 @@
 #include "rendererablemanager.h"
 
-#include "renderer.h"
+#include "../renderer/renderer.h"
 
 #include <glm/gtc/matrix_transform.hpp>
 glm::mat4 perspective = glm::perspective(90.0f, 16.0f / 9.0f, 0.01f, 100.0f);
