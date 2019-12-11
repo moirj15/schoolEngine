@@ -76,18 +76,23 @@ VertexArray *Skeleton::DrawableBones() {
   return BonesToVAO(m_bones);
 }
 
-VertexArray *Skeleton::NextTransformedBones() {
+VertexArray *Skeleton::NextTransformedBones(f32 t) {
   static Size transformIndex = 0;
   if (m_skeletonTree->transforms.empty()) {
     m_skeletonTree->Transformations(m_skeletonTree->frames);
   }
+  size_t index = ceil(m_skeletonTree->transforms.size() * (t / MaxFrameTime()));
   BoneList transformedBones;
   auto nodes = m_skeletonTree->ToList();
   for (const auto &node : nodes) {
     for (const auto &child : node->children) {
-      transformedBones.emplace_back(
-          node->transforms[transformIndex] * glm::vec4{1.0f, 1.0f, 1.0f, 1.0f},
-          child->transforms[transformIndex] * glm::vec4{1.0f, 1.0f, 1.0f, 1.0f});
+      // transformedBones.emplace_back(
+      //    node->transforms[transformIndex] * glm::vec4{1.0f, 1.0f, 1.0f, 1.0f},
+      //    child->transforms[transformIndex] * glm::vec4{1.0f, 1.0f, 1.0f, 1.0f});
+      transformedBones.emplace_back(node->transforms[index % m_skeletonTree->transforms.size()]
+                                        * glm::vec4{1.0f, 1.0f, 1.0f, 1.0f},
+          child->transforms[index % m_skeletonTree->transforms.size()]
+              * glm::vec4{1.0f, 1.0f, 1.0f, 1.0f});
     }
   }
   transformIndex = (transformIndex + 1) % m_skeletonTree->frames;

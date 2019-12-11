@@ -59,7 +59,7 @@ public:
       m_skeletonTree{nodes}, m_bones{}, m_transforms{}, m_motionCount{nodes->motions.size()} {}
 
   VertexArray *DrawableBones();
-  VertexArray *NextTransformedBones();
+  VertexArray *NextTransformedBones(f32 t);
 
   BoneList Bones() const { return m_bones; }
   f32 FrameTime() const { return m_skeletonTree->frameTime; }

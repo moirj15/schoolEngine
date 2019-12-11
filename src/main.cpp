@@ -94,7 +94,7 @@ int main(int argc, char **argv) {
   printf("%s\n", glGetString(GL_VERSION));
   bvh::Parser parser;
   Skeleton skeleton{parser.Parse("../wave.bvh")};
-  std::unique_ptr<VertexArray> transformedBones{skeleton.NextTransformedBones()};
+  std::unique_ptr<VertexArray> transformedBones{skeleton.NextTransformedBones(0.0f)};
 
   Shader shader{{"../shaders/shader.vert", "../shaders/shader.frag"}};
 
@@ -118,6 +118,7 @@ int main(int argc, char **argv) {
   vert.AddIndexBuffer(new IndexBuffer(ind, 6));
   vert.AddVertexBuffer(new VertexBuffer(poi, 12, {{"points", 3, 0, 0, GL_FLOAT}}));
   f32 elapsedTime = 0.0f;
+  f32 speed = 1.0f;
 
   while (!glfwWindowShouldClose(window->m_glWindow)) {
     Renderer::ClearDrawQueue();
@@ -129,17 +130,17 @@ int main(int argc, char **argv) {
     f64 currentTime = glfwGetTime();
     f64 delta = (currentTime - lastTime);
     t += (f32)delta;
-    elapsedTime += t;
-    if (elapsedTime > skeleton.MaxFrameTime()) {
-      elapsedTime = 0.0f;
-      glfwSetTime(0.0f);
-    }
+    elapsedTime += delta * speed;
+    // if (elapsedTime > skeleton.MaxFrameTime()) {
+    //  elapsedTime = 0.0f;
+    //  glfwSetTime(0.0f);
+    //}
 
-    f32 timeStep = t;
-    if (t > skeleton.FrameTime()) {
-      transformedBones.reset(skeleton.NextTransformedBones());
-      t = 0.0;
-    }
+    f32 timeStep = elapsedTime;
+    // if (t >= skeleton.FrameTime()) {
+    transformedBones.reset(skeleton.NextTransformedBones(elapsedTime));
+    // t = 0.0;
+    //}
     Renderer::AddToDrawQueue(
         {{}, {{"color", {1.0f, 0.0f, 0.0f}}}, transformedBones.get(), nullptr});
     Renderer::AddToDrawQueue(
@@ -151,7 +152,9 @@ int main(int argc, char **argv) {
     ImGui::Begin("Controls");
     ImGui::Text("This is where the controls will go");
     {
-      ImGui::SliderFloat("Time", &timeStep, 0, skeleton.MaxFrameTime());
+      printf("%f\n", elapsedTime);
+      ImGui::SliderFloat("Time", &elapsedTime, 0, skeleton.MaxFrameTime());
+      ImGui::SliderFloat("Speed", &speed, 0, 10.0f);
       //
     }
 
