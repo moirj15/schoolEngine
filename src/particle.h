@@ -18,6 +18,11 @@ struct Particle {
   bool alive;
 };
 
+struct Wall {
+  glm::vec3 lowerLeft;
+  glm::vec3 upperRight;
+};
+
 class ParticleEmitter {
   std::vector<Particle> m_particles;
   glm::vec3 m_position;
@@ -35,7 +40,7 @@ public:
     SpawnRandomParticles(numberOfParticles);
   }
 
-  void Update(f32 timeStep, const glm::mat4 &transform);
+  void Update(f32 timeStep, const glm::mat4 &transform, const Wall &wall);
   std::unique_ptr<VertexArray> ParticlesToVA();
 
 private:
