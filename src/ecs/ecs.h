@@ -68,18 +68,6 @@ struct NodeMotion {
   glm::vec3 rotations = {};
 };
 
-struct Skeleton {
-  u32 allowedMotions = 0;
-  glm::vec3 offset = {};
-  std::string name = {};
-  std::vector<NodeMotion> motions;
-  std::vector<std::unique_ptr<Skeleton>> children = {};
-  Skeleton() = default;
-  Skeleton(const std::string &n) : name{n} {}
-
-  std::vector<Skeleton *> ToList();
-};
-
 constexpr u64 COUNT_MASK = 0x0000000000ff0000;
 constexpr u64 INDEX_MASK = 0x000000000000ffff;
 constexpr u16 ID_MAX = 0xffff;
@@ -97,7 +85,7 @@ enum class Type : u64 {
 class ComponentManager {
   using CompTuple = std::tuple<std::array<Physics, ID_MAX>, std::array<Renderable, ID_MAX>,
       std::array<Transform, ID_MAX>, std::array<Shaterable, ID_MAX>, std::array<Mesh, ID_MAX>,
-      std::array<Collidable, ID_MAX>, std::array<Skeleton, ID_MAX>>;
+      std::array<Collidable, ID_MAX>>;
   CompTuple m_components;
 
 public:

@@ -3,8 +3,7 @@
 namespace ECS {
 
 ComponentManager::~ComponentManager() {
-  auto [physics, renderables, transforms, shaterables, meshes, collidables,
-      skeletons] = m_components;
+  auto [physics, renderables, transforms, shaterables, meshes, collidables] = m_components;
   for (u32 i = 0; i < physics.size(); i++) {
     delete (physics[i]);
     delete (renderables[i]);
@@ -14,8 +13,7 @@ ComponentManager::~ComponentManager() {
 
 EntityID ComponentManager::CreateEntity(EntityID type) {
   EntityID id = NextID();
-  auto &[physics, renderables, transforms, shaterables, meshes, collidables,
-      skeletons] = m_components;
+  auto &[physics, renderables, transforms, shaterables, meshes, collidables] = m_components;
   if (type & static_cast<EntityID>(Type::Renderable)) {
     renderables[id] = new Renderable;
   }
@@ -28,20 +26,18 @@ EntityID ComponentManager::CreateEntity(EntityID type) {
   if (type & static_cast<EntityID>(Type::Shaterable)) {
     shaterables[id] = new Shaterable;
   }
-  if (type & static_cast<EntityID>(Type::Mesh)) { meshes[id] = new Mesh; }
+  if (type & static_cast<EntityID>(Type::Mesh)) {
+    meshes[id] = new Mesh;
+  }
   if (type & static_cast<EntityID>(Type::Collidable)) {
     collidables[id] = new Collidable;
-  }
-  if (type & static_cast<EntityID>(Type::Skeleton)) {
-    skeletons[id] = new Skeleton;
   }
   id |= type;
   return id;
 }
 
 void ComponentManager::DestroyEntity(EntityID id) {
-  auto [physics, renderables, transforms, shaterables, meshes, collidables,
-      skeletons] = m_components;
+  auto [physics, renderables, transforms, shaterables, meshes, collidables] = m_components;
   u32 index = id & 0x0000ffff;
   if (id & static_cast<u32>(Type::Physics)) {
     delete (physics[index]);
