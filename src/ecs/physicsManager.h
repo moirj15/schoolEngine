@@ -8,7 +8,6 @@ class ComponentManager;
 }
 
 class PhysicsManager {
-  ECS::ComponentManager *m_componentManager;
 
 public:
   PhysicsManager(ECS::ComponentManager *componenetManager) :

@@ -6,4 +6,4 @@ qt-build/*
 CMakeLists.txt.*
 CMakeSettings.*
 .vscode/*
-.vs/*
+vis/*

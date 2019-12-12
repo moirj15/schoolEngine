@@ -73,6 +73,7 @@ struct NodeMotion {
 constexpr u64 COUNT_MASK = 0x0000000000ff0000;
 constexpr u64 INDEX_MASK = 0x000000000000ffff;
 constexpr u16 ID_MAX = 0xffff;
+constexpr u64 FREE_ID = 0x8000000000000000;
 
 enum class Type : u64 {
   Renderable = 1 << 24,
@@ -84,8 +85,13 @@ enum class Type : u64 {
   Skeleton = 1 << 30,
 };
 
+enum class TupleType : u64 {
+  Destructable = (u64)Type::Renderable | (u64)Type::Physics | (u64)Type::Transform
+                 | (u64)Type::Shaterable | (u64)Type::Mesh | (u64)Type::Collidable,
+};
+
 struct Component {
-  virtual ~Component() {}
+  virtual ~Component() = default;
 };
 
 struct Entity {
@@ -102,12 +108,28 @@ class WorldSystem {
   std::unordered_map<EntityID, Entity *> m_entities;
   std::array<System *, 6> m_systems;
   std::array<EntityID, ID_MAX> m_entityIDs;
+
   using CompTuple = std::tuple<std::array<Physics *, ID_MAX>, std::array<Renderable *, ID_MAX>,
       std::array<Transform *, ID_MAX>, std::array<Shaterable *, ID_MAX>, std::array<Mesh *, ID_MAX>,
       std::array<Collidable *, ID_MAX>>;
+
   CompTuple m_components;
 
 public:
+  WorldSystem();
+  ~WorldSystem();
+
+  EntityID Create(const TupleType type);
+  void Destroy(const EntityID id);
+
+  bool IsValid(const EntityID id) { return m_entityIDs[id & INDEX_MASK] == id; }
+
+  std::vector<EntityID> EntityIDsWithType(const TupleType type);
+
+  template<typename... Ts>
+  std::tuple<Ts...> GetTuple(const EntityID id, Ts... types) {
+    return std::make_tuple(std::get<Ts...>(m_components)[id & INDEX_MASK]);
+  }
 };
 
 // class ComponentManager {
