@@ -3,12 +3,14 @@
 
 #include "../common.h"
 
+#include <array>
 #include <glm/glm.hpp>
 #include <glm/gtc/quaternion.hpp>
 #include <memory>
 #include <optional>
 #include <string>
 #include <tuple>
+#include <unordered_map>
 #include <vector>
 
 class Shader;
@@ -82,38 +84,64 @@ enum class Type : u64 {
   Skeleton = 1 << 30,
 };
 
-class ComponentManager {
-  using CompTuple = std::tuple<std::array<Physics, ID_MAX>, std::array<Renderable, ID_MAX>,
-      std::array<Transform, ID_MAX>, std::array<Shaterable, ID_MAX>, std::array<Mesh, ID_MAX>,
-      std::array<Collidable, ID_MAX>>;
+struct Component {
+  virtual ~Component() {}
+};
+
+struct Entity {
+  EntityID m_id;
+  std::vector<Component *> m_components;
+};
+
+struct System {
+  virtual ~System() {}
+  virtual void Update(f32 t);
+};
+
+class WorldSystem {
+  std::unordered_map<EntityID, Entity *> m_entities;
+  std::array<System *, 6> m_systems;
+  std::array<EntityID, ID_MAX> m_entityIDs;
+  using CompTuple = std::tuple<std::array<Physics *, ID_MAX>, std::array<Renderable *, ID_MAX>,
+      std::array<Transform *, ID_MAX>, std::array<Shaterable *, ID_MAX>, std::array<Mesh *, ID_MAX>,
+      std::array<Collidable *, ID_MAX>>;
   CompTuple m_components;
 
 public:
-  ComponentManager() = default;
-  ~ComponentManager();
-
-  EntityID CreateEntity(EntityID type);
-
-  void DestroyEntity(EntityID id);
-
-  template<typename T>
-  T *GetComponent(EntityID id) {
-    auto component = std::get<std::vector<T *>>(m_components);
-    u32 index = id & INDEX_MASK;
-    if (index < component.size()) {
-      return component[index];
-    }
-    return nullptr;
-  }
-
-  template<typename T>
-  std::vector<T *> GetComponents() {
-    return std::get<std::vector<T *>>(m_components);
-  }
-
-private:
-  EntityID NextID();
 };
+
+// class ComponentManager {
+//  using CompTuple = std::tuple<std::array<Physics *, ID_MAX>, std::array<Renderable *, ID_MAX>,
+//      std::array<Transform *, ID_MAX>, std::array<Shaterable *, ID_MAX>, std::array<Mesh *,
+//      ID_MAX>, std::array<Collidable *, ID_MAX>>;
+//  CompTuple m_components;
+
+// public:
+//  ComponentManager() = default;
+//  ~ComponentManager();
+
+//  EntityID CreateEntity(EntityID type);
+
+//  void DestroyEntity(EntityID id);
+
+//  template<typename T>
+//  T *GetComponent(const EntityID id) {
+//    auto component = std::get<std::vector<T *>>(m_components);
+//    u32 index = id & INDEX_MASK;
+//    if (index < component.size()) {
+//      return component[index];
+//    }
+//    return nullptr;
+//  }
+
+//  template<typename T>
+//  std::vector<T *> GetComponents() {
+//    return std::get<std::vector<T *>>(m_components);
+//  }
+
+// private:
+//  EntityID NextID();
+//};
 
 } // namespace ECS
 
