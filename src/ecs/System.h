@@ -7,7 +7,7 @@ namespace ecs {
 
 struct System {
   virtual ~System() {}
-  virtual void Update(f32 t);
+  virtual void Update(f32 t) = 0;
 };
 
 } // namespace ecs

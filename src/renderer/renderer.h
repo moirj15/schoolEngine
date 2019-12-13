@@ -1,6 +1,4 @@
-#ifndef RENDERER_H
-#define RENDERER_H
-
+#pragma once
 #include <glm/mat4x4.hpp>
 #include <vector>
 
@@ -43,5 +41,3 @@ void Clear();
 
 void ClearDrawQueue();
 } // namespace Renderer
-
-#endif // RENDERER_H

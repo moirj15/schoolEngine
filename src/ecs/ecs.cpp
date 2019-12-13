@@ -24,6 +24,12 @@ WorldSystem::~WorldSystem() {
   }
 }
 
+void WorldSystem::Update(f32 t) {
+  for (auto *system : m_systems) {
+    system->Update(t);
+  }
+}
+
 void WorldSystem::Init() {
   m_systems.push_back(new PhysicsSystem(this));
   m_systems.push_back(new ShaterableSystem(this));
@@ -34,7 +40,7 @@ EntityID WorldSystem::Create(const TupleType type) {
   const EntityID id = m_entityIDs[m_nextFreeEntity];
   const size_t index = id & INDEX_MASK;
   auto &[physics, renderables, transforms, shaterables, meshes, collidables] = m_components;
-  Entity *entity = new Entity;
+  auto *entity = new Entity;
   entity->m_id = id;
   if ((u64)type & (u64)Type::Renderable) {
     renderables[index] = new RenderableComponent;
@@ -138,3 +144,4 @@ std::vector<EntityID> WorldSystem::EntityIDsWithType(const TupleType type) {
 //  return id;
 //}
 } // namespace ecs
+

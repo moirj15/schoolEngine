@@ -53,6 +53,7 @@ enum class Type : u64 {
 enum class TupleType : u64 {
   Destructable = (u64)Type::Renderable | (u64)Type::Physics | (u64)Type::Transform
                  | (u64)Type::Shaterable | (u64)Type::Mesh | (u64)Type::Collidable,
+  RenderableTuple = (u64)Type::Renderable | (u64)Type::Mesh | (u64)Type::Transform,
 };
 
 struct Entity {
@@ -60,7 +61,7 @@ struct Entity {
   std::vector<Component *> m_components;
 };
 
-class WorldSystem {
+class WorldSystem : public System {
   std::unordered_map<EntityID, Entity *> m_entities;
   std::vector<System *> m_systems;
   std::array<EntityID, ID_MAX> m_entityIDs;
@@ -77,17 +78,21 @@ public:
   WorldSystem();
   ~WorldSystem();
 
+  void Update(f32 t) override;
+
   void Init();
 
   EntityID Create(const TupleType type);
   void Destroy(const EntityID id);
 
-  bool IsValid(const EntityID id) { return m_entityIDs[id & INDEX_MASK] == id; }
+  bool IsValid(const EntityID id) const { return m_entityIDs[id & INDEX_MASK] == id; }
+
+  Entity *GetEntity(const EntityID id) { return m_entities[id]; }
 
   std::vector<EntityID> EntityIDsWithType(const TupleType type);
 
   template<typename... Ts>
-  std::tuple<Ts...> GetTuple(const EntityID id, Ts... types) {
+  std::tuple<Ts...> GetTuple(const EntityID id) {
     return std::make_tuple(std::get<Ts...>(m_components)[id & INDEX_MASK]);
   }
 };

@@ -103,57 +103,26 @@ int main(int argc, char **argv) {
   f32 t = 0.0;
 
   glEnable(GL_PROGRAM_POINT_SIZE);
-  u32 ind[] = {0, 1, 2, 2, 1, 3};
-  f32 poi[] = {-100.0, -5.0, -100.0, -100.0, -5.0, 100.0, 100.0, -5.0, -100.0, 100.0, -5.0, 100.0};
-  Wall wall = {{-100.0, -5.0, -100.0}, {100.0, -5.0, 100.0}};
-  // Wall wall
-  VertexArray vert;
-  vert.AddIndexBuffer(new IndexBuffer(ind, 6));
-  vert.AddVertexBuffer(new VertexBuffer(poi, 12, {{"points", 3, 0, 0, GL_FLOAT}}));
   // auto particles = SpawnRandomParticles(100);
-  ParticleEmitter particleEmitter(
-      {1.0f, 1.0f, 1.0f}, {0.0f, 0.0f, 0.0f}, {-1.0f, 0.0f, 0.0f}, 0.5f, 2.0f, 50);
-  // KeyFrameGroup keyframeGroup;
-  // keyframeGroup.LoadFromFile("../keyframe-input.txt");
-  // ObjReader objReader("../objData/block.obj");
-  // auto blockMesh = objReader.Parse();
-  // VertexArray blockVA;
-  // blockVA.AddVertexBuffer(new VertexBuffer(
-  //    blockMesh->vertecies.data(), blockMesh->vertecies.size(), {{"points", 3, 0, 0, GL_FLOAT}}));
-  //// blockVA.AddVertexBuffer(new VertexBuffer(
-  ////    blockMesh->normals.data(), blockMesh->normals.size(), {{"colors", 3, 0, 1, GL_FLOAT}}));
-  // blockVA.AddIndexBuffer(
-  //    new IndexBuffer(blockMesh->connections.data(), blockMesh->connections.size()));
-  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-  glfwSwapBuffers(window->m_glWindow);
-  do {
-    glfwPollEvents();
-  } while (glfwGetKey(window->m_glWindow, GLFW_KEY_G) != GLFW_PRESS);
-  glm::vec3 position(-10.0f, -1.0f, -10.0f);
+  //  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+  //  glfwSwapBuffers(window->m_glWindow);
+  //  do {
+  //    glfwPollEvents();
+  //  } while (glfwGetKey(window->m_glWindow, GLFW_KEY_G) != GLFW_PRESS);
   while (!glfwWindowShouldClose(window->m_glWindow)) {
     Renderer::ClearDrawQueue();
     glfwPollEvents();
     f64 currentTime = glfwGetTime();
     f64 delta = (currentTime - lastTime);
     t += (f32)delta;
-    auto pva = particleEmitter.ParticlesToVA();
 
-    // auto mat = keyframeGroup.GenerateTranslationMat(t);
-    particleEmitter.Update(delta, glm::translate(position), wall);
-    position += glm::vec3(0.0f, 0.05f, 0.0f);
-
-    Renderer::AddToDrawQueue({{Renderer::Command::DrawPoints}, {}, pva.get(), &shader});
-    Renderer::AddToDrawQueue({{Renderer::Command::DrawSolid}, {}, &vert, &shader});
     Renderer::Clear();
 
     lastTime = glfwGetTime();
 
-    // glfwMakeContextCurrent(window->m_glWindow);
-    // Renderer::Draw(camera->CalculateMatrix(), perspective);
     Renderer::Draw(
         glm::lookAt(glm::vec3{0.0f, 1.0f, 1.0f}, {0.0f, 1.0f, -1.0f}, {0.0f, 1.0f, 0.0f}),
         perspective);
-    // Renderer::DrawDebug(camera->CalculateMatrix(), perspective);
     Renderer::DisplayDraw(window);
   }
 
