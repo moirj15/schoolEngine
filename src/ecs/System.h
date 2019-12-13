@@ -3,9 +3,13 @@
 
 #include "../common.h"
 
-class System {
-public:
+namespace ecs {
+
+struct System {
+  virtual ~System() {}
   virtual void Update(f32 t);
 };
 
-#endif // SYSTEM_H
+} // namespace ecs
+
+#endif

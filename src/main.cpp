@@ -7,9 +7,6 @@
 #include "bvhParser.h"
 #include "common.h"
 #include "ecs/ecs.h"
-#include "ecs/physicsManager.h"
-#include "ecs/rendererablemanager.h"
-#include "ecs/shaterableManager.h"
 #include "keyframe.h"
 #include "obj.h"
 #include "particle.h"
@@ -105,10 +102,6 @@ int main(int argc, char **argv) {
   f64 lastTime = glfwGetTime();
   f32 t = 0.0;
 
-  ECS::ComponentManager componentManager;
-  PhysicsManager physicsManager{&componentManager};
-  ShaterableManager shaterableManager{&componentManager};
-  RendererableManager rendererManager{&componentManager};
   glEnable(GL_PROGRAM_POINT_SIZE);
   u32 ind[] = {0, 1, 2, 2, 1, 3};
   f32 poi[] = {-100.0, -5.0, -100.0, -100.0, -5.0, 100.0, 100.0, -5.0, -100.0, 100.0, -5.0, 100.0};

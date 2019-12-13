@@ -1,9 +1,15 @@
 #include "ecs.h"
 
-namespace ECS {
+#include "components.h"
+#include "physicsSystem.h"
+#include "rendererableSystem.h"
+#include "shaterableSystem.h"
+#include "system.h"
 
+namespace ecs {
 WorldSystem::WorldSystem() {
 }
+
 WorldSystem::~WorldSystem() {
   for (auto *system : m_systems) {
     if (system) {
@@ -18,7 +24,44 @@ WorldSystem::~WorldSystem() {
   }
 }
 
+void WorldSystem::Init() {
+  m_systems.push_back(new PhysicsSystem(this));
+  m_systems.push_back(new ShaterableSystem(this));
+  m_systems.push_back(new RenderableSystem(this));
+}
+
 EntityID WorldSystem::Create(const TupleType type) {
+  const EntityID id = m_entityIDs[m_nextFreeEntity];
+  const size_t index = id & INDEX_MASK;
+  auto &[physics, renderables, transforms, shaterables, meshes, collidables] = m_components;
+  Entity *entity = new Entity;
+  entity->m_id = id;
+  if ((u64)type & (u64)Type::Renderable) {
+    renderables[index] = new RenderableComponent;
+    entity->m_components.push_back(renderables[index]);
+  }
+  if ((u64)type & (u64)Type::Physics) {
+    physics[index] = new PhysicsComponent;
+    entity->m_components.push_back(physics[index]);
+  }
+  if ((u64)type & (u64)Type::Transform) {
+    transforms[index] = new TransformComponent;
+    entity->m_components.push_back(transforms[index]);
+  }
+  if ((u64)type & (u64)Type::Shaterable) {
+    shaterables[index] = new ShaterableComponent;
+    entity->m_components.push_back(shaterables[index]);
+  }
+  if ((u64)type & (u64)Type::Mesh) {
+    meshes[index] = new MeshComponent;
+    entity->m_components.push_back(meshes[index]);
+  }
+  if ((u64)type & (u64)Type::Collidable) {
+    collidables[index] = new CollidableComponent;
+    entity->m_components.push_back(collidables[index]);
+  }
+
+  return id;
 }
 void WorldSystem::Destroy(const EntityID id) {
   auto *entity = m_entities[id];
@@ -29,7 +72,7 @@ void WorldSystem::Destroy(const EntityID id) {
 
 std::vector<EntityID> WorldSystem::EntityIDsWithType(const TupleType type) {
   std::vector<EntityID> ids;
-  for (auto pair : m_entities) {
+  for (const auto &pair : m_entities) {
     auto id = pair.first;
     if ((id & (u64)type) == (u64)type) {
       ids.push_back(id);
@@ -94,4 +137,4 @@ std::vector<EntityID> WorldSystem::EntityIDsWithType(const TupleType type) {
 //  id++;
 //  return id;
 //}
-} // namespace ECS
+} // namespace ecs

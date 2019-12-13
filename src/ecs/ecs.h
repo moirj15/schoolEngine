@@ -2,6 +2,7 @@
 #define ECS_H
 
 #include "../common.h"
+#include "system.h"
 
 #include <array>
 #include <glm/glm.hpp>
@@ -22,53 +23,17 @@ enum class Command;
 struct ShaderData;
 class VertexArray;
 
-namespace ECS {
+namespace ecs {
+
+struct Component;
+struct PhysicsComponent;
+struct RenderableComponent;
+struct TransformComponent;
+struct ShaterableComponent;
+struct MeshComponent;
+struct CollidableComponent;
 
 using EntityID = u64;
-
-struct Physics {
-  glm::vec3 velocity = {};
-  glm::quat angularVelocity = {};
-  glm::quat angularMomentum = {};
-  glm::vec3 momentum = {};
-  f32 mass = 0.0f;
-  f32 frictionCoef = 0.0f;
-};
-
-struct Renderable {
-  std::vector<Renderer::Command> commands = {};
-  //  std::vector<ShaderData> shaderData = {};
-  VertexArray *vertexArray = nullptr;
-  Shader *shader = nullptr;
-};
-
-struct Transform {
-  glm::vec3 position = {};
-  glm::quat rotation = {};
-};
-
-struct Shaterable {
-  bool hasShatered = false;
-};
-
-struct Mesh {
-  std::vector<f32> vertecies = {};
-  std::vector<u32> connections = {};
-  std::vector<f32> normals = {};
-  u32 vertexSize = 3;
-};
-
-struct Collidable {
-  bool hasCollided = false;
-  EntityID collidedEntity = 0;
-  f32 collisionTime = 0.0f;
-  //  BoundingBox boundingBox = {};
-};
-
-struct NodeMotion {
-  glm::vec3 translations = {};
-  glm::vec3 rotations = {};
-};
 
 constexpr u64 COUNT_MASK = 0x0000000000ff0000;
 constexpr u64 INDEX_MASK = 0x000000000000ffff;
@@ -90,34 +55,29 @@ enum class TupleType : u64 {
                  | (u64)Type::Shaterable | (u64)Type::Mesh | (u64)Type::Collidable,
 };
 
-struct Component {
-  virtual ~Component() = default;
-};
-
 struct Entity {
   EntityID m_id;
   std::vector<Component *> m_components;
 };
 
-struct System {
-  virtual ~System() {}
-  virtual void Update(f32 t);
-};
-
 class WorldSystem {
   std::unordered_map<EntityID, Entity *> m_entities;
-  std::array<System *, 6> m_systems;
+  std::vector<System *> m_systems;
   std::array<EntityID, ID_MAX> m_entityIDs;
 
-  using CompTuple = std::tuple<std::array<Physics *, ID_MAX>, std::array<Renderable *, ID_MAX>,
-      std::array<Transform *, ID_MAX>, std::array<Shaterable *, ID_MAX>, std::array<Mesh *, ID_MAX>,
-      std::array<Collidable *, ID_MAX>>;
+  using CompTuple =
+      std::tuple<std::array<PhysicsComponent *, ID_MAX>, std::array<RenderableComponent *, ID_MAX>,
+          std::array<TransformComponent *, ID_MAX>, std::array<ShaterableComponent *, ID_MAX>,
+          std::array<MeshComponent *, ID_MAX>, std::array<CollidableComponent *, ID_MAX>>;
 
   CompTuple m_components;
+  size_t m_nextFreeEntity;
 
 public:
   WorldSystem();
   ~WorldSystem();
+
+  void Init();
 
   EntityID Create(const TupleType type);
   void Destroy(const EntityID id);
@@ -165,6 +125,6 @@ public:
 //  EntityID NextID();
 //};
 
-} // namespace ECS
+} // namespace ecs
 
 #endif
