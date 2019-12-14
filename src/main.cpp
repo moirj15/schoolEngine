@@ -91,7 +91,7 @@ int main(int argc, char **argv) {
   // InitIMGUI(window);
   printf("%s\n", glGetString(GL_VERSION));
 
-  Shader shader{{"../shaders/shader.vert", "../shaders/shader.frag"}};
+//  Shader shader{{"../shaders/shader.vert", "../shaders/shader.frag"}};
 
   auto perspective = glm::perspective(90.0f, 16.0f / 9.0f, 0.01f, 200.0f);
 
@@ -110,20 +110,20 @@ int main(int argc, char **argv) {
   //    glfwPollEvents();
   //  } while (glfwGetKey(window->m_glWindow, GLFW_KEY_G) != GLFW_PRESS);
   while (!glfwWindowShouldClose(window->m_glWindow)) {
-    Renderer::ClearDrawQueue();
+    renderer::ClearDrawQueue();
     glfwPollEvents();
     f64 currentTime = glfwGetTime();
     f64 delta = (currentTime - lastTime);
     t += (f32)delta;
 
-    Renderer::Clear();
+    renderer::Clear();
 
     lastTime = glfwGetTime();
 
-    Renderer::Draw(
+    renderer::Draw(
         glm::lookAt(glm::vec3{0.0f, 1.0f, 1.0f}, {0.0f, 1.0f, -1.0f}, {0.0f, 1.0f, 0.0f}),
         perspective);
-    Renderer::DisplayDraw(window);
+    renderer::DisplayDraw(window);
   }
 
   // ImGui_ImplOpenGL3_Shutdown();

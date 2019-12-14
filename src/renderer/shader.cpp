@@ -3,6 +3,8 @@
 #include <GLFW/glfw3.h>
 #include <glm/gtc/type_ptr.hpp>
 
+namespace renderer {
+
 static char *readFile(const char *name) {
   FILE *fp = nullptr;
   fp = fopen(name, "r");
@@ -187,4 +189,6 @@ std::vector<GLenum> Shader::DetermineShaderTypes() {
     }
   }
   return ret;
+}
+
 }

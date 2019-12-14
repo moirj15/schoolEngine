@@ -1,14 +1,14 @@
 #pragma once
 #include <glm/mat4x4.hpp>
 #include <vector>
+#include <string>
 
-class Shader;
 class VertexArray;
 struct Window;
 
-struct ShaderData;
 
-namespace Renderer {
+namespace renderer {
+struct ShaderData;
 
 enum class Command {
   DrawLine,
@@ -19,10 +19,10 @@ enum class Command {
 };
 
 struct Drawable {
-  std::vector<Command> commands;
-  std::vector<ShaderData> shaderData;
-  VertexArray *vertexArray;
-  Shader *shader;
+  std::vector<Command> m_commands;
+  std::vector<ShaderData> m_shaderData;
+  VertexArray *m_vertexArray;
+  std::string m_name;
 };
 
 /**
@@ -40,4 +40,4 @@ void DisplayDraw(const Window *window);
 void Clear();
 
 void ClearDrawQueue();
-} // namespace Renderer
+} // namespace renderer

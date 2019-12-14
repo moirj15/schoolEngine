@@ -22,10 +22,10 @@ glm::mat4 camera = glm::lookAt(
 //      auto copy = *drawable;
 //      auto transformMat =
 //          glm::translate(glm::mat4(1.0f), transform->position) * glm::mat4(transform->rotation);
-//      //      copy.shaderData.push_back({"transform", transformMat});
+//      //      copy.m_shaderData.push_back({"transform", transformMat});
 
-//      //      Renderer::AddToDrawQueue(
-//      //          {copy.commands, copy.shaderData, copy.vertexArray, copy.shader});
+//      //      renderer::AddToDrawQueue(
+//      //          {copy.m_commands, copy.m_shaderData, copy.m_vertexArray, copy.shader});
 //    }
 //  }
 //}
@@ -36,6 +36,12 @@ const glm::vec3 Y_AXIS = {0.0f, 1.0f, 0.0f};
 const glm::vec3 Z_AXIS = {0.0f, 0.0f, 1.0f};
 
 RenderableSystem::RenderableSystem(WorldSystem *world) : m_world(world) {
+}
+
+RenderableSystem::~RenderableSystem() {
+}
+
+void RenderableSystem::Update(f32 t) {
   for (auto &tuple : GetRenderableTuple()) {
     auto *mesh = tuple.m_mesh;
     auto *renderable = tuple.m_renderable;
@@ -43,10 +49,10 @@ RenderableSystem::RenderableSystem(WorldSystem *world) : m_world(world) {
     // TODO: figure out how to get around constantly allocating stuff.
     VertexArray *va;
     va->AddVertexBuffer(new VertexBuffer(
-        mesh->m_vertecies.data(), mesh->m_vertecies.size(), {{"name", 3, 0, 0, GL_FLOAT}}));
+        mesh->m_vertecies.data(), mesh->m_vertecies.size(), {{"m_name", 3, 0, 0, GL_FLOAT}}));
     va->AddIndexBuffer(new IndexBuffer(mesh->m_connections.data(), mesh->m_connections.size()));
 
-    std::vector<ShaderData> shaderData;
+    std::vector<renderer::ShaderData> shaderData;
     auto translate = glm::translate(glm::mat4(1.0f), transform->m_position);
     auto rotation = glm::rotate(glm::mat4(1.0f), transform->m_rotation.x, X_AXIS)
                     * glm::rotate(glm::mat4(1.0f), transform->m_rotation.y, Y_AXIS)
@@ -54,15 +60,9 @@ RenderableSystem::RenderableSystem(WorldSystem *world) : m_world(world) {
     auto transformMat = translate * rotation;
     shaderData.emplace_back("transform", transformMat);
 
-    ::Renderer::Drawable drawable = {renderable->m_commands, shaderData, va, renderable->m_shader};
-    ::Renderer::AddToDrawQueue(drawable)
+    ::renderer::Drawable drawable = {renderable->m_commands, shaderData, va, renderable->m_shader};
+    ::renderer::AddToDrawQueue(drawable);
   }
-}
-
-RenderableSystem::~RenderableSystem() {
-}
-
-void RenderableSystem::Update(f32 t) {
 }
 std::vector<RenderableTuple> RenderableSystem::GetRenderableTuple() {
   std::vector<RenderableTuple> ret;
@@ -71,7 +71,7 @@ std::vector<RenderableTuple> RenderableSystem::GetRenderableTuple() {
     if (m_world->IsValid(id)) {
       auto [renderable, transform, mesh] =
           m_world->GetTuple<RenderableComponent *, TransformComponent *, MeshComponent *>(id);
-      ret.emplace_back(renderable, transform, mesh);
+      ret.push_back({renderable, transform, mesh});
     }
   }
 

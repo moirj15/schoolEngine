@@ -60,7 +60,7 @@ void ShaterableSystem::Update(f32 t) {
 //    auto *renderable = m_componentManager->GetComponent<ecs::Renderable>(id);
 //    auto *transform = m_componentManager->GetComponent<ecs::Transform>(id);
 //
-//    renderable->vertexArray = new VertexArray();
+//    renderable->m_vertexArray = new VertexArray();
 //    u32 indecies[] = {0, 1, 2};
 //    f32 verts[] = {
 //        triangle.p0.x,
@@ -73,8 +73,8 @@ void ShaterableSystem::Update(f32 t) {
 //        triangle.p2.y,
 //        triangle.p2.z,
 //    };
-//    renderable->vertexArray->AddIndexBuffer(new IndexBuffer{indecies, 3});
-//    renderable->vertexArray->AddVertexBuffer(
+//    renderable->m_vertexArray->AddIndexBuffer(new IndexBuffer{indecies, 3});
+//    renderable->m_vertexArray->AddVertexBuffer(
 //        new VertexBuffer{verts, 9, {{"boxVerts", 3, 0, 0, GL_FLOAT}}});
 //
 //    transform->position = {0.0f, 0.0f, -1.0f};

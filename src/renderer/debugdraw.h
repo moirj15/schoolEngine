@@ -8,7 +8,7 @@
 #include "shader.h"
 
 class VertexArray;
-namespace Renderer { struct Drawable; }
+namespace renderer { struct Drawable; }
 
 namespace DebugDraw {
 
@@ -31,7 +31,7 @@ void AddLine(const glm::vec3 &start, const glm::vec3 &end);
  * Getter for the DebugMeshes from the DebugDraw module.
  * @return: The DebugMeshes
  */
-const std::vector<Renderer::Drawable> &DebugMeshes();
+const std::vector<renderer::Drawable> &DebugMeshes();
 }
 
 #endif // DEBUGDRAW_H

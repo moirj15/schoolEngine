@@ -8,7 +8,7 @@
 #include <string>
 #include <vector>
 
-namespace Renderer {
+namespace renderer {
 enum class Command;
 }
 namespace ecs {
@@ -28,7 +28,7 @@ struct PhysicsComponent : public Component {
 struct RenderableComponent : public Component {
   std::string m_texture;
   std::string m_shader;
-  std::vector<Renderer::Command> m_commands;
+  std::vector<renderer::Command> m_commands;
 };
 
 struct TransformComponent : public Component {

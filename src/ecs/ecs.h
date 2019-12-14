@@ -16,7 +16,7 @@
 
 class Shader;
 struct BoundingBox;
-namespace Renderer {
+namespace renderer {
 enum class Command;
 }
 
@@ -91,44 +91,11 @@ public:
 
   std::vector<EntityID> EntityIDsWithType(const TupleType type);
 
-  template<typename... Ts>
-  std::tuple<Ts...> GetTuple(const EntityID id) {
-    return std::make_tuple(std::get<Ts...>(m_components)[id & INDEX_MASK]);
+  template<typename ...Ts>
+  auto GetTuple(const EntityID id) {
+    return std::make_tuple(std::get<std::array<Ts, ID_MAX>>(m_components)[id & INDEX_MASK]...);
   }
 };
-
-// class ComponentManager {
-//  using CompTuple = std::tuple<std::array<Physics *, ID_MAX>, std::array<Renderable *, ID_MAX>,
-//      std::array<Transform *, ID_MAX>, std::array<Shaterable *, ID_MAX>, std::array<Mesh *,
-//      ID_MAX>, std::array<Collidable *, ID_MAX>>;
-//  CompTuple m_components;
-
-// public:
-//  ComponentManager() = default;
-//  ~ComponentManager();
-
-//  EntityID CreateEntity(EntityID type);
-
-//  void DestroyEntity(EntityID id);
-
-//  template<typename T>
-//  T *GetComponent(const EntityID id) {
-//    auto component = std::get<std::vector<T *>>(m_components);
-//    u32 index = id & INDEX_MASK;
-//    if (index < component.size()) {
-//      return component[index];
-//    }
-//    return nullptr;
-//  }
-
-//  template<typename T>
-//  std::vector<T *> GetComponents() {
-//    return std::get<std::vector<T *>>(m_components);
-//  }
-
-// private:
-//  EntityID NextID();
-//};
 
 } // namespace ecs
 

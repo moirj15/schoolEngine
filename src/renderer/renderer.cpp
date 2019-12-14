@@ -4,14 +4,16 @@
 #include "VertexBuffer.h"
 #include "debugdraw.h"
 #include "shader.h"
+#include "shaderLibrary.h"
 
 #include <GLFW/glfw3.h>
 #include <vector>
 
-namespace Renderer {
+namespace renderer {
 
 static std::vector<Drawable> s_renderQueue;
 static Shader *s_defaultShader = nullptr;
+static ShaderLibrary s_shaderLibrary;
 
 void AddToDrawQueue(const Drawable &drawable) {
   if (!s_defaultShader) {
@@ -25,27 +27,21 @@ void AddToDrawQueue(const Drawable &drawable) {
 void Draw(const glm::mat4 &camera, const glm::mat4 &perspective) {
   glLineWidth(2.0f);
   for (const auto &drawable : s_renderQueue) {
-    if (drawable.shader) {
-      drawable.shader->Bind();
-      drawable.shader->SetShaderData(drawable.shaderData);
-      drawable.shader->SetUniformMat4("camera", camera);
-      drawable.shader->SetUniformMat4("projection", perspective);
+    auto *shader = s_shaderLibrary.GetProgram(drawable.m_name);
+    shader->Bind();
+    shader->SetShaderData(drawable.m_shaderData);
+    shader->SetUniformMat4("camera", camera);
+    shader->SetUniformMat4("projection", perspective);
+    drawable.m_vertexArray->Bind();
 
-    } else {
-      s_defaultShader->Bind();
-      s_defaultShader->SetShaderData(drawable.shaderData);
-      s_defaultShader->SetUniformMat4("camera", camera);
-      s_defaultShader->SetUniformMat4("projection", perspective);
-    }
-    drawable.vertexArray->Bind();
-    switch (drawable.commands.back()) {
+    switch (drawable.m_commands.back()) {
     case Command::DrawSolid:
-      glDrawElements(GL_TRIANGLES, drawable.vertexArray->IndexCount(), GL_UNSIGNED_INT, (void *)0);
+      glDrawElements(GL_TRIANGLES, drawable.m_vertexArray->IndexCount(), GL_UNSIGNED_INT, (void *)0);
       break;
     case Command::DrawLine:
       break;
     case Command::DrawPoints:
-      glDrawElements(GL_POINTS, drawable.vertexArray->IndexCount(), GL_UNSIGNED_INT, (void *)0);
+      glDrawElements(GL_POINTS, drawable.m_vertexArray->IndexCount(), GL_UNSIGNED_INT, (void *)0);
       break;
     }
   }
@@ -53,31 +49,33 @@ void Draw(const glm::mat4 &camera, const glm::mat4 &perspective) {
 
 void DrawImmediate(
     const glm::mat4 &camera, const glm::mat4 &perspective, const Drawable &drawable) {
-  if (drawable.shader) {
-    drawable.shader->Bind();
-    drawable.shader->SetShaderData(drawable.shaderData);
-    drawable.shader->SetUniformMat4("camera", camera);
-    drawable.shader->SetUniformMat4("projection", perspective);
-
-  } else {
-    s_defaultShader->Bind();
-    s_defaultShader->SetShaderData(drawable.shaderData);
-    s_defaultShader->SetUniformMat4("camera", camera);
-    s_defaultShader->SetUniformMat4("projection", perspective);
-  }
-  drawable.vertexArray->Bind();
-  glDrawElements(GL_TRIANGLES, drawable.vertexArray->IndexCount(), GL_UNSIGNED_INT, (void *)0);
+  printf("REFRACTOR_ME\n");
+//  if (drawable.shader) {
+//    drawable.shader->Bind();
+//    drawable.shader->SetShaderData(drawable.m_shaderData);
+//    drawable.shader->SetUniformMat4("camera", camera);
+//    drawable.shader->SetUniformMat4("projection", perspective);
+//
+//  } else {
+//    s_defaultShader->Bind();
+//    s_defaultShader->SetShaderData(drawable.m_shaderData);
+//    s_defaultShader->SetUniformMat4("camera", camera);
+//    s_defaultShader->SetUniformMat4("projection", perspective);
+//  }
+//  drawable.m_vertexArray->Bind();
+//  glDrawElements(GL_TRIANGLES, drawable.m_vertexArray->IndexCount(), GL_UNSIGNED_INT, (void *)0);
 }
 
 void DrawDebug(const glm::mat4 &camera, const glm::mat4 &perspective) {
-  for (const auto &debug : DebugDraw::DebugMeshes()) {
-    debug.shader->Bind();
-    debug.shader->SetShaderData(debug.shaderData);
-    debug.shader->SetUniformMat4("camera", camera);
-    debug.shader->SetUniformMat4("projection", perspective);
-    debug.vertexArray->Bind();
-    glDrawElements(GL_LINES, debug.vertexArray->IndexCount(), GL_UNSIGNED_INT, (void *)0);
-  }
+  printf("REFRACTOR_ME\n");
+//  for (const auto &debug : DebugDraw::DebugMeshes()) {
+//    debug.shader->Bind();
+//    debug.shader->SetShaderData(debug.shaderData);
+//    debug.shader->SetUniformMat4("camera", camera);
+//    debug.shader->SetUniformMat4("projection", perspective);
+//    debug.m_vertexArray->Bind();
+//    glDrawElements(GL_LINES, debug.m_vertexArray->IndexCount(), GL_UNSIGNED_INT, (void *)0);
+//  }
 }
 
 void DisplayDraw(const Window *window) {
@@ -92,4 +90,4 @@ void ClearDrawQueue() {
   s_renderQueue.clear();
 }
 
-} // namespace Renderer
+} // namespace renderer
