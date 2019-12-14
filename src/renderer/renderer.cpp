@@ -15,10 +15,14 @@ static std::vector<Drawable> s_renderQueue;
 static Shader *s_defaultShader = nullptr;
 static ShaderLibrary s_shaderLibrary;
 
+void Init() {
+  s_shaderLibrary.Add({"../shaders/shader.vert", "../shaders/shader.frag"});
+}
+
 void AddToDrawQueue(const Drawable &drawable) {
-  if (!s_defaultShader) {
-    s_defaultShader = new Shader{{"../shaders/shader.vert", "../shaders/shader.frag"}};
-  }
+//  if (!s_defaultShader) {
+//    s_defaultShader = new Shader{{"../shaders/shader.vert", "../shaders/shader.frag"}};
+//  }
   s_renderQueue.push_back(drawable);
 }
 

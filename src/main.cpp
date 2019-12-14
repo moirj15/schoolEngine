@@ -17,6 +17,7 @@
 #include "renderer/shader.h"
 #include "skeleton.h"
 #include "window.h"
+#include "ecs/components.h"
 
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
@@ -25,6 +26,7 @@
 #include <glm/gtx/normal.hpp>
 #include <glm/gtx/string_cast.hpp>
 #include <glm/gtx/transform.hpp>
+#include <glm/gtx/quaternion.hpp>
 #include <string>
 #include <thread>
 
@@ -88,10 +90,12 @@ int main(int argc, char **argv) {
   (void)argv;
 
   Window *window = InitGL();
+  renderer::Init();
   // InitIMGUI(window);
   printf("%s\n", glGetString(GL_VERSION));
 
-//  Shader shader{{"../shaders/shader.vert", "../shaders/shader.frag"}};
+  ObjReader reader("../objData/block.obj");
+  auto blockMesh = reader.Parse();
 
   auto perspective = glm::perspective(90.0f, 16.0f / 9.0f, 0.01f, 200.0f);
 
@@ -103,25 +107,32 @@ int main(int argc, char **argv) {
   f32 t = 0.0;
 
   glEnable(GL_PROGRAM_POINT_SIZE);
-  // auto particles = SpawnRandomParticles(100);
-  //  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-  //  glfwSwapBuffers(window->m_glWindow);
-  //  do {
-  //    glfwPollEvents();
-  //  } while (glfwGetKey(window->m_glWindow, GLFW_KEY_G) != GLFW_PRESS);
+  auto *worldSystem = new ecs::WorldSystem();
+  auto testID = worldSystem->Create(ecs::TupleType::RenderableTuple);
+  auto [renderable, transform, mesh] = worldSystem->GetTuple<ecs::RenderableComponent *, ecs::TransformComponent *, ecs::MeshComponent *>(testID);
+  mesh->m_connections = blockMesh->connections;
+  mesh->m_normals = blockMesh->normals;
+  mesh->m_vertecies= blockMesh->vertecies;
+  mesh->m_vertexSize= blockMesh->vertexSize;
+  transform->m_position = {0.0f, 0.0f, -2.0f};
+  transform->m_rotation = glm::angleAxis(glm::radians(0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+  renderable->m_shader = "shader";
+  renderable->m_commands.push_back(renderer::Command::DrawSolid);
+
   while (!glfwWindowShouldClose(window->m_glWindow)) {
     renderer::ClearDrawQueue();
     glfwPollEvents();
     f64 currentTime = glfwGetTime();
     f64 delta = (currentTime - lastTime);
-    t += (f32)delta;
+
+    worldSystem->Update(delta);
 
     renderer::Clear();
 
     lastTime = glfwGetTime();
 
     renderer::Draw(
-        glm::lookAt(glm::vec3{0.0f, 1.0f, 1.0f}, {0.0f, 1.0f, -1.0f}, {0.0f, 1.0f, 0.0f}),
+        glm::lookAt(glm::vec3{0.0f, 0.0f, 1.0f}, {0.0f, 0.0f, -1.0f}, {0.0f, 1.0f, 0.0f}),
         perspective);
     renderer::DisplayDraw(window);
   }

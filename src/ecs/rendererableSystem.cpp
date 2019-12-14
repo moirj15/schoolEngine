@@ -6,7 +6,9 @@
 #include "components.h"
 #include "ecs.h"
 
+#define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtx/quaternion.hpp>
 glm::mat4 perspective = glm::perspective(90.0f, 16.0f / 9.0f, 0.01f, 100.0f);
 glm::mat4 camera = glm::lookAt(
     glm::vec3{0.0f, 0.0f, 0.0f}, glm::vec3{0.0f, 0.0f, -1.0f}, glm::vec3{0.0f, 1.0f, 0.0f});
@@ -47,16 +49,14 @@ void RenderableSystem::Update(f32 t) {
     auto *renderable = tuple.m_renderable;
     auto *transform = tuple.m_transform;
     // TODO: figure out how to get around constantly allocating stuff.
-    VertexArray *va;
+    VertexArray *va = new VertexArray();
     va->AddVertexBuffer(new VertexBuffer(
         mesh->m_vertecies.data(), mesh->m_vertecies.size(), {{"m_name", 3, 0, 0, GL_FLOAT}}));
     va->AddIndexBuffer(new IndexBuffer(mesh->m_connections.data(), mesh->m_connections.size()));
 
     std::vector<renderer::ShaderData> shaderData;
     auto translate = glm::translate(glm::mat4(1.0f), transform->m_position);
-    auto rotation = glm::rotate(glm::mat4(1.0f), transform->m_rotation.x, X_AXIS)
-                    * glm::rotate(glm::mat4(1.0f), transform->m_rotation.y, Y_AXIS)
-                    * glm::rotate(glm::mat4(1.0f), transform->m_rotation.z, Z_AXIS);
+    auto rotation = glm::toMat4(transform->m_rotation);
     auto transformMat = translate * rotation;
     shaderData.emplace_back("transform", transformMat);
 

@@ -25,6 +25,8 @@ struct Drawable {
   std::string m_name;
 };
 
+void Init();
+
 /**
  * Adds the given drawable to the draw queue.
  */

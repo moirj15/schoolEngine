@@ -7,7 +7,14 @@
 #include "system.h"
 
 namespace ecs {
-WorldSystem::WorldSystem() {
+WorldSystem::WorldSystem() : m_nextFreeEntity(0) {
+  m_systems.push_back(new PhysicsSystem(this));
+  m_systems.push_back(new ShaterableSystem(this));
+  m_systems.push_back(new RenderableSystem(this));
+
+  for (size_t i = 0; i < m_entityIDs.size(); i++) {
+    m_entityIDs[i] = FREE_ID | (u16)(i + 1);
+  }
 }
 
 WorldSystem::~WorldSystem() {
@@ -31,17 +38,15 @@ void WorldSystem::Update(f32 t) {
 }
 
 void WorldSystem::Init() {
-  m_systems.push_back(new PhysicsSystem(this));
-  m_systems.push_back(new ShaterableSystem(this));
-  m_systems.push_back(new RenderableSystem(this));
 }
 
 EntityID WorldSystem::Create(const TupleType type) {
-  const EntityID id = m_entityIDs[m_nextFreeEntity];
+  const EntityID id = NextFreeID(type);
   const size_t index = id & INDEX_MASK;
   auto &[physics, renderables, transforms, shaterables, meshes, collidables] = m_components;
   auto *entity = new Entity;
   entity->m_id = id;
+  m_entities[entity->m_id] = entity;
   if ((u64)type & (u64)Type::Renderable) {
     renderables[index] = new RenderableComponent;
     entity->m_components.push_back(renderables[index]);
@@ -72,7 +77,7 @@ EntityID WorldSystem::Create(const TupleType type) {
 void WorldSystem::Destroy(const EntityID id) {
   auto *entity = m_entities[id];
   m_entities.erase(id);
-  m_entityIDs[id & INDEX_MASK] = FREE_ID;
+  m_entityIDs[id & INDEX_MASK] |= FREE_ID;
   delete (entity);
 }
 
@@ -87,61 +92,13 @@ std::vector<EntityID> WorldSystem::EntityIDsWithType(const TupleType type) {
   return ids;
 }
 
-// ComponentManager::~ComponentManager() {
-//  auto [physics, renderables, transforms, shaterables, meshes, collidables] = m_components;
-//  for (u32 i = 0; i < physics.size(); i++) {
-//    delete (physics[i]);
-//    delete (renderables[i]);
-//    delete (transforms[i]);
-//  }
-//}
-//
-// EntityID ComponentManager::CreateEntity(EntityID type) {
-//  EntityID id = NextID();
-//  auto &[physics, renderables, transforms, shaterables, meshes, collidables] = m_components;
-//  if (type & static_cast<EntityID>(Type::Renderable)) {
-//    renderables[id] = new Renderable;
-//  }
-//  if (type & static_cast<EntityID>(Type::Physics)) {
-//    physics[id] = new Physics;
-//  }
-//  if (type & static_cast<EntityID>(Type::Transform)) {
-//    transforms[id] = new Transform;
-//  }
-//  if (type & static_cast<EntityID>(Type::Shaterable)) {
-//    shaterables[id] = new Shaterable;
-//  }
-//  if (type & static_cast<EntityID>(Type::Mesh)) {
-//    meshes[id] = new Mesh;
-//  }
-//  if (type & static_cast<EntityID>(Type::Collidable)) {
-//    collidables[id] = new Collidable;
-//  }
-//  id |= type;
-//  return id;
-//}
-//
-// void ComponentManager::DestroyEntity(EntityID id) {
-//  auto [physics, renderables, transforms, shaterables, meshes, collidables] = m_components;
-//  u32 index = id & 0x0000ffff;
-//  if (id & static_cast<u32>(Type::Physics)) {
-//    delete (physics[index]);
-//    physics[index] = nullptr;
-//  }
-//  if (id & static_cast<u32>(Type::Renderable)) {
-//    delete (renderables[index]);
-//    renderables[index] = nullptr;
-//  }
-//  if (id & static_cast<u32>(Type::Transform)) {
-//    delete (transforms[index]);
-//    transforms[index] = nullptr;
-//  }
-//}
-//
-// EntityID ComponentManager::NextID() {
-//  static EntityID id = 0;
-//  id++;
-//  return id;
-//}
-} // namespace ecs
+EntityID WorldSystem::NextFreeID(const TupleType type) {
+  size_t index = m_nextFreeEntity;
+  m_nextFreeEntity = INDEX_MASK & m_entityIDs[m_nextFreeEntity];
+  m_entityIDs[index] &= (~FREE_ID);
+  m_entityIDs[index] &= (~INDEX_MASK);
+  m_entityIDs[index] |= (u64)type;
+  return m_entityIDs[index];
+}
 
+} // namespace ecs
