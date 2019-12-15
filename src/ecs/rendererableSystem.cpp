@@ -40,9 +40,8 @@ const glm::vec3 Z_AXIS = {0.0f, 0.0f, 1.0f};
 RenderableSystem::RenderableSystem(WorldSystem *world) : m_world(world) {
 }
 
-RenderableSystem::~RenderableSystem() {
-}
 
+// TODO: add support for textures
 void RenderableSystem::Update(f32 t) {
   for (auto &tuple : GetRenderableTuple()) {
     auto *mesh = tuple.m_mesh;

@@ -1,6 +1,7 @@
 #include "shaterableSystem.h"
 
 #include "../renderer/VertexBuffer.h"
+#include "components.h"
 #include "ecs.h"
 
 #define GLM_ENABLE_EXPERIMENTAL
@@ -10,10 +11,28 @@ namespace ecs {
 
 ShaterableSystem::ShaterableSystem(WorldSystem *world) : m_world(world) {
 }
-ShaterableSystem::~ShaterableSystem() {
-}
 
 void ShaterableSystem::Update(f32 t) {
+  for (auto &tuple : GetShaterableTuple()) {
+    auto collidable = tuple.m_collidable;
+    if (collidable->m_hasCollided) {
+
+    }
+  }
+}
+
+std::vector<ShaterableTuple> ShaterableSystem::GetShaterableTuple() {
+  std::vector<ShaterableTuple> ret;
+  auto ids = m_world->EntityIDsWithType(TupleType::ShaterableTuple);
+  for (auto id : ids) {
+    if (m_world->IsValid(id)) {
+      auto [physics, mesh, shaterable, collidable] =
+          m_world->GetTuple<PhysicsComponent *, MeshComponent *, ShaterableComponent *, CollidableComponent*>(id);
+      ret.push_back({physics, mesh, shaterable, collidable});
+    }
+  }
+
+  return ret;
 }
 
 } // namespace ecs

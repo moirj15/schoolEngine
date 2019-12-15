@@ -25,6 +25,7 @@ struct PhysicsComponent : public Component {
   f32 m_frictionCoef = 0.0f;
 };
 
+
 struct RenderableComponent : public Component {
   std::string m_texture;
   std::string m_shader;
@@ -51,7 +52,7 @@ struct CollidableComponent : public Component {
   bool m_hasCollided = false;
   // EntityID collidedEntity = 0;
   f32 m_collisionTime = 0.0f;
-  //  BoundingBox boundingBox = {};
+  //  AABB boundingBox = {};
 };
 
 struct NodeMotionComponent : public Component {

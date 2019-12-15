@@ -15,7 +15,7 @@
 #include <vector>
 
 class Shader;
-struct BoundingBox;
+struct AABB;
 namespace renderer {
 enum class Command;
 }
@@ -52,7 +52,7 @@ enum class Type : u64 {
 
 enum class TupleType : u64 {
   ShaterableTuple =
-      (u64)Type::Physics | (u64)Type::Transform | (u64)Type::Shaterable | (u64)Type::Collidable,
+      (u64)Type::Physics | (u64)Type::Mesh | (u64)Type::Shaterable | (u64)Type::Collidable,
   RenderableTuple = (u64)Type::Renderable | (u64)Type::Mesh | (u64)Type::Transform,
 };
 

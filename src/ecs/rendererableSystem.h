@@ -20,12 +20,21 @@ class RenderableSystem : public System {
   WorldSystem *m_world;
 
 public:
+  /*
+   * Constructor
+   *
+   * @param world: The world the system belongs to.
+   */
   RenderableSystem(WorldSystem *world);
-  ~RenderableSystem();
+
 
   void Update(f32 t) override;
 
 private:
+  /**
+   * Gets the components that make up a renderableTuple from the world.
+   * @return: The list of RenderableTuples.
+   */
   std::vector<RenderableTuple> GetRenderableTuple();
 };
 

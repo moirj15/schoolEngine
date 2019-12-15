@@ -44,18 +44,18 @@ if (WIN32)
             D:/libraries/glew-2.1.0/include
     )
     set(CMAKE_CXX_FLAGS "/std:c++17  /MP /GS /TP /W3 -D_CRT_SECURE_NO_WARNINGS")
-    #set(CMAKE_CXX_FLAGS "-std=c++17 -g -Wall -Wextra -pedantic -D_DEBUG")
+#set(CMAKE_CXX_FLAGS "-std=c++17 -g -Wall -Wextra -pedantic -D_DEBUG")
     #    #add_definitions(-DGLEW_STATIC=1)
     target_link_libraries(
             schoolEngine
             ${OPENGL_LIBRARY}#OpenGL
-            #D:/libraries/glew-2.1.0/lib/Release/x64/libglew32.a
-            #D:/libraries/glew-2.1.0/lib/Release/x64/libglew32.dll.a
+            # D:/libraries/glew-2.1.0/lib/Release/x64/libglew32.a
+            # D:/libraries/glew-2.1.0/lib/Release/x64/libglew32.dll.a
             #D:/libraries/glew-2.1.0/lib/Release/x64/glew32s.lib
-            D:/libraries/glew-2.1.0/lib/Release/x64/glew32.lib
             #D:/libraries/glew-2.1.0/lib/Release/x64/glew32.dll
-            D:/libraries/glfw-3.3.bin.WIN64/lib-vc2019/glfw3.lib
             #D:/libraries/glfw-3.2.1.bin.WIN64/lib-mingw-w64/libglfw3.a
+            D:/libraries/glew-2.1.0/lib/Release/x64/glew32.lib
+            D:/libraries/glfw-3.3.bin.WIN64/lib-vc2019/glfw3.lib
     )
 elseif(APPLE)
     set(CMAKE_CXX_FLAGS "-std=c++17 -g -Wall -Wextra -pedantic -D_DEBUG")

@@ -3,31 +3,21 @@
 #include "../imgui/imgui.h"
 #include "../imgui/imgui_impl_glfw.h"
 #include "../imgui/imgui_impl_opengl3.h"
-#include "boundingbox.h"
+#include "aabb.h"
 #include "bvhParser.h"
+#include "TriangleNeighbor.h"
 #include "common.h"
+#include "ecs/components.h"
 #include "ecs/ecs.h"
-#include "keyframe.h"
 #include "obj.h"
-#include "particle.h"
-#include "renderer/VertexBuffer.h"
 #include "renderer/camera.h"
-#include "renderer/debugdraw.h"
 #include "renderer/renderer.h"
-#include "renderer/shader.h"
 #include "skeleton.h"
 #include "window.h"
-#include "ecs/components.h"
 
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
-#include <chrono>
 #include <glm/glm.hpp>
-#include <glm/gtx/normal.hpp>
-#include <glm/gtx/string_cast.hpp>
-#include <glm/gtx/transform.hpp>
-#include <glm/gtx/quaternion.hpp>
-#include <string>
 #include <thread>
 
 #define STB_IMAGE_IMPLEMENTATION
@@ -96,6 +86,8 @@ int main(int argc, char **argv) {
 
   ObjReader reader("../objData/block.obj");
   auto blockMesh = reader.Parse();
+//  auto *blockAABBTree = ConstructAABBTree(blockMesh->vertecies, blockMesh->connections);
+  auto blockTriangles = ConstructEdgeList(blockMesh->vertecies, blockMesh->connections);
 
   auto perspective = glm::perspective(90.0f, 16.0f / 9.0f, 0.01f, 200.0f);
 
@@ -109,11 +101,12 @@ int main(int argc, char **argv) {
   glEnable(GL_PROGRAM_POINT_SIZE);
   auto *worldSystem = new ecs::WorldSystem();
   auto testID = worldSystem->Create(ecs::TupleType::RenderableTuple);
-  auto [renderable, transform, mesh] = worldSystem->GetTuple<ecs::RenderableComponent *, ecs::TransformComponent *, ecs::MeshComponent *>(testID);
+  auto [renderable, transform, mesh] = worldSystem->GetTuple<ecs::RenderableComponent *,
+      ecs::TransformComponent *, ecs::MeshComponent *>(testID);
   mesh->m_connections = blockMesh->connections;
   mesh->m_normals = blockMesh->normals;
-  mesh->m_vertecies= blockMesh->vertecies;
-  mesh->m_vertexSize= blockMesh->vertexSize;
+  mesh->m_vertecies = blockMesh->vertecies;
+  mesh->m_vertexSize = blockMesh->vertexSize;
   transform->m_position = {0.0f, 0.0f, -2.0f};
   transform->m_rotation = glm::angleAxis(glm::radians(0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
   renderable->m_shader = "shader";
