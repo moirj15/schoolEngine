@@ -1,6 +1,7 @@
 #include "shaterableSystem.h"
 
 #include "../renderer/VertexBuffer.h"
+#include "../renderer/renderer.h"
 #include "components.h"
 #include "ecs.h"
 
@@ -26,8 +27,9 @@ std::vector<ShaterableTuple> ShaterableSystem::GetShaterableTuple() {
   auto ids = m_world->EntityIDsWithType(TupleType::ShaterableTuple);
   for (auto id : ids) {
     if (m_world->IsValid(id)) {
-      auto [physics, mesh, shaterable, collidable, DECL] = m_world->GetTuple<PhysicsComponent *,
-          MeshComponent *, ShaterableComponent *, CollidableComponent *, DECLComponent *>(id);
+      auto [physics, mesh, shaterable, collidable, DECL, transform] =
+          m_world->GetTuple<PhysicsComponent *, MeshComponent *, ShaterableComponent *,
+              CollidableComponent *, DECLComponent *, TransformComponent *>(id);
       ret.push_back({id, physics, mesh, shaterable, collidable, DECL});
     }
   }
@@ -50,8 +52,44 @@ void ShaterableSystem::DecomposeShaterable(ShaterableTuple *tuple) {
   if (nonShattered.empty()) {
     m_world->Destroy(tuple->m_id);
   }
+  for (auto *shatteredTri : shattered) {
+    auto id = m_world->Create(
+        (TupleType)((u64)TupleType::RenderableTuple | (u64)TupleType::PhysicsTuple));
+    auto [renderable, mesh, transform, physics] = m_world->GetTuple<RenderableComponent *,
+        MeshComponent *, TransformComponent *, PhysicsComponent *>(id);
+    // Populate renderable component
+    renderable->m_texture = "";
+    renderable->m_shader = "shader";
+    renderable->m_commands = {::renderer::Command::DrawSolid};
 
+    // Populate mesh component
+    mesh->m_connections = {0, 1, 2};
+    std::vector<glm::vec3> points;
+    for (auto edge : shatteredTri->m_edges) {
+      u32 c = edge.start;
+      mesh->m_vertecies.push_back(tuple->m_mesh->m_vertecies[c]);
+      mesh->m_vertecies.push_back(tuple->m_mesh->m_vertecies[c + 1]);
+      mesh->m_vertecies.push_back(tuple->m_mesh->m_vertecies[c + 2]);
+      points.push_back({tuple->m_mesh->m_vertecies[c], tuple->m_mesh->m_vertecies[c + 1],
+          tuple->m_mesh->m_vertecies[c + 2]});
+    }
+    glm::vec3 center(0.0f, 0.0f, 0.0f);
+    for (const auto &p : points) {
+      center += p;
+    }
+    center /= 3.0f;
+
+    // Populate transform component
+    transform->m_rotation = tuple->m_transform->m_rotation;
+    transform->m_position = tuple->m_transform->m_position + center;
+
+    // Populate physics component
+    // TODO: make better
+    physics->m_velocity = tuple->m_physics->m_velocity;
+  }
+  for (auto *nonShatteredTrie : nonShattered) {
+    // TODO: modify the nonshattered mesh to remove the shattered triangles.
+  }
 }
 
 } // namespace ecs
-

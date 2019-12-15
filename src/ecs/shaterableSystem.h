@@ -13,6 +13,7 @@ struct MeshComponent;
 struct ShaterableComponent;
 struct CollidableComponent;
 struct DECLComponent;
+struct TransformComponent;
 
 struct ShaterableTuple {
   u64 m_id;
@@ -21,6 +22,7 @@ struct ShaterableTuple {
   ShaterableComponent *m_shaterable;
   CollidableComponent *m_collidable;
   DECLComponent *m_DECL;
+  TransformComponent *m_transform;
 };
 
 class ShaterableSystem : public System {
