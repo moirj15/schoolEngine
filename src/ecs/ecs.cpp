@@ -43,7 +43,7 @@ void WorldSystem::Init() {
 EntityID WorldSystem::Create(const TupleType type) {
   const EntityID id = NextFreeID(type);
   const size_t index = id & INDEX_MASK;
-  auto &[physics, renderables, transforms, shaterables, meshes, collidables] = m_components;
+  auto &[physics, renderables, transforms, shaterables, meshes, collidables, DECLs] = m_components;
   auto *entity = new Entity;
   entity->m_id = id;
   m_entities[entity->m_id] = entity;
@@ -70,6 +70,10 @@ EntityID WorldSystem::Create(const TupleType type) {
   if ((u64)type & (u64)Type::Collidable) {
     collidables[index] = new CollidableComponent;
     entity->m_components.push_back(collidables[index]);
+  }
+  if ((u64)type & (u64)Type::DECL) {
+    DECLs[index] = new DECLComponent;
+    entity->m_components.push_back(DECLs[index]);
   }
 
   return id;

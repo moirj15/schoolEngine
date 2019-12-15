@@ -7,6 +7,9 @@
 #include <optional>
 #include <string>
 #include <vector>
+#include <unordered_set>
+#include "../TriangleNeighbor.h"
+#include "../aabb.h"
 
 namespace renderer {
 enum class Command;
@@ -25,6 +28,18 @@ struct PhysicsComponent : public Component {
   f32 m_frictionCoef = 0.0f;
 };
 
+struct Edge {
+  u32 start;
+  u32 end;
+
+  bool operator==(const Edge &o) const { return start == o.start && end == o.end; }
+  Edge() = default;
+};
+
+
+struct DECLComponent : public Component {
+  std::vector<Triangle *> m_triangles;
+};
 
 struct RenderableComponent : public Component {
   std::string m_texture;
@@ -50,9 +65,9 @@ struct MeshComponent : public Component {
 
 struct CollidableComponent : public Component {
   bool m_hasCollided = false;
-  // EntityID collidedEntity = 0;
   f32 m_collisionTime = 0.0f;
-  //  AABB boundingBox = {};
+  AABB m_boundingBox = {};
+  std::unordered_set<u32> m_collidedTriangles;
 };
 
 struct NodeMotionComponent : public Component {

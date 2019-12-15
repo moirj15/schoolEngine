@@ -3,9 +3,9 @@
 #include "../imgui/imgui.h"
 #include "../imgui/imgui_impl_glfw.h"
 #include "../imgui/imgui_impl_opengl3.h"
+#include "TriangleNeighbor.h"
 #include "aabb.h"
 #include "bvhParser.h"
-#include "TriangleNeighbor.h"
 #include "common.h"
 #include "ecs/components.h"
 #include "ecs/ecs.h"
@@ -75,6 +75,23 @@ void InitIMGUI(Window *window) {
   ImGui_ImplOpenGL3_Init("#version 150");
 }
 
+void PrintTriangle(Triangle &t) {
+  printf("Triangle: ");
+  for (auto e : t.m_edges) {
+    printf("e start: %d, end: %d", e.start, e.end);
+  }
+  printf("\n\tneighbors: ");
+  for (auto n : t.m_neighbors) {
+    printf("Triangle: ");
+    for (auto e : t.m_edges) {
+      printf(" edge start: %d, end: %d", e.start, e.end);
+    }
+    printf("\n\t");
+  }
+  printf("\n");
+
+}
+
 int main(int argc, char **argv) {
   (void)argc;
   (void)argv;
@@ -86,8 +103,13 @@ int main(int argc, char **argv) {
 
   ObjReader reader("../objData/block.obj");
   auto blockMesh = reader.Parse();
-//  auto *blockAABBTree = ConstructAABBTree(blockMesh->vertecies, blockMesh->connections);
+  //  auto *blockAABBTree = ConstructAABBTree(blockMesh->vertecies, blockMesh->connections);
   auto blockTriangles = ConstructEdgeList(blockMesh->vertecies, blockMesh->connections);
+  for (auto &t : blockTriangles) {
+    PrintTriangle(*t);
+
+  }
+  fflush(stdout);
 
   auto perspective = glm::perspective(90.0f, 16.0f / 9.0f, 0.01f, 200.0f);
 
@@ -101,8 +123,8 @@ int main(int argc, char **argv) {
   glEnable(GL_PROGRAM_POINT_SIZE);
   auto *worldSystem = new ecs::WorldSystem();
   auto testID = worldSystem->Create(ecs::TupleType::RenderableTuple);
-  auto [renderable, transform, mesh] = worldSystem->GetTuple<ecs::RenderableComponent *,
-      ecs::TransformComponent *, ecs::MeshComponent *>(testID);
+  auto [renderable, transform, mesh, DECL] = worldSystem->GetTuple<ecs::RenderableComponent *,
+      ecs::TransformComponent *, ecs::MeshComponent *, ecs::DECLComponent *>(testID);
   mesh->m_connections = blockMesh->connections;
   mesh->m_normals = blockMesh->normals;
   mesh->m_vertecies = blockMesh->vertecies;
@@ -111,6 +133,7 @@ int main(int argc, char **argv) {
   transform->m_rotation = glm::angleAxis(glm::radians(0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
   renderable->m_shader = "shader";
   renderable->m_commands.push_back(renderer::Command::DrawSolid);
+  DECL->m_triangles = blockTriangles;
 
   while (!glfwWindowShouldClose(window->m_glWindow)) {
     renderer::ClearDrawQueue();

@@ -8,22 +8,19 @@
 namespace ecs {
 class WorldSystem;
 
-struct Triangle {
-  glm::vec3 p0;
-  glm::vec3 p1;
-  glm::vec3 p2;
-};
-
 struct PhysicsComponent;
 struct MeshComponent;
 struct ShaterableComponent;
 struct CollidableComponent;
+struct DECLComponent;
 
 struct ShaterableTuple {
+  u64 m_id;
   PhysicsComponent *m_physics;
   MeshComponent *m_mesh;
   ShaterableComponent *m_shaterable;
   CollidableComponent *m_collidable;
+  DECLComponent *m_DECL;
 };
 
 class ShaterableSystem : public System {
@@ -36,6 +33,7 @@ public:
 
 private:
   std::vector<ShaterableTuple> GetShaterableTuple();
+  void DecomposeShaterable(ShaterableTuple *tuple);
 };
 
 } // namespace ecs

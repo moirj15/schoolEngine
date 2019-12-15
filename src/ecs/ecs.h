@@ -32,6 +32,7 @@ struct TransformComponent;
 struct ShaterableComponent;
 struct MeshComponent;
 struct CollidableComponent;
+struct DECLComponent;
 
 using EntityID = u64;
 
@@ -47,12 +48,12 @@ enum class Type : u64 {
   Shaterable = 1 << 27,
   Mesh = 1 << 28,
   Collidable = 1 << 29,
-  Skeleton = 1 << 30,
+  DECL = 1 << 30,
 };
 
 enum class TupleType : u64 {
-  ShaterableTuple =
-      (u64)Type::Physics | (u64)Type::Mesh | (u64)Type::Shaterable | (u64)Type::Collidable,
+  ShaterableTuple = (u64)Type::Physics | (u64)Type::Mesh | (u64)Type::Shaterable
+                    | (u64)Type::Collidable | (u64)Type::DECL,
   RenderableTuple = (u64)Type::Renderable | (u64)Type::Mesh | (u64)Type::Transform,
 };
 
@@ -66,10 +67,10 @@ class WorldSystem : public System {
   std::vector<System *> m_systems;
   std::array<EntityID, ID_MAX> m_entityIDs;
 
-  using CompTuple =
-      std::tuple<std::array<PhysicsComponent *, ID_MAX>, std::array<RenderableComponent *, ID_MAX>,
-          std::array<TransformComponent *, ID_MAX>, std::array<ShaterableComponent *, ID_MAX>,
-          std::array<MeshComponent *, ID_MAX>, std::array<CollidableComponent *, ID_MAX>>;
+  using CompTuple = std::tuple<std::array<PhysicsComponent *, ID_MAX>,
+      std::array<RenderableComponent *, ID_MAX>, std::array<TransformComponent *, ID_MAX>,
+      std::array<ShaterableComponent *, ID_MAX>, std::array<MeshComponent *, ID_MAX>,
+      std::array<CollidableComponent *, ID_MAX>, std::array<DECLComponent *, ID_MAX>>;
 
   CompTuple m_components;
   size_t m_nextFreeEntity;
@@ -85,9 +86,7 @@ public:
   EntityID Create(const TupleType type);
   void Destroy(const EntityID id);
 
-  bool IsValid(const EntityID id) const {
-    return m_entityIDs[id & INDEX_MASK] == id;
-  }
+  bool IsValid(const EntityID id) const { return m_entityIDs[id & INDEX_MASK] == id; }
 
   Entity *GetEntity(const EntityID id) { return m_entities[id]; }
 
@@ -97,6 +96,7 @@ public:
   auto GetTuple(const EntityID id) {
     return std::make_tuple(std::get<std::array<Ts, ID_MAX>>(m_components)[id & INDEX_MASK]...);
   }
+
 private:
   EntityID NextFreeID(const TupleType type);
 };
