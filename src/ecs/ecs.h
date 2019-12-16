@@ -88,7 +88,9 @@ public:
   EntityID Create(const TupleType type);
   void Destroy(const EntityID id);
 
-  bool IsValid(const EntityID id) const { return m_entityIDs[id & INDEX_MASK] == id; }
+  bool IsValid(const EntityID id) const {
+    return m_entityIDs[id & INDEX_MASK] == id;
+  }
 
   Entity *GetEntity(const EntityID id) { return m_entities[id]; }
 

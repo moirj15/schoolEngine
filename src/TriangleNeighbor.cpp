@@ -28,7 +28,7 @@ std::vector<Triangle *> ConstructEdgeList(
     u32 c2 = connections[i + 2];
     triangle->m_edges[0] = {c0, c1};
     triangle->m_edges[1] = {c1, c2};
-    triangle->m_edges[2] = {c0, c2};
+    triangle->m_edges[2] = {c2, c0};
     triangles.push_back(triangle);
     triangleMap[triangle->m_edges[0]].push_back(triangle);
     triangleMap[triangle->m_edges[1]].push_back(triangle);

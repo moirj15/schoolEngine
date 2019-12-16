@@ -29,7 +29,9 @@ void CollidableSystem::Update(f32 t) {
       if ((length < collidableA->m_boundingSphereRadius)
           || (length < collidableB->m_boundingSphereRadius)) {
         collidableA->m_hasCollided = true;
+        collidableA->m_id = tuples[j].m_id;
         collidableB->m_hasCollided = true;
+        collidableB->m_id = tuples[i].m_id;
         UpdateDecl(&tuples[i], transformB->m_position);
         UpdateDecl(&tuples[j], transformA->m_position);
       }
@@ -44,7 +46,7 @@ std::vector<CollidableTuple> CollidableSystem::GetCollidableTuples() {
     if (m_world->IsValid(id)) {
       auto [collidable, DECL, transform, mesh] =
           m_world->GetTuple<CollidableComponent *, DECLComponent *, TransformComponent *, MeshComponent*>(id);
-      ret.push_back({collidable, DECL, transform, mesh});
+      ret.push_back({id, collidable, DECL, transform, mesh});
     }
   }
 
@@ -61,6 +63,9 @@ void CollidableSystem::UpdateDecl(CollidableTuple *tuple, const glm::vec3 &posit
     for (auto &edge : triangle->m_edges) {
       u32 index = edge.start;
       glm::vec3 point(mesh->m_vertecies[index], mesh->m_vertecies[index + 1],mesh->m_vertecies[index + 2]);
+      point = glm::translate(glm::mat4(1.0f), tuple->m_transform->m_position) * glm::vec4(point, 1.0f);
+      printf("LENGTH %f\n", glm::length(point - position));
+      fflush(stdout);
       if (glm::length(point - position) < collidable->m_boundingSphereRadius) {
         collidable->m_collidedTriangles.insert(i);
       }

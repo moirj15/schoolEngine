@@ -19,7 +19,7 @@ void PhysicsSystem::Update(f32 t) {
 
 std::vector<PhysicsTuple> PhysicsSystem::GetPhysicsTuples() {
   std::vector<PhysicsTuple> ret;
-  auto ids = m_world->EntityIDsWithType(TupleType::ShaterableTuple);
+  auto ids = m_world->EntityIDsWithType(TupleType::PhysicsTuple);
   for (auto id : ids) {
     if (m_world->IsValid(id)) {
       auto [physics, transform] =

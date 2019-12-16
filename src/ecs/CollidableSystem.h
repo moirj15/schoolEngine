@@ -17,6 +17,7 @@ struct TransformComponent;
 struct MeshComponent;
 
 struct CollidableTuple {
+  u64 m_id;
   CollidableComponent *m_collidable;
   DECLComponent *m_DECL;
   TransformComponent *m_transform;

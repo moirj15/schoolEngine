@@ -64,6 +64,7 @@ struct MeshComponent : public Component {
 };
 
 struct CollidableComponent : public Component {
+  u64 m_id = 0;
   bool m_hasCollided = false;
   f32 m_collisionTime = 0.0f;
 //  AABB m_boundingBox = {};

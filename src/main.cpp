@@ -102,11 +102,12 @@ int main(int argc, char **argv) {
 
   ObjReader reader("../objData/block.obj");
   auto blockMesh = reader.Parse();
+
   //  auto *blockAABBTree = ConstructAABBTree(blockMesh->vertecies, blockMesh->connections);
   auto blockTriangles = ConstructEdgeList(blockMesh->vertecies, blockMesh->connections);
-  for (auto &t : blockTriangles) {
-    PrintTriangle(*t);
-  }
+//  for (auto &t : blockTriangles) {
+//    PrintTriangle(*t);
+//  }
   fflush(stdout);
 
   auto perspective = glm::perspective(90.0f, 16.0f / 9.0f, 0.01f, 200.0f);
@@ -120,19 +121,36 @@ int main(int argc, char **argv) {
 
   glEnable(GL_PROGRAM_POINT_SIZE);
   auto *worldSystem = new ecs::WorldSystem();
+
   auto testID = worldSystem->Create((ecs::TupleType)(
       (u64)ecs::TupleType::ShaterableTuple | (u64)ecs::TupleType::RenderableTuple));
-  auto [renderable, transform, mesh, DECL] = worldSystem->GetTuple<ecs::RenderableComponent *,
-      ecs::TransformComponent *, ecs::MeshComponent *, ecs::DECLComponent *>(testID);
+  auto [renderable, transform, mesh, DECL, collidable] = worldSystem->GetTuple<ecs::RenderableComponent *,
+      ecs::TransformComponent *, ecs::MeshComponent *, ecs::DECLComponent *, ecs::CollidableComponent*>(testID);
   mesh->m_connections = blockMesh->connections;
   mesh->m_normals = blockMesh->normals;
   mesh->m_vertecies = blockMesh->vertecies;
   mesh->m_vertexSize = blockMesh->vertexSize;
-  transform->m_position = {0.0f, 0.0f, -2.0f};
+  transform->m_position = {5.0f, 0.0f, -10.0f};
   transform->m_rotation = glm::angleAxis(glm::radians(0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
   renderable->m_shader = "shader";
   renderable->m_commands.push_back(renderer::Command::DrawSolid);
   DECL->m_triangles = blockTriangles;
+  collidable->m_boundingSphereRadius = 2.0f;
+
+  auto movingID = worldSystem->Create((ecs::TupleType)((u64)ecs::TupleType::CollidableTuple | (u64)ecs::TupleType::RenderableTuple| (u64)ecs::TupleType::PhysicsTuple));
+  auto [renderableMoving, transformMoving, meshMoving, DECLMoving, physicsMoving, collidableMoving] = worldSystem->GetTuple<ecs::RenderableComponent *,
+      ecs::TransformComponent *, ecs::MeshComponent *, ecs::DECLComponent *, ecs::PhysicsComponent*,  ecs::CollidableComponent*>(movingID);
+  meshMoving->m_connections = blockMesh->connections;
+  meshMoving->m_normals = blockMesh->normals;
+  meshMoving->m_vertecies = blockMesh->vertecies;
+  meshMoving->m_vertexSize = blockMesh->vertexSize;
+  transformMoving->m_position = {-5.00f, 0.0f, -10.0f};
+  transformMoving->m_rotation = glm::angleAxis(glm::radians(0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+  renderableMoving->m_shader = "shader";
+  renderableMoving->m_commands.push_back(renderer::Command::DrawSolid);
+  DECLMoving->m_triangles = blockTriangles;
+  physicsMoving->m_velocity = {5.0f, 0.0f, 0.0f};
+  collidableMoving->m_boundingSphereRadius = 2.0f;
 
   while (!glfwWindowShouldClose(window->m_glWindow)) {
     renderer::ClearDrawQueue();

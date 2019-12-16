@@ -20,9 +20,9 @@ void Init() {
 }
 
 void AddToDrawQueue(const Drawable &drawable) {
-//  if (!s_defaultShader) {
-//    s_defaultShader = new Shader{{"../shaders/shader.vert", "../shaders/shader.frag"}};
-//  }
+  //  if (!s_defaultShader) {
+  //    s_defaultShader = new Shader{{"../shaders/shader.vert", "../shaders/shader.frag"}};
+  //  }
   s_renderQueue.push_back(drawable);
 }
 
@@ -40,7 +40,8 @@ void Draw(const glm::mat4 &camera, const glm::mat4 &perspective) {
 
     switch (drawable.m_commands.back()) {
     case Command::DrawSolid:
-      glDrawElements(GL_TRIANGLES, drawable.m_vertexArray->IndexCount(), GL_UNSIGNED_INT, (void *)0);
+      glDrawElements(
+          GL_TRIANGLES, drawable.m_vertexArray->IndexCount(), GL_UNSIGNED_INT, (void *)0);
       break;
     case Command::DrawLine:
       break;
@@ -54,32 +55,33 @@ void Draw(const glm::mat4 &camera, const glm::mat4 &perspective) {
 void DrawImmediate(
     const glm::mat4 &camera, const glm::mat4 &perspective, const Drawable &drawable) {
   printf("REFRACTOR_ME\n");
-//  if (drawable.shader) {
-//    drawable.shader->Bind();
-//    drawable.shader->SetShaderData(drawable.m_shaderData);
-//    drawable.shader->SetUniformMat4("camera", camera);
-//    drawable.shader->SetUniformMat4("projection", perspective);
-//
-//  } else {
-//    s_defaultShader->Bind();
-//    s_defaultShader->SetShaderData(drawable.m_shaderData);
-//    s_defaultShader->SetUniformMat4("camera", camera);
-//    s_defaultShader->SetUniformMat4("projection", perspective);
-//  }
-//  drawable.m_vertexArray->Bind();
-//  glDrawElements(GL_TRIANGLES, drawable.m_vertexArray->IndexCount(), GL_UNSIGNED_INT, (void *)0);
+  //  if (drawable.shader) {
+  //    drawable.shader->Bind();
+  //    drawable.shader->SetShaderData(drawable.m_shaderData);
+  //    drawable.shader->SetUniformMat4("camera", camera);
+  //    drawable.shader->SetUniformMat4("projection", perspective);
+  //
+  //  } else {
+  //    s_defaultShader->Bind();
+  //    s_defaultShader->SetShaderData(drawable.m_shaderData);
+  //    s_defaultShader->SetUniformMat4("camera", camera);
+  //    s_defaultShader->SetUniformMat4("projection", perspective);
+  //  }
+  //  drawable.m_vertexArray->Bind();
+  //  glDrawElements(GL_TRIANGLES, drawable.m_vertexArray->IndexCount(), GL_UNSIGNED_INT, (void
+  //  *)0);
 }
 
 void DrawDebug(const glm::mat4 &camera, const glm::mat4 &perspective) {
   printf("REFRACTOR_ME\n");
-//  for (const auto &debug : DebugDraw::DebugMeshes()) {
-//    debug.shader->Bind();
-//    debug.shader->SetShaderData(debug.shaderData);
-//    debug.shader->SetUniformMat4("camera", camera);
-//    debug.shader->SetUniformMat4("projection", perspective);
-//    debug.m_vertexArray->Bind();
-//    glDrawElements(GL_LINES, debug.m_vertexArray->IndexCount(), GL_UNSIGNED_INT, (void *)0);
-//  }
+  //  for (const auto &debug : DebugDraw::DebugMeshes()) {
+  //    debug.shader->Bind();
+  //    debug.shader->SetShaderData(debug.shaderData);
+  //    debug.shader->SetUniformMat4("camera", camera);
+  //    debug.shader->SetUniformMat4("projection", perspective);
+  //    debug.m_vertexArray->Bind();
+  //    glDrawElements(GL_LINES, debug.m_vertexArray->IndexCount(), GL_UNSIGNED_INT, (void *)0);
+  //  }
 }
 
 void DisplayDraw(const Window *window) {
@@ -91,6 +93,9 @@ void Clear() {
 }
 
 void ClearDrawQueue() {
+  for (auto &drawable : s_renderQueue) {
+    delete(drawable.m_vertexArray);
+  }
   s_renderQueue.clear();
 }
 

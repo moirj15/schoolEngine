@@ -103,7 +103,7 @@ EntityID WorldSystem::NextFreeID(const TupleType type) {
   m_nextFreeEntity = INDEX_MASK & m_entityIDs[m_nextFreeEntity];
   m_entityIDs[index] &= (~FREE_ID);
   m_entityIDs[index] &= (~INDEX_MASK);
-  m_entityIDs[index] |= (u64)type;
+  m_entityIDs[index] |= (u64)type | index;
   return m_entityIDs[index];
 }
 
