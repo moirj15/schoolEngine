@@ -24,6 +24,8 @@ struct PhysicsComponent : public Component {
   glm::vec3 m_momentum = {};
   glm::quat m_angularVelocity = {};
   glm::quat m_angularMomentum = {};
+  glm::vec3 m_axis = {};
+
   f32 m_mass = 0.0f;
   f32 m_frictionCoef = 0.0f;
 };

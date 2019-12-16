@@ -18,8 +18,8 @@ std::vector<Triangle *> ConstructEdgeList(
     const std::vector<f32> &verts, const std::vector<u32> &connections) {
   auto edgeHash = [](const Edge &e) { return e.start + e.end; };
   auto edgeEq = [](const Edge &a, const Edge &b) { return a == b; };
-  std::unordered_map<Edge, std::vector<Triangle *>, decltype(edgeHash), decltype(edgeEq)>
-      triangleMap(connections.size(), edgeHash, edgeEq);
+//  std::unordered_map<Edge, std::vector<Triangle *>, decltype(edgeHash), decltype(edgeEq)>
+//      triangleMap(connections.size(), edgeHash, edgeEq);
   std::vector<Triangle *> triangles;
   for (size_t i = 0; i < connections.size(); i += 3) {
     Triangle *triangle = new Triangle();
@@ -30,17 +30,17 @@ std::vector<Triangle *> ConstructEdgeList(
     triangle->m_edges[1] = {c1, c2};
     triangle->m_edges[2] = {c2, c0};
     triangles.push_back(triangle);
-    triangleMap[triangle->m_edges[0]].push_back(triangle);
-    triangleMap[triangle->m_edges[1]].push_back(triangle);
-    triangleMap[triangle->m_edges[2]].push_back(triangle);
+//    triangleMap[triangle->m_edges[0]].push_back(triangle);
+//    triangleMap[triangle->m_edges[1]].push_back(triangle);
+//    triangleMap[triangle->m_edges[2]].push_back(triangle);
   }
-  for (auto &pair : triangleMap) {
-    auto &neighbors = pair.second;
-    if (neighbors.size() > 1) {
-      neighbors[0]->m_neighbors.emplace(neighbors[1]);
-      neighbors[1]->m_neighbors.emplace(neighbors[0]);
-    }
-  }
+//  for (auto &pair : triangleMap) {
+//    auto &neighbors = pair.second;
+//    if (neighbors.size() > 1) {
+//      neighbors[0]->m_neighbors.emplace(neighbors[1]);
+//      neighbors[1]->m_neighbors.emplace(neighbors[0]);
+//    }
+//  }
 
   return triangles;
 }

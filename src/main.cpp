@@ -100,11 +100,14 @@ int main(int argc, char **argv) {
   // InitIMGUI(window);
   printf("%s\n", glGetString(GL_VERSION));
 
-  ObjReader reader("../objData/block.obj");
+  ObjReader reader("../objData/teapot.obj");
   auto blockMesh = reader.Parse();
+  ObjReader otherReader("../objData/teapot.obj");
+  auto otherMesh = otherReader.Parse();
 
   //  auto *blockAABBTree = ConstructAABBTree(blockMesh->vertecies, blockMesh->connections);
   auto blockTriangles = ConstructEdgeList(blockMesh->vertecies, blockMesh->connections);
+  auto otherTriangles = ConstructEdgeList(otherMesh->vertecies, otherMesh->connections);
 //  for (auto &t : blockTriangles) {
 //    PrintTriangle(*t);
 //  }
@@ -115,9 +118,6 @@ int main(int argc, char **argv) {
   std::unique_ptr<Camera> camera{
       new Camera({0.0f, 0.0f, -1.0f}, {0.0f, 0.0f, -1.0f}, {0.0f, 1.0f, 0.0f})};
 
-  glfwSetTime(0.0);
-  f64 lastTime = glfwGetTime();
-  f32 t = 0.0;
 
   glEnable(GL_PROGRAM_POINT_SIZE);
   auto *worldSystem = new ecs::WorldSystem();
@@ -126,16 +126,16 @@ int main(int argc, char **argv) {
       (u64)ecs::TupleType::ShaterableTuple | (u64)ecs::TupleType::RenderableTuple));
   auto [renderable, transform, mesh, DECL, collidable] = worldSystem->GetTuple<ecs::RenderableComponent *,
       ecs::TransformComponent *, ecs::MeshComponent *, ecs::DECLComponent *, ecs::CollidableComponent*>(testID);
-  mesh->m_connections = blockMesh->connections;
-  mesh->m_normals = blockMesh->normals;
-  mesh->m_vertecies = blockMesh->vertecies;
-  mesh->m_vertexSize = blockMesh->vertexSize;
-  transform->m_position = {5.0f, 0.0f, -10.0f};
+  mesh->m_connections = otherMesh->connections;
+  mesh->m_normals = otherMesh->normals;
+  mesh->m_vertecies = otherMesh->vertecies;
+  mesh->m_vertexSize = otherMesh->vertexSize;
+  transform->m_position = {0.0f, 0.0f, -10.0f};
   transform->m_rotation = glm::angleAxis(glm::radians(0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
   renderable->m_shader = "shader";
   renderable->m_commands.push_back(renderer::Command::DrawSolid);
-  DECL->m_triangles = blockTriangles;
-  collidable->m_boundingSphereRadius = 2.0f;
+  DECL->m_triangles = otherTriangles;
+  collidable->m_boundingSphereRadius = 1.5f;
 
   auto movingID = worldSystem->Create((ecs::TupleType)((u64)ecs::TupleType::CollidableTuple | (u64)ecs::TupleType::RenderableTuple| (u64)ecs::TupleType::PhysicsTuple));
   auto [renderableMoving, transformMoving, meshMoving, DECLMoving, physicsMoving, collidableMoving] = worldSystem->GetTuple<ecs::RenderableComponent *,
@@ -144,13 +144,22 @@ int main(int argc, char **argv) {
   meshMoving->m_normals = blockMesh->normals;
   meshMoving->m_vertecies = blockMesh->vertecies;
   meshMoving->m_vertexSize = blockMesh->vertexSize;
-  transformMoving->m_position = {-5.00f, 0.0f, -10.0f};
-  transformMoving->m_rotation = glm::angleAxis(glm::radians(0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+  transformMoving->m_position = {-10.00f, -0.0f, -10.0f};
+  transformMoving->m_rotation = glm::angleAxis(glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
   renderableMoving->m_shader = "shader";
   renderableMoving->m_commands.push_back(renderer::Command::DrawSolid);
   DECLMoving->m_triangles = blockTriangles;
   physicsMoving->m_velocity = {5.0f, 0.0f, 0.0f};
-  collidableMoving->m_boundingSphereRadius = 2.0f;
+  collidableMoving->m_boundingSphereRadius = 1.5f;
+
+  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+  glfwSwapBuffers(window->m_glWindow);
+  do {
+    glfwPollEvents();
+  } while (glfwGetKey(window->m_glWindow, GLFW_KEY_G) != GLFW_PRESS);
+  glfwSetTime(0.0);
+  f64 lastTime = glfwGetTime();
+  f32 t = 0.0;
 
   while (!glfwWindowShouldClose(window->m_glWindow)) {
     renderer::ClearDrawQueue();

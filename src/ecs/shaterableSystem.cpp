@@ -57,7 +57,7 @@ void ShaterableSystem::DecomposeShaterable(ShaterableTuple *tuple) {
   for (auto *shatteredTri : shattered) {
     auto id = m_world->Create(
         (TupleType)((u64)TupleType::RenderableTuple | (u64)TupleType::PhysicsTuple));
-    auto [renderable, mesh, transform, physics] = m_world->GetTuple<RenderableComponent *,
+    auto [renderable, newMesh, transform, physics] = m_world->GetTuple<RenderableComponent *,
         MeshComponent *, TransformComponent *, PhysicsComponent *>(id);
     // Populate renderable component
     renderable->m_texture = "";
@@ -65,13 +65,13 @@ void ShaterableSystem::DecomposeShaterable(ShaterableTuple *tuple) {
     renderable->m_commands = {::renderer::Command::DrawSolid};
 
     // Populate mesh component
-    mesh->m_connections = {0, 1, 2};
+    newMesh->m_connections = {0, 1, 2};
     std::vector<glm::vec3> points;
     for (auto edge : shatteredTri->m_edges) {
       u32 c = edge.start;
-      mesh->m_vertecies.push_back(tuple->m_mesh->m_vertecies[c]);
-      mesh->m_vertecies.push_back(tuple->m_mesh->m_vertecies[c + 1]);
-      mesh->m_vertecies.push_back(tuple->m_mesh->m_vertecies[c + 2]);
+      newMesh->m_vertecies.push_back(tuple->m_mesh->m_vertecies[c]);
+      newMesh->m_vertecies.push_back(tuple->m_mesh->m_vertecies[c + 1]);
+      newMesh->m_vertecies.push_back(tuple->m_mesh->m_vertecies[c + 2]);
       points.push_back({tuple->m_mesh->m_vertecies[c], tuple->m_mesh->m_vertecies[c + 1],
           tuple->m_mesh->m_vertecies[c + 2]});
     }
@@ -82,13 +82,14 @@ void ShaterableSystem::DecomposeShaterable(ShaterableTuple *tuple) {
     center /= 3.0f;
 
     // Populate transform component
-//    transform->m_rotation = tuple->m_transform->m_rotation;
-    transform->m_position = tuple->m_transform->m_position;// + center;
+    transform->m_rotation = tuple->m_transform->m_rotation;
+    transform->m_position = tuple->m_transform->m_position;
 
     // Populate physics component
     // TODO: make better
     auto [collidedPhysics] = m_world->GetTuple<PhysicsComponent*>(collidable->m_id);
     physics->m_velocity = collidedPhysics->m_velocity + glm::triangleNormal(points[0], points[1], points[2]);//tuple->m_physics->m_velocity;
+    physics->m_axis = glm::triangleNormal(points[0], points[1], points[2]);
   }
   std::vector<u32> newConnections;
   std::vector<f32> newPoints;

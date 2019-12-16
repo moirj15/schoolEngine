@@ -37,8 +37,8 @@ struct DECLComponent;
 using EntityID = u64;
 
 const u64 COUNT_MASK = 0x0000000000ff0000;
-const u64 INDEX_MASK = 0x000000000000ffff;
-const u16 ID_MAX = 0xffff;
+const u64 INDEX_MASK = 0x0000000000ffffff;
+const u32 ID_MAX = 0xffffff;
 const u64 FREE_ID = 0x8000000000000000;
 
 enum class Type : u64 {

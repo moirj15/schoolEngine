@@ -45,6 +45,7 @@ if (WIN32)
     )
 #    set(CMAKE_CXX_FLAGS "/std:c++17  /MP /GS /TP /W3 -D_CRT_SECURE_NO_WARNINGS")
 set(CMAKE_CXX_FLAGS "-std=c++17 -g -Wall -Wextra -pedantic -D_DEBUG")
+#    set(CMAKE_CXX_FLAGS "-std=c++17 -O2 -Wall -Wextra -pedantic ")
     #    #add_definitions(-DGLEW_STATIC=1)
     target_link_libraries(
             schoolEngine

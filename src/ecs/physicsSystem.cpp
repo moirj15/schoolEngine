@@ -14,6 +14,7 @@ void PhysicsSystem::Update(f32 t) {
     auto *transform = tuple.m_transform;
     auto *physics = tuple.m_physics;
     transform->m_position += physics->m_velocity * t;
+    transform->m_rotation = glm::angleAxis(glm::radians(t * 10.0f), physics->m_axis);
   }
 }
 

@@ -58,14 +58,12 @@ void CollidableSystem::UpdateDecl(CollidableTuple *tuple, const glm::vec3 &posit
   auto *DECL= tuple->m_DECL;
   auto *collidable = tuple->m_collidable;
   auto *mesh = tuple->m_mesh;
-  for (size_t i = 0; i < DECL->m_triangles.size(); i++) {
+  for (size_t i = 0; i < DECL->m_triangles.size() - 1; i++) {
     auto *triangle = DECL->m_triangles[i];
     for (auto &edge : triangle->m_edges) {
       u32 index = edge.start;
       glm::vec3 point(mesh->m_vertecies[index], mesh->m_vertecies[index + 1],mesh->m_vertecies[index + 2]);
       point = glm::translate(glm::mat4(1.0f), tuple->m_transform->m_position) * glm::vec4(point, 1.0f);
-      printf("LENGTH %f\n", glm::length(point - position));
-      fflush(stdout);
       if (glm::length(point - position) < collidable->m_boundingSphereRadius) {
         collidable->m_collidedTriangles.insert(i);
       }
