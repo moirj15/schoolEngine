@@ -89,7 +89,6 @@ void PrintTriangle(Triangle &t) {
     printf("\n\t");
   }
   printf("\n");
-
 }
 
 int main(int argc, char **argv) {
@@ -107,7 +106,6 @@ int main(int argc, char **argv) {
   auto blockTriangles = ConstructEdgeList(blockMesh->vertecies, blockMesh->connections);
   for (auto &t : blockTriangles) {
     PrintTriangle(*t);
-
   }
   fflush(stdout);
 
@@ -122,7 +120,8 @@ int main(int argc, char **argv) {
 
   glEnable(GL_PROGRAM_POINT_SIZE);
   auto *worldSystem = new ecs::WorldSystem();
-  auto testID = worldSystem->Create(ecs::TupleType::RenderableTuple);
+  auto testID = worldSystem->Create((ecs::TupleType)(
+      (u64)ecs::TupleType::ShaterableTuple | (u64)ecs::TupleType::RenderableTuple));
   auto [renderable, transform, mesh, DECL] = worldSystem->GetTuple<ecs::RenderableComponent *,
       ecs::TransformComponent *, ecs::MeshComponent *, ecs::DECLComponent *>(testID);
   mesh->m_connections = blockMesh->connections;

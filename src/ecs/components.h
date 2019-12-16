@@ -66,7 +66,8 @@ struct MeshComponent : public Component {
 struct CollidableComponent : public Component {
   bool m_hasCollided = false;
   f32 m_collisionTime = 0.0f;
-  AABB m_boundingBox = {};
+//  AABB m_boundingBox = {};
+  f32 m_boundingSphereRadius = 0.0f;
   std::unordered_set<u32> m_collidedTriangles;
 };
 

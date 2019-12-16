@@ -4,12 +4,14 @@
 #include "physicsSystem.h"
 #include "rendererableSystem.h"
 #include "shaterableSystem.h"
+#include "CollidableSystem.h"
 #include "system.h"
 
 namespace ecs {
 WorldSystem::WorldSystem() : m_nextFreeEntity(0) {
   m_systems.push_back(new PhysicsSystem(this));
   m_systems.push_back(new ShaterableSystem(this));
+  m_systems.push_back(new CollidableSystem(this));
   m_systems.push_back(new RenderableSystem(this));
 
   for (size_t i = 0; i < m_entityIDs.size(); i++) {

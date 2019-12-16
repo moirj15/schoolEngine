@@ -1,15 +1,36 @@
 #include "physicsSystem.h"
 
 #include "ecs.h"
+#include "components.h"
 
 namespace ecs {
-PhysicsSystem::PhysicsSystem(WorldSystem *world) {
+PhysicsSystem::PhysicsSystem(WorldSystem *world) : m_world(world) {
 }
 PhysicsSystem::~PhysicsSystem() {
 }
 
 void PhysicsSystem::Update(f32 t) {
+  for (auto &tuple : GetPhysicsTuples()) {
+    auto *transform = tuple.m_transform;
+    auto *physics = tuple.m_physics;
+    transform->m_position += physics->m_velocity * t;
+  }
 }
+
+std::vector<PhysicsTuple> PhysicsSystem::GetPhysicsTuples() {
+  std::vector<PhysicsTuple> ret;
+  auto ids = m_world->EntityIDsWithType(TupleType::ShaterableTuple);
+  for (auto id : ids) {
+    if (m_world->IsValid(id)) {
+      auto [physics, transform] =
+      m_world->GetTuple<PhysicsComponent *, TransformComponent *>(id);
+      ret.push_back({physics, transform});
+    }
+  }
+
+  return ret;
+}
+
 } // namespace ecs
 
 // void PhysicsManager::Simulate(f32 prevTimeStep, f32 currTimeStep) {
