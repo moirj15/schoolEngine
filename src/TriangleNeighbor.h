@@ -25,5 +25,11 @@ struct Triangle {
   Triangle() = default;
 };
 
+/**
+ * Constructs an edge list using the given vertex list and connection list.
+ * @param verts: The list of vertecies.
+ * @param connections: The list of connections.
+ * @return: The edge list (Represented using the triangle struct).
+ */
 std::vector<Triangle *> ConstructEdgeList(
     const std::vector<f32> &verts, const std::vector<u32> &connections);

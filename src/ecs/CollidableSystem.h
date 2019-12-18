@@ -5,8 +5,8 @@
 #pragma once
 #include "../common.h"
 #include "system.h"
-#include <glm/vec3.hpp>
 
+#include <glm/vec3.hpp>
 #include <vector>
 namespace ecs {
 class WorldSystem;

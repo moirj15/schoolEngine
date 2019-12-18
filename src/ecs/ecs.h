@@ -56,7 +56,8 @@ enum class TupleType : u64 {
                     | (u64)Type::Collidable | (u64)Type::DECL | (u64)Type::Transform,
   RenderableTuple = (u64)Type::Renderable | (u64)Type::Mesh | (u64)Type::Transform,
   PhysicsTuple = (u64)Type::Physics | (u64)Type::Transform,
-  CollidableTuple = (u64)Type::DECL | (u64)Type::Collidable | (u64)Type::Transform | (u64)Type::Mesh,
+  CollidableTuple =
+      (u64)Type::DECL | (u64)Type::Collidable | (u64)Type::Transform | (u64)Type::Mesh,
 };
 
 struct Entity {
@@ -81,27 +82,39 @@ public:
   WorldSystem();
   ~WorldSystem();
 
+  /// Updates the WorldSystems contained systems.
   void Update(f32 t) override;
 
-  void Init();
-
+  /**
+   * Creates a new entity with the given type.
+   * @param type: The entity type.
+   * @return : The new EntityID.
+   */
   EntityID Create(const TupleType type);
+
+  /**
+   * Destroys the entity with the given id.
+   * @param id: The id of the entity.
+   */
   void Destroy(const EntityID id);
 
-  bool IsValid(const EntityID id) const {
-    return m_entityIDs[id & INDEX_MASK] == id;
-  }
+  /// Checks if the given id is still valid.
+  bool IsValid(const EntityID id) const { return m_entityIDs[id & INDEX_MASK] == id; }
 
+  /// Gets the entity with the givne id.
   Entity *GetEntity(const EntityID id) { return m_entities[id]; }
 
+  /// Gets the entiies that have the given type.
   std::vector<EntityID> EntityIDsWithType(const TupleType type);
 
+  /// Gets a tuple containing the types specified by the variadic template.
   template<typename... Ts>
   auto GetTuple(const EntityID id) {
     return std::make_tuple(std::get<std::array<Ts, ID_MAX>>(m_components)[id & INDEX_MASK]...);
   }
 
 private:
+  /// Gets the next free entity id.
   EntityID NextFreeID(const TupleType type);
 };
 

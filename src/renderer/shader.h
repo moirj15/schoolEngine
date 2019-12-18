@@ -35,6 +35,7 @@ class Shader {
 
 public:
   Shader() = default;
+  /// Constructs a shader from the list containing the filepaths to each shader file
   Shader(const std::vector<std::string> &filePaths);
 
   inline void Bind() const { glUseProgram(m_programHandle); }
@@ -42,6 +43,7 @@ public:
 
   inline u32 Handle() const { return m_programHandle; }
 
+  /// Compiles the shader
   void Compile(const std::vector<std::string> &filePaths);
 
   void SetUniform1F(const std::string &name, const f32 value);

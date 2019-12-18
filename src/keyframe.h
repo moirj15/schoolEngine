@@ -23,12 +23,24 @@ class KeyFrameGroup {
   f32 m_timeFrameStart = 0.0;
 
 public:
+  /// Constructor
   KeyFrameGroup() = default;
+
+  /**
+   * Loads keyframes from the given file.
+   * @param filename: The name of the file containing the keyframe information.
+   */
   void LoadFromFile(const std::string &filename);
 
+  /**
+   * Generates the transformation matrix that belongs to the given time.
+   * @param time: The time.
+   * @return the transformation matrix.
+   */
   glm::mat4 GenerateTranslationMat(const f32 time);
 
 private:
+  /// Updates the frame points with the givne time.
   void UpdateFramePoints(const f32 t);
 };
 

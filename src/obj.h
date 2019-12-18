@@ -43,27 +43,46 @@ class ObjReader {
   };
 
 public:
+  /**
+   * Constructor.
+   * @param filename: The obj filename that will be parsed.
+   */
   ObjReader(char *filename);
 
+  /// Parses the obj file and returns a mesh
   Mesh *Parse();
 
+  /// Clears the parser.
   void Clear();
 
 private:
+  /// Determines the parse type of the current token.
   DataType ParseType();
 
+  /// Getter for the current token.
   inline char Token() { return m_data[m_pos]; }
 
+  /// Parses a vertex from the file.
   void ParseVertex();
 
+  /// Parses a normal from the file.
   void ParseNormal();
 
+  /// parses a face from thefile.
   void ParseFace();
 
+  /// Reads a line from the file.
   std::string ReadLine();
 
+  /// Skips a line of the file.
   void SkipLine();
 
+  /**
+   * Replaces the specifide char with the given replacement.
+   * @param str: The string that will have a character replaced.
+   * @param toReplace: THe character that will be replaced.
+   * @param replacement: The replacement character.
+   */
   void ReplaceChars(std::string *str, char toReplace, char replacement);
 };
 

@@ -1,10 +1,10 @@
 #include "ecs.h"
 
+#include "CollidableSystem.h"
 #include "components.h"
 #include "physicsSystem.h"
 #include "rendererableSystem.h"
 #include "shaterableSystem.h"
-#include "CollidableSystem.h"
 #include "system.h"
 
 namespace ecs {
@@ -37,9 +37,6 @@ void WorldSystem::Update(f32 t) {
   for (auto *system : m_systems) {
     system->Update(t);
   }
-}
-
-void WorldSystem::Init() {
 }
 
 EntityID WorldSystem::Create(const TupleType type) {
